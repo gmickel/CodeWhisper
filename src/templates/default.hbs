@@ -1,0 +1,16 @@
+# Code Summary
+
+{{tableOfContents files}}
+
+## Files
+
+{{#each files}}
+## {{this.path}}
+
+- Language: {{this.language}}
+- Size: {{this.size}} bytes
+- Last modified: {{this.modified}}
+
+{{#codeblock this.content this.language}}{{/codeblock}}
+
+{{/each}}

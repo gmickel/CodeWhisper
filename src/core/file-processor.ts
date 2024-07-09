@@ -27,34 +27,74 @@ interface ProcessOptions {
 
 const DEFAULT_IGNORES = [
   // Version control
-  '.git',
-  '.svn',
-  '.hg',
+  '**/.git',
+  '**/.gitignore',
+  '**/.gitattributes',
+  '**/.gitmodules',
+  '**/.gitkeep',
+  '**/.github',
+  '**/.svn',
+  '**/.hg',
+  '**/.hgignore',
+  '**/.hgcheck',
 
-  // Package manager files
-  'package-lock.json',
-  'yarn.lock',
-  'pnpm-lock.yaml',
-  'bun.lockb',
-
-  // Other package managers (examples)
-  'Gemfile.lock', // Ruby
-  'Cargo.lock', // Rust
-  'poetry.lock', // Python
-  'composer.lock', // PHP
+  // Package manager directories
+  '**/node_modules',
+  '**/jspm_packages',
+  '**/bower_components',
 
   // Build outputs and caches
-  'node_modules',
-  'dist',
-  'build',
-  '.cache',
+  '**/dist',
+  '**/build',
+  '**/.cache',
+  '**/.output',
+  '**/.nuxt',
+  '**/.next',
+  '**/.vuepress/dist',
+  '**/.serverless',
+  '**/.fusebox',
+  '**/.dynamodb',
+
+  // Package manager files
+  '**/package-lock.json',
+  '**/yarn.lock',
+  '**/pnpm-lock.yaml',
+  '**/bun.lockb',
+  '**/Gemfile.lock',
+  '**/Cargo.lock',
+  '**/poetry.lock',
+  '**/composer.lock',
 
   // IDE and editor files
-  '.vscode',
-  '.idea',
-  '*.swp',
-  '*.swo',
-  '.DS_Store',
+  '**/.vscode',
+  '**/.idea',
+  '**/*.swp',
+  '**/*.swo',
+  '**/.DS_Store',
+
+  // Logs
+  '**/logs',
+  '**/*.log',
+  '**/npm-debug.log*',
+  '**/yarn-debug.log*',
+  '**/yarn-error.log*',
+
+  // OS generated files
+  '**/.DS_Store',
+  '**/.DS_Store?',
+  '**/._*',
+  '**/.Spotlight-V100',
+  '**/.Trashes',
+  '**/ehthumbs.db',
+  '**/Thumbs.db',
+
+  // Test coverage
+  '**/coverage',
+  '**/.nyc_output',
+
+  // Temporary files
+  '**/tmp',
+  '**/temp',
 ];
 
 export async function processFiles(
@@ -87,7 +127,7 @@ export async function processFiles(
   const globOptions = {
     nocase: !caseSensitive,
     ignore: exclude,
-    dot: true, // Include dotfiles
+    dot: true,
   };
 
   const filePaths = await glob(path.join(basePath, '**', '*'), globOptions);

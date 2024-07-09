@@ -2,6 +2,7 @@ import path from 'node:path';
 import chalk from 'chalk';
 import { Command } from 'commander';
 import fs from 'fs-extra';
+import ora from 'ora';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
 
@@ -17,7 +18,7 @@ program
   .description('Generate a markdown file from your codebase')
   .option('-p, --path <path>', 'Path to the codebase', '.')
   .option('-o, --output <output>', 'Output file name')
-  .option('-t, --template <template>', 'Template to use', 'codebase-summary')
+  .option('-t, --template <template>', 'Template to use', 'default')
   .option('-g, --gitignore <path>', 'Path to .gitignore file')
   .option('-f, --filter <patterns...>', 'File patterns to include')
   .option('-e, --exclude <patterns...>', 'File patterns to exclude')
@@ -31,6 +32,7 @@ program
   .option('--custom-template <path>', 'Path to a custom Handlebars template')
   .option('--custom-ignores <patterns...>', 'Additional patterns to ignore')
   .action(async (options) => {
+    const spinner = ora('Processing files...').start();
     try {
       const files = await processFiles({
         path: options.path,
@@ -42,15 +44,15 @@ program
         customIgnores: options.customIgnores,
       });
 
+      spinner.text = 'Generating markdown...';
+
       let customData = {};
       if (options.customData) {
         try {
           customData = JSON.parse(options.customData);
         } catch (error) {
-          console.error(
-            chalk.red('Error parsing custom data JSON:'),
-            (error as Error).message,
-          );
+          spinner.fail('Error parsing custom data JSON');
+          console.error(chalk.red((error as Error).message));
           process.exit(1);
         }
       }
@@ -64,12 +66,14 @@ program
 
       if (options.output) {
         await fs.writeFile(options.output, markdown);
-        console.log(chalk.green(`Output written to ${options.output}`));
+        spinner.succeed(`Output written to ${options.output}`);
       } else {
+        spinner.stop();
         console.log(markdown);
       }
     } catch (error) {
-      console.error(chalk.red('Error:'), (error as Error).message);
+      spinner.fail('Error generating output');
+      console.error(chalk.red((error as Error).message));
       process.exit(1);
     }
   });
