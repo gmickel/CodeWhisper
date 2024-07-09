@@ -22,7 +22,40 @@ interface ProcessOptions {
   exclude?: string[];
   suppressComments?: boolean;
   caseSensitive?: boolean;
+  customIgnores?: string[];
 }
+
+const DEFAULT_IGNORES = [
+  // Version control
+  '.git',
+  '.svn',
+  '.hg',
+
+  // Package manager files
+  'package-lock.json',
+  'yarn.lock',
+  'pnpm-lock.yaml',
+  'bun.lockb',
+
+  // Other package managers (examples)
+  'Gemfile.lock', // Ruby
+  'Cargo.lock', // Rust
+  'poetry.lock', // Python
+  'composer.lock', // PHP
+
+  // Build outputs and caches
+  'node_modules',
+  'dist',
+  'build',
+  '.cache',
+
+  // IDE and editor files
+  '.vscode',
+  '.idea',
+  '*.swp',
+  '*.swo',
+  '.DS_Store',
+];
 
 export async function processFiles(
   options: ProcessOptions,
@@ -34,9 +67,18 @@ export async function processFiles(
     exclude = [],
     suppressComments = false,
     caseSensitive = false,
+    customIgnores = [],
   } = options;
 
   const ig = ignore();
+
+  // Add default ignores
+  ig.add(DEFAULT_IGNORES);
+
+  // Add custom ignores
+  ig.add(customIgnores);
+
+  // Add .gitignore patterns
   if (await fs.pathExists(gitignorePath)) {
     const gitignoreContent = await fs.readFile(gitignorePath, 'utf-8');
     ig.add(gitignoreContent);

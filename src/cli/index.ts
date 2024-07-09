@@ -29,6 +29,7 @@ program
     'Custom data to pass to the template (JSON string)',
   )
   .option('--custom-template <path>', 'Path to a custom Handlebars template')
+  .option('--custom-ignores <patterns...>', 'Additional patterns to ignore')
   .action(async (options) => {
     try {
       const files = await processFiles({
@@ -38,6 +39,7 @@ program
         exclude: options.exclude,
         suppressComments: options.suppressComments,
         caseSensitive: options.caseSensitive,
+        customIgnores: options.customIgnores,
       });
 
       let customData = {};
