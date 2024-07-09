@@ -1,9 +1,8 @@
 import path from 'node:path';
 import fs from 'fs-extra';
 import { glob } from 'glob';
-import { Minimatch } from 'minimatch';
-import { stripComments } from '../utils/comment-stripper';
-import { parseGitignore } from '../utils/gitignore-parser';
+import ignore from 'ignore';
+import isbinaryfile from 'isbinaryfile';
 import { detectLanguage } from '../utils/language-detector';
 
 export interface FileInfo {
@@ -37,52 +36,62 @@ export async function processFiles(
     caseSensitive = false,
   } = options;
 
-  const gitignoreFilter = await parseGitignore(gitignorePath);
-  const globOptions = { nocase: !caseSensitive, ignore: exclude };
+  const ig = ignore();
+  if (await fs.pathExists(gitignorePath)) {
+    const gitignoreContent = await fs.readFile(gitignorePath, 'utf-8');
+    ig.add(gitignoreContent);
+  }
 
-  const filterMatchers = filter.map(
-    (pattern) => new Minimatch(pattern, { nocase: !caseSensitive }),
-  );
-  const excludeMatchers = exclude.map(
-    (pattern) => new Minimatch(pattern, { nocase: !caseSensitive }),
-  );
+  const globOptions = {
+    nocase: !caseSensitive,
+    ignore: exclude,
+    dot: true, // Include dotfiles
+  };
 
-  const filePaths = glob
-    .sync(path.join(basePath, '**', '*'), globOptions)
-    .filter((filePath) => {
-      const relativePath = path.relative(basePath, filePath);
-      return !gitignoreFilter.ignores(relativePath);
-    })
-    .filter((filePath) => {
-      if (filterMatchers.length === 0) return true;
-      return filterMatchers.some((matcher) => matcher.match(filePath));
-    })
-    .filter((filePath) => {
-      return !excludeMatchers.some((matcher) => matcher.match(filePath));
-    });
+  const filePaths = await glob(path.join(basePath, '**', '*'), globOptions);
 
-  const fileInfos: FileInfo[] = await Promise.all(
-    filePaths.map(async (filePath) => {
-      const stats = await fs.stat(filePath);
-      let content = await fs.readFile(filePath, 'utf-8');
-      const extension = path.extname(filePath).slice(1);
-      const language = detectLanguage(filePath);
+  const fileInfos: FileInfo[] = (
+    await Promise.all(
+      filePaths
+        .filter((filePath) => !ig.ignores(path.relative(basePath, filePath)))
+        .map(async (filePath) => {
+          try {
+            const stats = await fs.stat(filePath);
 
-      if (suppressComments) {
-        content = stripComments(content, language);
-      }
+            if (!stats.isFile()) {
+              return null;
+            }
 
-      return {
-        path: filePath,
-        extension,
-        language,
-        size: stats.size,
-        created: stats.birthtime,
-        modified: stats.mtime,
-        content,
-      };
-    }),
-  );
+            const buffer = await fs.readFile(filePath);
+            if (await isbinaryfile.isBinaryFile(buffer)) {
+              return null;
+            }
+
+            const content = buffer.toString('utf-8');
+            const extension = path.extname(filePath).slice(1);
+            const language = detectLanguage(filePath);
+
+            if (suppressComments) {
+              // Here you would implement comment suppression logic
+              // This depends on the language and might require a separate module
+            }
+
+            return {
+              path: filePath,
+              extension,
+              language,
+              size: stats.size,
+              created: stats.birthtime,
+              modified: stats.mtime,
+              content,
+            };
+          } catch (error) {
+            console.error(`Error processing file ${filePath}:`, error);
+            return null;
+          }
+        }),
+    )
+  ).filter((fileInfo): fileInfo is FileInfo => fileInfo !== null);
 
   return fileInfos;
 }

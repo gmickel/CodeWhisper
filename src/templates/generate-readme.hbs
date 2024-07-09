@@ -1,0 +1,164 @@
+{{#if projectLogo}}
+<p align="center">
+  <img src="{{projectLogo}}"
+    alt="{{projectName}} logo"
+    width="200" />
+</p>
+{{/if}}
+
+<h1 align="center">{{projectName}}</h1>
+
+<p align="center">
+  {{projectTagline}}
+</p>
+
+<p align="center">
+  {{#if projectBadges}}
+  {{{projectBadges}}}
+  {{else}}
+  <!-- Add your badges here -->
+  <img alt="GitHub release (latest by date)"
+    src="https://img.shields.io/github/v/release/{{githubUsername}}/{{projectName}}">
+  <img alt="GitHub Workflow Status"
+    src="https://img.shields.io/github/actions/workflow/status/{{githubUsername}}/{{projectName}}/main.yml">
+  <img alt="GitHub"
+    src="https://img.shields.io/github/license/{{githubUsername}}/{{projectName}}">
+  {{/if}}
+</p>
+
+<p align="center">
+  <a href="#key-features">Key Features</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#usage">Usage</a> •
+  <a href="#api">API</a> •
+  <a href="#configuration">Configuration</a> •
+  <a href="#contributing">Contributing</a> •
+  <a href="#license">License</a>
+</p>
+
+{{#if projectDemo}}
+<p align="center">
+  <img src="{{projectDemo}}"
+    alt="{{projectName}} Demo"
+    width="600">
+</p>
+{{/if}}
+
+## 📖 About
+
+{{projectDescription}}
+
+## ✨ Key Features
+
+{{#each keyFeatures}}
+- {{this}}
+{{/each}}
+
+## 🚀 Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/{{githubUsername}}/{{projectName}}.git
+
+# Navigate to the project directory
+cd {{projectName}}
+
+# Install dependencies
+{{installationCommand}}
+
+# Run the project
+{{quickStartCommand}}
+```
+
+## 📦 Installation
+
+{{installationInstructions}}
+
+## 💻 Usage
+
+{{usageInstructions}}
+
+{{#if codeExamples}}
+### Examples
+
+{{#each codeExamples}}
+```{{language}}
+{{{code}}}
+```
+{{description}}
+
+{{/each}}
+{{/if}}
+
+## 🔧 Configuration
+
+{{configuration}}
+
+## 📚 API Reference
+
+{{#each files}}
+{{#if (eq this.language "typescript" "javascript")}}
+### `{{this.path}}`
+
+```{{this.language}}
+{{this.content}}
+```
+
+{{/if}}
+{{/each}}
+
+## 🌳 Project Structure
+
+```
+{{projectStructure}}
+```
+
+## 🤝 Contributing
+
+We welcome contributions to {{projectName}}! Please follow these steps:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull
+requests.
+
+## 🧪 Running Tests
+
+{{testingInstructions}}
+
+## 🚢 Deployment
+
+{{deploymentInstructions}}
+
+## 🗺️ Roadmap
+
+{{roadmap}}
+
+## 📄 License
+
+This project is licensed under the {{license}} License - see the [LICENSE](LICENSE) file for details.
+
+## 👏 Acknowledgments
+
+{{acknowledgments}}
+
+## 📬 Contact
+
+{{contactInformation}}
+
+{{#if faq}}
+## ❓ FAQ
+
+{{faq}}
+{{/if}}
+
+---
+
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/{{githubUsername}}">{{authorName}}</a>
+</p>

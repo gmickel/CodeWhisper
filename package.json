@@ -36,7 +36,7 @@
   "scripts": {
     "build": "unbuild",
     "lint": "biome check .",
-    "lint:fix": "biome check . --apply",
+    "lint:fix": "biome check . --write",
     "prepublishOnly": "nr build",
     "release": "bumpp && npm publish",
     "start": "esno src/cli/index.ts",
@@ -53,6 +53,7 @@
     "handlebars": "4.7.8",
     "ignore": "5.3.1",
     "inquirer": "10.0.1",
+    "isbinaryfile": "^5.0.2",
     "minimatch": "10.0.1",
     "ora": "8.0.1",
     "simple-git": "3.25.0",

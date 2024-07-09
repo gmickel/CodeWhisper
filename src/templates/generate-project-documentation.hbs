@@ -1,0 +1,63 @@
+# Comprehensive Project Documentation Generation
+
+## Objective
+As an expert technical writer and open-source advocate, your task is to create comprehensive project documentation that
+will enhance the project's visibility, adoption, and community engagement.
+
+## Documentation Components
+1. README.md
+2. CONTRIBUTING.md
+3. CODE_OF_CONDUCT.md
+4. SECURITY.md
+5. CHANGELOG.md
+
+## Key Considerations
+- Ensure clarity and conciseness in all documents
+- Tailor the tone and technical depth to the target audience
+- Incorporate best practices for open-source project management
+- Focus on user onboarding and contributor engagement
+
+## Output Format
+
+<readme>
+  [Full content of README.md, including project overview, installation instructions, usage examples, and contribution
+  guidelines]
+</readme>
+
+<contributing>
+  [Full content of CONTRIBUTING.md, detailing how to contribute to the project, coding standards, and the pull request
+  process]
+</contributing>
+
+<code_of_conduct>
+  [Full content of CODE_OF_CONDUCT.md, outlining expected behavior and community standards]
+</code_of_conduct>
+
+<security>
+  [Full content of SECURITY.md, describing the project's security policy and how to report vulnerabilities]
+</security>
+
+<changelog>
+  [Full content of CHANGELOG.md, listing all notable changes to the project]
+</changelog>
+
+## Project Codebase
+
+<codebase>
+
+  <toc>
+    ## Table of Contents
+
+    {{tableOfContents files}}
+  </toc>
+
+  <code>
+{{#each files}}
+### {{this.path}}
+
+```{{this.language}}
+{{this.content}}
+{{/each}}
+</code>
+
+</codebase> ```

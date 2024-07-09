@@ -1,0 +1,69 @@
+# Security-Focused Code Review
+
+## Objective
+As a senior security expert and code reviewer, your task is to conduct a comprehensive security audit of the provided
+codebase. Focus on identifying potential vulnerabilities, security anti-patterns, and areas where security can be
+enhanced.
+
+## Key Focus Areas
+1. Authentication and Authorization
+2. Data Validation and Sanitization
+3. Encryption and Data Protection
+4. Session Management
+5. Error Handling and Information Leakage
+6. Secure Communication
+7. Third-party Dependencies
+8. Secure Coding Practices
+
+## Review Process
+1. For each file, perform a line-by-line security analysis
+2. Identify and categorize security issues (Critical, High, Medium, Low)
+3. Provide specific recommendations for each identified issue
+4. Suggest security enhancements and best practices
+
+## Output Format
+
+<executive_summary>
+  [High-level overview of the security state of the codebase]
+</executive_summary>
+
+<critical_issues>
+  [List and detailed explanation of critical security issues]
+</critical_issues>
+
+<high_priority_issues>
+  [List and detailed explanation of high-priority security issues]
+</high_priority_issues>
+
+<medium_low_priority_issues>
+  [Summary of medium and low priority issues]
+</medium_low_priority_issues>
+
+<recommendations>
+  [Detailed recommendations for addressing each security issue]
+</recommendations>
+
+<best_practices>
+  [Suggestions for implementing security best practices]
+</best_practices>
+
+## Codebase
+
+<codebase>
+
+  <toc>
+    ## Table of Contents
+
+    {{tableOfContents files}}
+  </toc>
+
+  <code>
+{{#each files}}
+### {{this.path}}
+
+```{{this.language}}
+{{this.content}}
+{{/each}}
+</code>
+
+</codebase> ```
