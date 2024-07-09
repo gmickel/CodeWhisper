@@ -1,7 +1,7 @@
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import fs from 'fs-extra';
 import Handlebars from 'handlebars';
+import { joinPath } from '../utils/path-utils';
 import type { FileInfo } from './file-processor';
 
 interface MarkdownOptions {
@@ -9,9 +9,6 @@ interface MarkdownOptions {
   noCodeblock?: boolean;
   customData?: Record<string, unknown>;
 }
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export async function generateMarkdown(
   files: FileInfo[],
@@ -31,7 +28,12 @@ export async function generateMarkdown(
   ) {
     templatePath = template;
   } else {
-    templatePath = path.join(__dirname, '..', 'templates', `${template}.hbs`);
+    templatePath = joinPath(
+      import.meta.url,
+      '..',
+      'templates',
+      `${template}.hbs`,
+    );
   }
 
   const templateContent = await fs.readFile(templatePath, 'utf-8');

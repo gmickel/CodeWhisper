@@ -1,9 +1,13 @@
+import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fastGlob from 'fast-glob';
 import fs from 'fs-extra';
-import { glob } from 'glob';
 import ignore from 'ignore';
 import isbinaryfile from 'isbinaryfile';
-import { detectLanguage } from '../utils/language-detector';
+import workerpool from 'workerpool';
+import type Pool from 'workerpool/types/Pool';
+import { FileCache } from '../utils/file-cache';
 
 export interface FileInfo {
   path: string;
@@ -23,6 +27,7 @@ interface ProcessOptions {
   suppressComments?: boolean;
   caseSensitive?: boolean;
   customIgnores?: string[];
+  cachePath?: string;
 }
 
 const DEFAULT_IGNORES = [
@@ -97,6 +102,33 @@ const DEFAULT_IGNORES = [
   '**/temp',
 ];
 
+function getWorkerPath() {
+  const currentFilePath = fileURLToPath(import.meta.url);
+  const currentDir = path.dirname(currentFilePath);
+
+  // Check if we're running from the compiled output (e.g., in dist or node_modules)
+  const isCompiledEnvironment =
+    currentFilePath.includes('dist') ||
+    currentFilePath.includes('node_modules');
+
+  if (isCompiledEnvironment) {
+    return path.join(currentDir, 'file-worker.js');
+  }
+
+  // For development environment, return the path to the source file
+  return path.join(currentDir, '..', 'core', 'file-worker.ts');
+}
+
+let pool: Pool;
+
+try {
+  const workerPath = getWorkerPath();
+  pool = workerpool.pool(workerPath);
+} catch (error) {
+  console.error('Error creating worker pool:', error);
+  process.exit(1);
+}
+
 export async function processFiles(
   options: ProcessOptions,
 ): Promise<FileInfo[]> {
@@ -108,72 +140,84 @@ export async function processFiles(
     suppressComments = false,
     caseSensitive = false,
     customIgnores = [],
+    cachePath = path.join(os.tmpdir(), 'codewhisper-cache.json'),
   } = options;
 
-  const ig = ignore();
+  const fileCache = new FileCache(cachePath);
 
-  // Add default ignores
-  ig.add(DEFAULT_IGNORES);
+  const ig = ignore().add(DEFAULT_IGNORES).add(customIgnores);
 
-  // Add custom ignores
-  ig.add(customIgnores);
-
-  // Add .gitignore patterns
   if (await fs.pathExists(gitignorePath)) {
     const gitignoreContent = await fs.readFile(gitignorePath, 'utf-8');
     ig.add(gitignoreContent);
   }
 
-  const globOptions = {
-    nocase: !caseSensitive,
-    ignore: exclude,
+  const globOptions: fastGlob.Options = {
+    cwd: basePath,
     dot: true,
+    absolute: true,
+    onlyFiles: true,
+    followSymbolicLinks: false,
+    caseSensitiveMatch: caseSensitive,
+    ignore: exclude,
   };
 
-  const filePaths = await glob(path.join(basePath, '**', '*'), globOptions);
+  const fileInfos: FileInfo[] = [];
+  const globStream = fastGlob.stream('**/*', globOptions);
 
-  const fileInfos: FileInfo[] = (
-    await Promise.all(
-      filePaths
-        .filter((filePath) => !ig.ignores(path.relative(basePath, filePath)))
-        .map(async (filePath) => {
-          try {
-            const stats = await fs.stat(filePath);
+  return new Promise((resolve, reject) => {
+    globStream.on('data', async (filePath: string) => {
+      const relativePath = path.relative(basePath, filePath);
+      if (ig.ignores(relativePath)) return;
+      if (
+        filter.length > 0 &&
+        !filter.some((pattern) => new RegExp(pattern).test(filePath))
+      )
+        return;
 
-            if (!stats.isFile()) {
-              return null;
-            }
+      try {
+        const cached = await fileCache.get(filePath);
+        if (cached) {
+          fileInfos.push(cached);
+          return;
+        }
 
-            const buffer = await fs.readFile(filePath);
-            if (await isbinaryfile.isBinaryFile(buffer)) {
-              return null;
-            }
+        const stats = await fs.stat(filePath);
+        if (!stats.isFile()) return;
 
-            const content = buffer.toString('utf-8');
-            const extension = path.extname(filePath).slice(1);
-            const language = detectLanguage(filePath);
+        const buffer = await fs.readFile(filePath);
+        if (await isbinaryfile.isBinaryFile(buffer)) return;
 
-            if (suppressComments) {
-              // Here you would implement comment suppression logic
-              // This depends on the language and might require a separate module
-            }
+        const result = await pool.exec('processFile', [
+          filePath,
+          suppressComments,
+        ]);
 
-            return {
-              path: filePath,
-              extension,
-              language,
-              size: stats.size,
-              created: stats.birthtime,
-              modified: stats.mtime,
-              content,
-            };
-          } catch (error) {
-            console.error(`Error processing file ${filePath}:`, error);
-            return null;
-          }
-        }),
-    )
-  ).filter((fileInfo): fileInfo is FileInfo => fileInfo !== null);
+        if (result) {
+          await fileCache.set(filePath, result);
+          fileInfos.push(result);
+        }
+      } catch (error) {
+        console.error(`Error processing file ${filePath}:`, error);
+      }
+    });
 
-  return fileInfos;
+    globStream.on('end', () => {
+      pool
+        .terminate()
+        .then(() => resolve(fileInfos))
+        .catch(reject);
+    });
+
+    globStream.on('error', (error) => {
+      pool
+        .terminate()
+        .then(() => reject(new Error(error)))
+        .catch(reject);
+    });
+  });
 }
+
+export const testExports = {
+  pool,
+};

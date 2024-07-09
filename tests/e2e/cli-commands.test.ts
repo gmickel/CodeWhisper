@@ -2,13 +2,21 @@ import { execSync } from 'node:child_process';
 import path from 'node:path';
 import fs from 'fs-extra';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { resolvePath } from '../../src/utils/path-utils';
 import {
   removeTemporaryGitignore,
   setupTemporaryGitignore,
 } from '../helpers/gitignore-helper';
 
 describe('CLI Commands', () => {
-  const cliPath = path.resolve(__dirname, '..', '..', 'src', 'cli', 'index.ts');
+  const cliPath = resolvePath(
+    import.meta.url,
+    '..',
+    '..',
+    'src',
+    'cli',
+    'index.ts',
+  );
   const testProjectPath = path.resolve(
     __dirname,
     '..',

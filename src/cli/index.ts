@@ -1,3 +1,4 @@
+import os from 'node:os';
 import path from 'node:path';
 import chalk from 'chalk';
 import { Command } from 'commander';
@@ -5,6 +6,10 @@ import fs from 'fs-extra';
 import ora from 'ora';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
+import { joinPath } from '../utils/path-utils';
+
+export { processFiles, generateMarkdown };
+export type { FileInfo } from '../core/file-processor';
 
 const program = new Command();
 
@@ -31,6 +36,11 @@ program
   )
   .option('--custom-template <path>', 'Path to a custom Handlebars template')
   .option('--custom-ignores <patterns...>', 'Additional patterns to ignore')
+  .option(
+    '--cache-path <path>',
+    'Custom path for the cache file',
+    path.join(os.tmpdir(), 'codewhisper-cache.json'),
+  )
   .action(async (options) => {
     const spinner = ora('Processing files...').start();
     try {
@@ -42,6 +52,7 @@ program
         suppressComments: options.suppressComments,
         caseSensitive: options.caseSensitive,
         customIgnores: options.customIgnores,
+        cachePath: options.cachePath,
       });
 
       spinner.text = 'Generating markdown...';
@@ -77,12 +88,11 @@ program
       process.exit(1);
     }
   });
-
 program
   .command('list-templates')
   .description('List available templates')
   .action(() => {
-    const templatesDir = path.join(__dirname, '..', 'templates');
+    const templatesDir = joinPath(import.meta.url, '..', 'templates');
     const templates = fs
       .readdirSync(templatesDir)
       .filter((file) => file.endsWith('.hbs'))
@@ -103,7 +113,7 @@ program
     '.',
   )
   .action(async (options) => {
-    const sourceDir = path.join(__dirname, '..', 'templates');
+    const sourceDir = joinPath(import.meta.url, '..', 'templates');
     const targetDir = path.resolve(options.dir);
 
     try {

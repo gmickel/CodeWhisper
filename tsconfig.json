@@ -13,5 +13,6 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "include": ["src/**/*", "tests/**/*"]
 }

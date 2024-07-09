@@ -1,5 +1,7 @@
 # code-whisper
 
+add blazing fast AI-friendly prompts to your codebase
+
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
 [![bundle][bundle-src]][bundle-href]
