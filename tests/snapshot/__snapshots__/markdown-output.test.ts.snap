@@ -1,0 +1,51 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Markdown Output > should match snapshot for default template 1`] = `
+"# Code Summary
+
+- /Users/gordon/work/CodeWhisper/tests/fixtures/test-project/package.json
+- /Users/gordon/work/CodeWhisper/tests/fixtures/test-project/src/utils.ts
+- /Users/gordon/work/CodeWhisper/tests/fixtures/test-project/src/main.js
+
+## Files
+
+## /Users/gordon/work/CodeWhisper/tests/fixtures/test-project/package.json
+
+- Language: json
+- Size: 51 bytes
+- Last modified: Tue Jul 09 2024 22:40:41 GMT+0200 (Central European Summer Time)
+
+\`\`\`json
+{
+  "name": "test-project",
+  "version": "1.0.0"
+}
+
+\`\`\`
+
+## /Users/gordon/work/CodeWhisper/tests/fixtures/test-project/src/utils.ts
+
+- Language: typescript
+- Size: 70 bytes
+- Last modified: Tue Jul 09 2024 22:40:30 GMT+0200 (Central European Summer Time)
+
+\`\`\`typescript
+export function add(a: number, b: number): number {
+  return a + b;
+}
+
+\`\`\`
+
+## /Users/gordon/work/CodeWhisper/tests/fixtures/test-project/src/main.js
+
+- Language: javascript
+- Size: 30 bytes
+- Last modified: Tue Jul 09 2024 22:40:24 GMT+0200 (Central European Summer Time)
+
+\`\`\`javascript
+console.log('Hello, World!');
+
+\`\`\`
+
+"
+`;
