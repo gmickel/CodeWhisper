@@ -2,27 +2,18 @@ import { execSync } from 'node:child_process';
 import path from 'node:path';
 import fs from 'fs-extra';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { resolvePath } from '../../src/utils/path-utils';
 import {
   removeTemporaryGitignore,
   setupTemporaryGitignore,
 } from '../helpers/gitignore-helper';
 
+const __dirname = new URL('.', import.meta.url).pathname;
+const resolvePath = (pathname: string) =>
+  new URL(pathname, import.meta.url).pathname;
+
 describe('CLI Commands', () => {
-  const cliPath = resolvePath(
-    import.meta.url,
-    '..',
-    '..',
-    'src',
-    'cli',
-    'index.ts',
-  );
-  const testProjectPath = path.resolve(
-    __dirname,
-    '..',
-    'fixtures',
-    'test-project',
-  );
+  const cliPath = resolvePath('../../../src/cli/index.ts');
+  const testProjectPath = path.resolve(__dirname, '../fixtures/test-project');
   const outputPath = path.join(testProjectPath, 'output.md');
   let tempGitignorePath: string;
 

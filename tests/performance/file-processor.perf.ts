@@ -2,15 +2,12 @@ import path from 'node:path';
 import fs from 'fs-extra';
 import { afterAll, describe, expect, it } from 'vitest';
 import { processFiles } from '../../src/core/file-processor';
-import { resolvePath } from '../../src/utils/path-utils';
+
+const resolvePath = (pathname: string) =>
+  new URL(pathname, import.meta.url).pathname;
 
 describe('File Processor Performance', () => {
-  const largePath = resolvePath(
-    import.meta.url,
-    '..',
-    'fixtures',
-    'large-project',
-  );
+  const largePath = resolvePath('../fixtures/large-project');
 
   // Helper function to create a large project structure
   async function createLargeProject() {

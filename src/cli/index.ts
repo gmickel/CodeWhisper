@@ -6,21 +6,14 @@ import fs from 'fs-extra';
 import ora from 'ora';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
-import { joinPath } from '../utils/path-utils';
 
-// Function to determine the current script's extension
-function getScriptExtension(): string {
-  const scriptPath = process.argv[1] || '';
-  return path.extname(scriptPath);
-}
+const isTS = path.extname(new URL(import.meta.url).pathname) === '.ts';
 
-const scriptExt = getScriptExtension();
-const isTS = scriptExt === '.ts';
-
-// Determine the templates directory based on the script type
-const templatesDir = isTS
-  ? joinPath(import.meta.url, '..', 'templates')
-  : path.resolve(__dirname, '../templates');
+// get the templates directory based on the script type
+const templatesDir = new URL(
+  isTS ? '../templates' : '../dist/templates',
+  import.meta.url,
+).pathname;
 
 const program = new Command();
 

@@ -99,7 +99,7 @@ cd {{projectName}}
 
 {{#each files}}
 {{#if (eq this.language "typescript" "javascript")}}
-### `{{this.path}}`
+### `{{relativePath this.path}}`
 
 ```{{this.language}}
 {{this.content}}

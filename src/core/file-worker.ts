@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import { isBinaryFile } from 'isbinaryfile'; // Ensure correct import
+import { isBinaryFile } from 'isbinaryfile';
 import { stripComments } from '../utils/comment-stripper';
 import { detectLanguage } from '../utils/language-detector';
 

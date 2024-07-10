@@ -7,17 +7,15 @@ import workerpool from 'workerpool';
 import { type FileInfo, processFiles } from '../../src/core/file-processor';
 import { FileCache } from '../../src/utils/file-cache';
 
+const resolvePath = (pathname: string) =>
+  new URL(pathname, import.meta.url).pathname;
+
 vi.mock('fast-glob');
 vi.mock('workerpool');
 vi.mock('../../src/utils/file-cache');
 
 describe('processFiles', () => {
-  const fixturesPath = path.resolve(
-    __dirname,
-    '..',
-    'fixtures',
-    'test-project',
-  );
+  const fixturesPath = resolvePath('../fixtures/test-project');
   const tempGitignorePath = path.join(fixturesPath, '.gitignore');
 
   beforeEach(async () => {

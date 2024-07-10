@@ -1,13 +1,18 @@
 import path from 'node:path';
 import fs from 'fs-extra';
 import Handlebars from 'handlebars';
-import { joinPath } from '../utils/path-utils';
 import type { FileInfo } from './file-processor';
 
 interface MarkdownOptions {
   template?: string;
   noCodeblock?: boolean;
   customData?: Record<string, unknown>;
+  basePath?: string;
+}
+
+// Helper function to convert absolute path to relative path
+function relativePath(base: string, target: string): string {
+  return path.relative(base, target);
 }
 
 export async function generateMarkdown(
@@ -18,6 +23,7 @@ export async function generateMarkdown(
     template = 'generate-readme',
     noCodeblock = false,
     customData = {},
+    basePath = process.cwd(),
   } = options;
 
   let templatePath: string;
@@ -28,28 +34,34 @@ export async function generateMarkdown(
   ) {
     templatePath = template;
   } else {
-    templatePath = joinPath(
+    const isTS = path.extname(new URL(import.meta.url).pathname) === '.ts';
+    templatePath = new URL(
+      isTS
+        ? `../templates/${template}.hbs`
+        : `../dist/templates/${template}.hbs`,
       import.meta.url,
-      '..',
-      'templates',
-      `${template}.hbs`,
-    );
+    ).pathname;
   }
 
   const templateContent = await fs.readFile(templatePath, 'utf-8');
   const compiledTemplate = Handlebars.compile(templateContent);
 
-  registerHandlebarsHelpers(noCodeblock);
+  registerHandlebarsHelpers(noCodeblock, files, basePath);
 
   const data = {
     files,
+    base: basePath,
     ...customData,
   };
 
   return compiledTemplate(data);
 }
 
-function registerHandlebarsHelpers(noCodeblock: boolean) {
+function registerHandlebarsHelpers(
+  noCodeblock: boolean,
+  files: FileInfo[],
+  basePath: string,
+) {
   Handlebars.registerHelper(
     'codeblock',
     (content: string, language: string) => {
@@ -66,18 +78,26 @@ function registerHandlebarsHelpers(noCodeblock: boolean) {
     return new Handlebars.SafeString(numberedLines.join('\n'));
   });
 
-  Handlebars.registerHelper('tableOfContents', (files: FileInfo[]) => {
-    const toc = files.map((file) => `- ${file.path}`).join('\n');
+  Handlebars.registerHelper('tableOfContents', (files: FileInfo[], options) => {
+    const basePath = options.data.root.base;
+    const toc = files
+      .map((file) => `- ${relativePath(basePath, file.path)}`)
+      .join('\n');
     return new Handlebars.SafeString(toc);
   });
 
-  Handlebars.registerHelper(
-    'fileInfo',
-    (file: FileInfo) =>
-      new Handlebars.SafeString(`
+  Handlebars.registerHelper('fileInfo', (file: FileInfo, options) => {
+    const basePath = options.data.root.base;
+    return new Handlebars.SafeString(`
+- Path: ${relativePath(basePath, file.path)}
 - Language: ${file.language}
 - Size: ${file.size} bytes
 - Last modified: ${file.modified}
-    `),
-  );
+    `);
+  });
+
+  Handlebars.registerHelper('relativePath', (filePath: string, options) => {
+    const basePath = options.data.root.base;
+    return relativePath(basePath, filePath);
+  });
 }
