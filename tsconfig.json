@@ -14,5 +14,5 @@
     "sourceMap": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*", "tests/**/*"]
+  "include": ["src/**/*", "tests/**/*", "cli.js"]
 }

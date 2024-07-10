@@ -33,7 +33,7 @@
     }
   },
   "bin": {
-    "codewhisper": "./dist/cli/index.js"
+    "codewhisper": "./dist/cli.js"
   },
   "files": ["dist", "README.md", "LICENSE"],
   "scripts": {
