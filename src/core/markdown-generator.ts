@@ -7,7 +7,7 @@ interface MarkdownOptions {
   template?: string;
   noCodeblock?: boolean;
   customData?: Record<string, unknown>;
-  basePath?: string;
+  basePath?: string; // Add this property
 }
 
 // Helper function to convert absolute path to relative path
@@ -23,30 +23,26 @@ export async function generateMarkdown(
     template = 'generate-readme',
     noCodeblock = false,
     customData = {},
-    basePath = process.cwd(),
+    basePath = process.cwd(), // Default to current working directory if not provided
   } = options;
 
-  let templatePath: string;
-  if (
-    path.isAbsolute(template) ||
-    template.startsWith('./') ||
-    template.startsWith('../')
-  ) {
-    templatePath = template;
-  } else {
-    const isTS = path.extname(new URL(import.meta.url).pathname) === '.ts';
-    templatePath = new URL(
-      isTS
-        ? `../templates/${template}.hbs`
-        : `../dist/templates/${template}.hbs`,
-      import.meta.url,
-    ).pathname;
-  }
+  const isDist = path
+    .dirname(new URL(import.meta.url).pathname)
+    .includes('/dist/');
+  const templatesDir = isDist
+    ? path.resolve(path.dirname(new URL(import.meta.url).pathname), '../')
+    : path.resolve(
+        path.dirname(new URL(import.meta.url).pathname),
+        '../templates',
+      );
+  const templatePath = options.template
+    ? options.template
+    : path.resolve(templatesDir, `${template}.hbs`);
 
   const templateContent = await fs.readFile(templatePath, 'utf-8');
   const compiledTemplate = Handlebars.compile(templateContent);
 
-  registerHandlebarsHelpers(noCodeblock, files, basePath);
+  registerHandlebarsHelpers(noCodeblock);
 
   const data = {
     files,
@@ -57,11 +53,7 @@ export async function generateMarkdown(
   return compiledTemplate(data);
 }
 
-function registerHandlebarsHelpers(
-  noCodeblock: boolean,
-  files: FileInfo[],
-  basePath: string,
-) {
+function registerHandlebarsHelpers(noCodeblock: boolean) {
   Handlebars.registerHelper(
     'codeblock',
     (content: string, language: string) => {

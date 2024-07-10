@@ -28,14 +28,18 @@ interface ProcessOptions {
   cachePath?: string;
 }
 
-// Determine the correct worker script based on the current script's extension
-const isTS = path.extname(new URL(import.meta.url).pathname) === '.ts';
+// Determine the correct extension and filename for the worker
+const isDist = path
+  .dirname(new URL(import.meta.url).pathname)
+  .includes('/dist/');
+const workerFilename = `file-worker.${isDist ? 'js' : 'ts'}`;
+const workerFilePath = new URL(
+  isDist ? path.join('../core', workerFilename) : workerFilename,
+  import.meta.url,
+).href;
 
 const piscina = new Piscina({
-  filename: new URL(
-    isTS ? './file-worker.ts' : './file-worker.mjs',
-    import.meta.url,
-  ).href,
+  filename: workerFilePath,
 });
 
 const DEFAULT_IGNORES = [

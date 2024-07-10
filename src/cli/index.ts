@@ -7,13 +7,16 @@ import ora from 'ora';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
 
-const isTS = path.extname(new URL(import.meta.url).pathname) === '.ts';
-
-// get the templates directory based on the script type
-const templatesDir = new URL(
-  isTS ? '../templates' : '../dist/templates',
-  import.meta.url,
-).pathname;
+// Determine if we're in a development or production environment
+const isProduction = path
+  .dirname(new URL(import.meta.url).pathname)
+  .includes('/dist/');
+const templatesDir = isProduction
+  ? path.resolve(path.dirname(new URL(import.meta.url).pathname), '../')
+  : path.resolve(
+      path.dirname(new URL(import.meta.url).pathname),
+      '../templates',
+    );
 
 const program = new Command();
 
@@ -75,9 +78,11 @@ program
       const templatePath =
         options.customTemplate ||
         path.join(templatesDir, `${options.template}.hbs`);
+
       const markdown = await generateMarkdown(files, {
         template: templatePath,
         noCodeblock: !options.codeblock,
+        basePath: options.path,
         customData,
       });
 
