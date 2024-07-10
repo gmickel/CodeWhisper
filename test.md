@@ -1,11 +1,5 @@
 
-> codewhisper@1.0.0 dev /Users/gordon/work/CodeWhisper
-> esno src/cli/index.ts "generate"
+> codewhisper@1.0.0 start /Users/gordon/work/CodeWhisper
+> node dist/index.mjs "generate"
 
-# Code Summary
-
-
-
-## Files
-
-
+ ELIFECYCLE  Command failed with exit code 1.

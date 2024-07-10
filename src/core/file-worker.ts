@@ -1,15 +1,22 @@
-import { parentPort } from 'node:worker_threads';
 import fs from 'fs-extra';
-import isbinaryfile from 'isbinaryfile';
+import { isBinaryFile } from 'isbinaryfile'; // Ensure correct import
 import { stripComments } from '../utils/comment-stripper';
 import { detectLanguage } from '../utils/language-detector';
 
-async function processFile(filePath: string, suppressComments: boolean) {
+interface WorkerData {
+  filePath: string;
+  suppressComments: boolean;
+}
+
+export default async function processFile({
+  filePath,
+  suppressComments,
+}: WorkerData) {
   try {
     const stats = await fs.stat(filePath);
     const buffer = await fs.readFile(filePath);
 
-    if (await isbinaryfile.isBinaryFile(buffer)) {
+    if (await isBinaryFile(buffer)) {
       return null;
     }
 
@@ -35,8 +42,3 @@ async function processFile(filePath: string, suppressComments: boolean) {
     return null;
   }
 }
-
-parentPort?.on('message', async ({ filePath, suppressComments }) => {
-  const result = await processFile(filePath, suppressComments);
-  parentPort?.postMessage(result);
-});

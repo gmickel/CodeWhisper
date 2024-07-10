@@ -8,8 +8,19 @@ import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
 import { joinPath } from '../utils/path-utils';
 
-export { processFiles, generateMarkdown };
-export type { FileInfo } from '../core/file-processor';
+// Function to determine the current script's extension
+function getScriptExtension(): string {
+  const scriptPath = process.argv[1] || '';
+  return path.extname(scriptPath);
+}
+
+const scriptExt = getScriptExtension();
+const isTS = scriptExt === '.ts';
+
+// Determine the templates directory based on the script type
+const templatesDir = isTS
+  ? joinPath(import.meta.url, '..', 'templates')
+  : path.resolve(__dirname, '../templates');
 
 const program = new Command();
 
@@ -68,7 +79,9 @@ program
         }
       }
 
-      const templatePath = options.customTemplate || options.template;
+      const templatePath =
+        options.customTemplate ||
+        path.join(templatesDir, `${options.template}.hbs`);
       const markdown = await generateMarkdown(files, {
         template: templatePath,
         noCodeblock: !options.codeblock,
@@ -88,11 +101,11 @@ program
       process.exit(1);
     }
   });
+
 program
   .command('list-templates')
   .description('List available templates')
   .action(() => {
-    const templatesDir = joinPath(import.meta.url, '..', 'templates');
     const templates = fs
       .readdirSync(templatesDir)
       .filter((file) => file.endsWith('.hbs'))
@@ -113,12 +126,11 @@ program
     '.',
   )
   .action(async (options) => {
-    const sourceDir = joinPath(import.meta.url, '..', 'templates');
     const targetDir = path.resolve(options.dir);
 
     try {
       await fs.ensureDir(targetDir);
-      await fs.copy(sourceDir, targetDir, { overwrite: false });
+      await fs.copy(templatesDir, targetDir, { overwrite: false });
       console.log(chalk.green(`Templates exported to ${targetDir}`));
     } catch (error) {
       console.error(

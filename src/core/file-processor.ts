@@ -1,12 +1,10 @@
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import fastGlob from 'fast-glob';
 import fs from 'fs-extra';
 import ignore from 'ignore';
-import isbinaryfile from 'isbinaryfile';
-import workerpool from 'workerpool';
-import type Pool from 'workerpool/types/Pool';
+import { isBinaryFile } from 'isbinaryfile';
+import Piscina from 'piscina';
 import { FileCache } from '../utils/file-cache';
 
 export interface FileInfo {
@@ -29,6 +27,22 @@ interface ProcessOptions {
   customIgnores?: string[];
   cachePath?: string;
 }
+
+// Function to determine the current script's extension
+function getScriptExtension(): string {
+  const scriptPath = process.argv[1] || '';
+  return path.extname(scriptPath);
+}
+
+const scriptExt = getScriptExtension();
+const isTS = scriptExt === '.ts';
+
+// Determine the correct worker script based on the current script's extension
+const piscina = new Piscina({
+  filename: isTS
+    ? new URL('./file-worker.ts', import.meta.url).href
+    : new URL('./file-worker.mjs', import.meta.url).href,
+});
 
 const DEFAULT_IGNORES = [
   // Version control
@@ -102,33 +116,6 @@ const DEFAULT_IGNORES = [
   '**/temp',
 ];
 
-function getWorkerPath() {
-  const currentFilePath = fileURLToPath(import.meta.url);
-  const currentDir = path.dirname(currentFilePath);
-
-  // Check if we're running from the compiled output (e.g., in dist or node_modules)
-  const isCompiledEnvironment =
-    currentFilePath.includes('dist') ||
-    currentFilePath.includes('node_modules');
-
-  if (isCompiledEnvironment) {
-    return path.join(currentDir, 'file-worker.js');
-  }
-
-  // For development environment, return the path to the source file
-  return path.join(currentDir, '..', 'core', 'file-worker.ts');
-}
-
-let pool: Pool;
-
-try {
-  const workerPath = getWorkerPath();
-  pool = workerpool.pool(workerPath);
-} catch (error) {
-  console.error('Error creating worker pool:', error);
-  process.exit(1);
-}
-
 export async function processFiles(
   options: ProcessOptions,
 ): Promise<FileInfo[]> {
@@ -144,7 +131,6 @@ export async function processFiles(
   } = options;
 
   const fileCache = new FileCache(cachePath);
-
   const ig = ignore().add(DEFAULT_IGNORES).add(customIgnores);
 
   if (await fs.pathExists(gitignorePath)) {
@@ -186,38 +172,24 @@ export async function processFiles(
         if (!stats.isFile()) return;
 
         const buffer = await fs.readFile(filePath);
-        if (await isbinaryfile.isBinaryFile(buffer)) return;
+        if (await isBinaryFile(buffer)) return;
 
-        const result = await pool.exec('processFile', [
-          filePath,
-          suppressComments,
-        ]);
+        const result = await piscina.run({ filePath, suppressComments });
 
         if (result) {
-          await fileCache.set(filePath, result);
-          fileInfos.push(result);
+          await fileCache.set(filePath, result as FileInfo);
+          fileInfos.push(result as FileInfo);
         }
       } catch (error) {
         console.error(`Error processing file ${filePath}:`, error);
       }
     });
 
-    globStream.on('end', () => {
-      pool
-        .terminate()
-        .then(() => resolve(fileInfos))
-        .catch(reject);
-    });
-
-    globStream.on('error', (error) => {
-      pool
-        .terminate()
-        .then(() => reject(new Error(error)))
-        .catch(reject);
-    });
+    globStream.on('end', () => resolve(fileInfos));
+    globStream.on('error', (error) => reject(new Error(error)));
   });
 }
 
 export const testExports = {
-  pool,
+  piscina,
 };
