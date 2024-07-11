@@ -1,0 +1,40 @@
+# Custom Template: {{#if customData.title}}{{customData.title}}{{else}}Untitled Project{{/if}}
+
+## Project Overview
+
+This project contains {{files.length}} file(s).
+
+## File Listing
+
+{{#each files}}
+### {{this.path}}
+
+- **Language:** {{this.language}}
+- **Size:** {{this.size}} bytes
+- **Last Modified:** {{this.modified}}
+
+#### Content Preview:
+
+```{{this.language}}
+{{this.content}}
+```
+
+---
+{{/each}}
+
+## Custom Data
+
+{{#if customData}}
+{{#if (hasCustomData customData)}}
+Custom data provided:
+{{#each customData}}
+- {{@key}}: {{this}}
+{{/each}}
+{{else}}
+No custom data provided.
+{{/if}}
+{{else}}
+No custom data provided.
+{{/if}}
+
+## Generated on: {{now}}

@@ -28,7 +28,6 @@ interface ProcessOptions {
   cachePath?: string;
 }
 
-// Determine the correct extension and filename for the worker
 const isDist = path
   .dirname(new URL(import.meta.url).pathname)
   .includes('/dist/');
@@ -38,9 +37,7 @@ const workerFilePath = new URL(
   import.meta.url,
 ).href;
 
-const piscina = new Piscina({
-  filename: workerFilePath,
-});
+const pool = new Piscina({ filename: workerFilePath });
 
 const DEFAULT_IGNORES = [
   // Version control
@@ -147,47 +144,63 @@ export async function processFiles(
   };
 
   const fileInfos: FileInfo[] = [];
+  const tasks: Promise<void>[] = [];
+
   const globStream = fastGlob.stream('**/*', globOptions);
 
   return new Promise((resolve, reject) => {
-    globStream.on('data', async (filePath: string) => {
-      const relativePath = path.relative(basePath, filePath);
-      if (ig.ignores(relativePath)) return;
-      if (
-        filter.length > 0 &&
-        !filter.some((pattern) => new RegExp(pattern).test(filePath))
-      )
-        return;
+    globStream.on('data', (filePath) => {
+      tasks.push(
+        (async () => {
+          const filePathStr = filePath.toString();
+          const relativePath = path.relative(basePath, filePathStr);
 
-      try {
-        const cached = await fileCache.get(filePath);
-        if (cached) {
-          fileInfos.push(cached);
-          return;
-        }
+          if (ig.ignores(relativePath)) return;
 
-        const stats = await fs.stat(filePath);
-        if (!stats.isFile()) return;
+          if (
+            filter.length > 0 &&
+            !filter.some((pattern) => new RegExp(pattern).test(filePathStr))
+          )
+            return;
 
-        const buffer = await fs.readFile(filePath);
-        if (await isBinaryFile(buffer)) return;
+          try {
+            const cached = await fileCache.get(filePathStr);
+            if (cached) {
+              fileInfos.push(cached);
+              return;
+            }
 
-        const result = await piscina.run({ filePath, suppressComments });
+            const stats = await fs.stat(filePathStr);
+            if (!stats.isFile()) return;
 
-        if (result) {
-          await fileCache.set(filePath, result as FileInfo);
-          fileInfos.push(result as FileInfo);
-        }
-      } catch (error) {
-        console.error(`Error processing file ${filePath}:`, error);
-      }
+            const buffer = await fs.readFile(filePathStr);
+            if (await isBinaryFile(buffer)) return;
+
+            const result = await pool.run({
+              filePath: filePathStr,
+              suppressComments,
+            });
+
+            if (result) {
+              await fileCache.set(filePathStr, result as FileInfo);
+              fileInfos.push(result as FileInfo);
+            }
+          } catch (error) {
+            console.error(`Error processing file ${filePathStr}:`, error);
+          }
+        })(),
+      );
     });
 
-    globStream.on('end', () => resolve(fileInfos));
-    globStream.on('error', (error) => reject(new Error(error)));
+    globStream.on('end', async () => {
+      await Promise.all(tasks);
+      resolve(fileInfos);
+    });
+
+    globStream.on('error', reject);
   });
 }
 
 export const testExports = {
-  piscina,
+  pool,
 };

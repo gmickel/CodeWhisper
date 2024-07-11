@@ -12,7 +12,7 @@ const resolvePath = (pathname: string) =>
   new URL(pathname, import.meta.url).pathname;
 
 describe('CLI Commands', () => {
-  const cliPath = resolvePath('../../../src/cli/index.ts');
+  const cliPath = resolvePath('../../cli.js');
   const testProjectPath = path.resolve(__dirname, '../fixtures/test-project');
   const outputPath = path.join(testProjectPath, 'output.md');
   let tempGitignorePath: string;
@@ -33,7 +33,7 @@ describe('CLI Commands', () => {
 
   it('should generate markdown file with default options', () => {
     execSync(
-      `bun run ${cliPath} generate -p ${testProjectPath} -o ${outputPath} -g ${tempGitignorePath}`,
+      `pnpm exec esno ${cliPath} generate -p ${testProjectPath} -o ${outputPath} -g ${tempGitignorePath}`,
       { stdio: 'inherit' },
     );
 

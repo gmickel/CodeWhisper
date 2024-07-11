@@ -1,6 +1,6 @@
 import path from 'node:path';
 import fs from 'fs-extra';
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { processFiles } from '../../src/core/file-processor';
 
 const resolvePath = (pathname: string) =>
@@ -18,14 +18,16 @@ describe('File Processor Performance', () => {
     }
   }
 
+  beforeAll(async () => {
+    await createLargeProject();
+  });
+
   // Clean up after tests
   afterAll(async () => {
     await fs.remove(largePath);
   });
 
   it('should process a large number of files efficiently', async () => {
-    await createLargeProject();
-
     const start = performance.now();
     const result = await processFiles({ path: largePath });
     const end = performance.now();

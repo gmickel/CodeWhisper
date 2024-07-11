@@ -1,5 +1,4 @@
 import path from 'node:path';
-import fs from 'fs-extra';
 import Handlebars from 'handlebars';
 import type { FileInfo } from './file-processor';
 
@@ -7,50 +6,7 @@ interface MarkdownOptions {
   template?: string;
   noCodeblock?: boolean;
   customData?: Record<string, unknown>;
-  basePath?: string; // Add this property
-}
-
-// Helper function to convert absolute path to relative path
-function relativePath(base: string, target: string): string {
-  return path.relative(base, target);
-}
-
-export async function generateMarkdown(
-  files: FileInfo[],
-  options: MarkdownOptions = {},
-): Promise<string> {
-  const {
-    template = 'generate-readme',
-    noCodeblock = false,
-    customData = {},
-    basePath = process.cwd(), // Default to current working directory if not provided
-  } = options;
-
-  const isDist = path
-    .dirname(new URL(import.meta.url).pathname)
-    .includes('/dist/');
-  const templatesDir = isDist
-    ? path.resolve(path.dirname(new URL(import.meta.url).pathname), '../')
-    : path.resolve(
-        path.dirname(new URL(import.meta.url).pathname),
-        '../templates',
-      );
-  const templatePath = options.template
-    ? options.template
-    : path.resolve(templatesDir, `${template}.hbs`);
-
-  const templateContent = await fs.readFile(templatePath, 'utf-8');
-  const compiledTemplate = Handlebars.compile(templateContent);
-
-  registerHandlebarsHelpers(noCodeblock);
-
-  const data = {
-    files,
-    base: basePath,
-    ...customData,
-  };
-
-  return compiledTemplate(data);
+  basePath?: string;
 }
 
 function registerHandlebarsHelpers(noCodeblock: boolean) {
@@ -63,6 +19,14 @@ function registerHandlebarsHelpers(noCodeblock: boolean) {
       return new Handlebars.SafeString(`\`\`\`${language}\n${content}\n\`\`\``);
     },
   );
+
+  Handlebars.registerHelper('eq', (v1, v2) => v1 === v2);
+  Handlebars.registerHelper('objectKeys', Object.keys);
+  Handlebars.registerHelper('gt', (a, b) => a > b);
+
+  Handlebars.registerHelper('hasCustomData', (customData) => {
+    return customData && Object.keys(customData).length > 0;
+  });
 
   Handlebars.registerHelper('lineNumbers', (content: string) => {
     const lines = content.split('\n');
@@ -92,4 +56,39 @@ function registerHandlebarsHelpers(noCodeblock: boolean) {
     const basePath = options.data.root.base;
     return relativePath(basePath, filePath);
   });
+
+  // Adapt to handle missing helpers gracefully
+  Handlebars.registerHelper('helperMissing', (...args) => {
+    const options = args.pop();
+    console.warn(`Missing helper: "${options.name}"`);
+    return `Missing helper: "${options.name}"`;
+  });
+}
+
+function relativePath(base: string, target: string): string {
+  return path.relative(base, target).replace(/\\/g, '/');
+}
+
+export async function generateMarkdown(
+  files: FileInfo[],
+  templateContent: string,
+  options: MarkdownOptions = {},
+): Promise<string> {
+  const {
+    noCodeblock = false,
+    customData = {},
+    basePath = process.cwd(),
+  } = options;
+
+  registerHandlebarsHelpers(noCodeblock);
+
+  const compiledTemplate = Handlebars.compile(templateContent);
+
+  const data = {
+    files,
+    base: basePath,
+    customData,
+  };
+
+  return compiledTemplate(data);
 }

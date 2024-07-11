@@ -8,7 +8,6 @@ import ora from 'ora';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
 
-// Determine if we're in a development or production environment
 const isProduction = path
   .dirname(new URL(import.meta.url).pathname)
   .includes('/dist/');
@@ -55,6 +54,7 @@ export function cli(args: string[]) {
     )
     .action(async (options) => {
       const spinner = ora('Processing files...').start();
+
       try {
         const files = await processFiles({
           path: options.path,
@@ -84,8 +84,9 @@ export function cli(args: string[]) {
           options.customTemplate ||
           path.join(templatesDir, `${options.template}.hbs`);
 
-        const markdown = await generateMarkdown(files, {
-          template: templatePath,
+        const templateContent = await fs.readFile(templatePath, 'utf-8');
+
+        const markdown = await generateMarkdown(files, templateContent, {
           noCodeblock: !options.codeblock,
           basePath: options.path,
           customData,
