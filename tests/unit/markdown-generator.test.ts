@@ -1,5 +1,4 @@
-// tests/unit/markdown-generator.test.ts
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import type { FileInfo } from '../../src/core/file-processor';
 import { generateMarkdown } from '../../src/core/markdown-generator';
 

@@ -1,5 +1,25 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Markdown Output > should match snapshot for custom template with custom data 1`] = `
+"# Custom Template: Snapshot Test Project
+
+## Project Overview
+
+This project contains 0 file(s).
+
+## File Listing
+
+
+## Custom Data
+
+Custom data provided:
+- title: Snapshot Test Project
+- version: 1.0.0
+
+## Generated on: Missing helper: &quot;now&quot;
+"
+`;
+
 exports[`Markdown Output > should match snapshot for default template 1`] = `
 "# Code Summary
 
@@ -46,6 +66,16 @@ export function add(a: number, b: number): number {
 console.log('Hello, World!');
 
 \`\`\`
+
+"
+`;
+
+exports[`Markdown Output > should match snapshot for default template with additional custom data 1`] = `
+"# Code Summary
+
+
+
+## Files
 
 "
 `;

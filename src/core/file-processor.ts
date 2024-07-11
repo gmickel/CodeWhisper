@@ -1,11 +1,12 @@
 import os from 'node:os';
-import path from 'node:path';
+import path, { resolve } from 'node:path';
 import fastGlob from 'fast-glob';
 import fs from 'fs-extra';
 import ignore from 'ignore';
 import { isBinaryFile } from 'isbinaryfile';
 import Piscina from 'piscina';
 import { FileCache } from '../utils/file-cache';
+import { filename } from './file-worker';
 
 export interface FileInfo {
   path: string;
@@ -31,11 +32,12 @@ interface ProcessOptions {
 const isDist = path
   .dirname(new URL(import.meta.url).pathname)
   .includes('/dist/');
-const workerFilename = `file-worker.${isDist ? 'js' : 'ts'}`;
-const workerFilePath = new URL(
-  isDist ? path.join('../core', workerFilename) : workerFilename,
-  import.meta.url,
-).href;
+const workerFilename = 'file-worker.js';
+const workerFilePath = path.resolve(
+  path.dirname(new URL(import.meta.url).pathname),
+  '../core',
+  workerFilename,
+);
 
 const pool = new Piscina({ filename: workerFilePath });
 
@@ -84,14 +86,6 @@ const DEFAULT_IGNORES = [
   '**/.idea',
   '**/*.swp',
   '**/*.swo',
-  '**/.DS_Store',
-
-  // Logs
-  '**/logs',
-  '**/*.log',
-  '**/npm-debug.log*',
-  '**/yarn-debug.log*',
-  '**/yarn-error.log*',
 
   // OS generated files
   '**/.DS_Store',
@@ -102,9 +96,12 @@ const DEFAULT_IGNORES = [
   '**/ehthumbs.db',
   '**/Thumbs.db',
 
-  // Test coverage
-  '**/coverage',
-  '**/.nyc_output',
+  // Logs
+  '**/logs',
+  '**/*.log',
+  '**/npm-debug.log*',
+  '**/yarn-debug.log*',
+  '**/yarn-error.log*',
 
   // Temporary files
   '**/tmp',
@@ -126,6 +123,7 @@ export async function processFiles(
   } = options;
 
   const fileCache = new FileCache(cachePath);
+
   const ig = ignore().add(DEFAULT_IGNORES).add(customIgnores);
 
   if (await fs.pathExists(gitignorePath)) {
@@ -194,6 +192,7 @@ export async function processFiles(
 
     globStream.on('end', async () => {
       await Promise.all(tasks);
+      fileInfos.sort((a, b) => a.path.localeCompare(b.path));
       resolve(fileInfos);
     });
 
