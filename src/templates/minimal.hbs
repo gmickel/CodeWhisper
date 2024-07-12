@@ -1,0 +1,10 @@
+## Files
+
+{{#each files}}
+## {{relativePath this.path}}
+
+- Language: {{this.language}}
+
+{{#codeblock this.content this.language}}{{/codeblock}}
+
+{{/each}}
