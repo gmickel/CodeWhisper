@@ -1,3 +1,4 @@
+import path from 'node:path';
 /**
  * This file is configured to use a JavaScript worker file (`file-worker.js`)
  * because the `Piscina` worker-thread pool works better with a JavaScript file as the entry point.
@@ -5,8 +6,60 @@
  */
 import fs from 'fs-extra';
 import { isBinaryFile } from 'isbinaryfile';
-import { stripComments } from '../utils/comment-stripper';
-import { detectLanguage } from '../utils/language-detector';
+import stripCommentsLib from 'strip-comments';
+
+/**
+ * Strips comments from the given code.
+ *
+ * @param {string} code - The code from which to strip comments.
+ * @param {string} language - The language of the code (e.g., 'javascript', 'python').
+ * @returns {string} - The code with comments stripped.
+ */
+export function stripComments(code, language) {
+  const options = {
+    language,
+    preserveNewlines: true,
+  };
+
+  return stripCommentsLib(code, options);
+}
+
+const languageMap = {
+  js: 'javascript',
+  ts: 'typescript',
+  py: 'python',
+  rb: 'ruby',
+  java: 'java',
+  c: 'c',
+  cpp: 'cpp',
+  cs: 'csharp',
+  go: 'go',
+  rs: 'rust',
+  php: 'php',
+  html: 'html',
+  css: 'css',
+  json: 'json',
+  md: 'markdown',
+  yml: 'yaml',
+  yaml: 'yaml',
+  xml: 'xml',
+  sql: 'sql',
+  sh: 'bash',
+  bat: 'batch',
+  ps1: 'powershell',
+  // Add more mappings as needed
+};
+
+/**
+ * Detects the language of a file based on its extension.
+ *
+ * @param {string} filePath - The path of the file.
+ * @returns {string} The detected language of the file.
+ */
+export function detectLanguage(filePath) {
+  const extension = path.extname(filePath).slice(1).toLowerCase();
+  return languageMap[extension] || 'plaintext';
+}
 
 /**
  * Process a file and return its metadata and content.
@@ -17,7 +70,10 @@ import { detectLanguage } from '../utils/language-detector';
  * @returns {Promise<Object|null>} A promise that resolves to an object containing the file metadata and content,
  *                                or null if there was an error processing the file.
  */
-export default async function processFile({ filePath, suppressComments }) {
+export default async function processFile({
+  filePath,
+  suppressComments = false,
+}) {
   try {
     const stats = await fs.stat(filePath);
     const buffer = await fs.readFile(filePath);

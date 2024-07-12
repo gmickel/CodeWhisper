@@ -1,6 +1,6 @@
 import path from 'node:path';
 import fs from 'fs-extra';
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { type FileInfo, processFiles } from '../../src/core/file-processor';
 import { generateMarkdown } from '../../src/core/markdown-generator';
 
@@ -13,67 +13,91 @@ describe('Markdown Output', () => {
   const defaultTemplatePath = path.join(fixturesPath, 'default.hbs');
   const testDir = path.join(fixturesPath, 'test-project');
 
-  async function readTemplateContent(templatePath: string): Promise<string> {
-    return await fs.readFile(templatePath, 'utf-8');
-  }
+  let processedFiles: FileInfo[];
+  let defaultTemplateContent: string;
+  let customTemplateContent: string;
 
-  async function getProcessedFiles(directory: string) {
-    return await processFiles({ path: directory });
-  }
+  beforeAll(async () => {
+    // Set the TSNODE environment variable to enable the use of the `ts-node/register` module
+    // This is required for the `processFiles` function to work correctly in the test environment
+    process.env.TSNODE = 'true';
+    processedFiles = await processFiles({ path: testDir });
+    defaultTemplateContent = await fs.readFile(defaultTemplatePath, 'utf-8');
+    customTemplateContent = await fs.readFile(customTemplatePath, 'utf-8');
+  });
+
+  afterAll(() => {
+    process.env.TSNODE = undefined;
+  });
 
   async function generateMarkdownContent(
-    files: FileInfo[],
     templateContent: string,
-    options: Record<string, unknown>,
+    options: Record<string, unknown> = {},
   ) {
-    return await generateMarkdown(files, templateContent, {
+    return await generateMarkdown(processedFiles, templateContent, {
       ...options,
-      basePath: (options.basePath as string) || testDir,
+      basePath: testDir,
     });
   }
 
+  // Custom snapshot serializer
+  expect.addSnapshotSerializer({
+    test: (val) => typeof val === 'string',
+    print: (val) => {
+      const str = val as string;
+      // Replace the actual test directory path with a placeholder
+      let normalizedStr = str.replace(
+        new RegExp(testDir.replace(/\\/g, '\\\\'), 'g'),
+        '[TEST_DIR]',
+      );
+
+      // Unescape HTML entities
+      normalizedStr = normalizedStr
+        .replace(/&quot;/g, '"')
+        .replace(/&#x27;/g, "'")
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&');
+
+      return normalizedStr;
+    },
+  });
+
   it('should match snapshot for default template', async () => {
-    const files = await getProcessedFiles(testDir);
-    const defaultTemplateContent =
-      await readTemplateContent(defaultTemplatePath);
-
-    const markdown = await generateMarkdownContent(
-      files,
-      defaultTemplateContent,
-      {},
-    );
-
+    const markdown = await generateMarkdownContent(defaultTemplateContent);
     expect(markdown).toMatchSnapshot();
   });
 
   it('should match snapshot for custom template with custom data', async () => {
-    const files = await getProcessedFiles(testDir);
-    const customTemplateContent = await readTemplateContent(customTemplatePath);
-
-    const markdownWithCustomData = await generateMarkdownContent(
-      files,
-      customTemplateContent,
-      {
-        customData: { title: 'Snapshot Test Project', version: '1.0.0' },
-      },
-    );
-
-    expect(markdownWithCustomData).toMatchSnapshot();
+    const markdown = await generateMarkdownContent(customTemplateContent, {
+      customData: { title: 'Snapshot Test Project', version: '1.0.0' },
+    });
+    expect(markdown).toMatchSnapshot();
   });
 
-  it('should match snapshot for default template with additional custom data', async () => {
-    const files = await getProcessedFiles(testDir);
-    const defaultTemplateContent =
-      await readTemplateContent(defaultTemplatePath);
+  it('should match snapshot for default template with no codeblocks', async () => {
+    const markdown = await generateMarkdownContent(defaultTemplateContent, {
+      noCodeblock: true,
+    });
+    expect(markdown).toMatchSnapshot();
+  });
 
-    const markdownWithCustomData = await generateMarkdownContent(
-      files,
-      defaultTemplateContent,
-      {
-        customData: { key: 'value', another: 'data point' },
+  it('should match snapshot for custom template with additional custom data', async () => {
+    const markdown = await generateMarkdownContent(customTemplateContent, {
+      customData: {
+        title: 'Extended Snapshot Test',
+        version: '2.0.0',
+        author: 'Test Author',
+        description: 'This is a test project for snapshot testing',
       },
-    );
+    });
+    expect(markdown).toMatchSnapshot();
+  });
 
-    expect(markdownWithCustomData).toMatchSnapshot();
+  it('should match snapshot for custom template with empty custom data', async () => {
+    const markdown = await generateMarkdownContent(customTemplateContent, {
+      customData: {},
+    });
+    expect(markdown).toMatchSnapshot();
   });
 });

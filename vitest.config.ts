@@ -6,11 +6,12 @@ export default defineConfig({
     exclude: ['**/node_modules/**', '**/dist/**'],
     environment: 'node',
     globals: true,
+    pool: 'threads',
     coverage: {
       enabled: true,
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
     },
-    setupFiles: ['./tests/vitest.setup.ts'],
+    //setupFiles: ['./tests/vitest.setup.ts'],
   },
 });

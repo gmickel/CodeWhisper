@@ -2,49 +2,45 @@ import { execSync } from 'node:child_process';
 import path from 'node:path';
 import fs from 'fs-extra';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import {
-  removeTemporaryGitignore,
-  setupTemporaryGitignore,
-} from '../helpers/gitignore-helper';
-
-const __dirname = new URL('.', import.meta.url).pathname;
-const resolvePath = (pathname: string) =>
-  new URL(pathname, import.meta.url).pathname;
 
 describe('CLI Commands', () => {
-  const cliPath = resolvePath('../../cli.js');
+  const cliPath = path.resolve(__dirname, '../../cli.js');
   const testProjectPath = path.resolve(__dirname, '../fixtures/test-project');
   const outputPath = path.join(testProjectPath, 'output.md');
-  let tempGitignorePath: string;
+  const tempGitignorePath = path.join(testProjectPath, '.gitignore');
 
   beforeAll(async () => {
-    tempGitignorePath = await setupTemporaryGitignore(
-      testProjectPath,
-      '*.log\nnode_modules/\n',
-    );
+    // Ensure .gitignore exists
+    await fs.writeFile(tempGitignorePath, '*.log\n');
   });
 
   afterAll(async () => {
-    await removeTemporaryGitignore(tempGitignorePath);
-    if (await fs.pathExists(outputPath)) {
-      await fs.remove(outputPath);
-    }
+    // Clean up
+    await fs.remove(tempGitignorePath);
+    await fs.remove(outputPath);
   });
 
   it('should generate markdown file with default options', () => {
-    execSync(
-      `pnpm exec esno ${cliPath} generate -p ${testProjectPath} -o ${outputPath} -g ${tempGitignorePath}`,
-      { stdio: 'inherit' },
-    );
+    try {
+      const command = `pnpm exec esno ${cliPath} generate -p "${testProjectPath}" -o "${outputPath}" -g "${tempGitignorePath}"`;
 
-    const output = fs.readFileSync(outputPath, 'utf-8');
-    expect(output).toContain('# Code Summary');
-    expect(output).toContain('## Files');
-    expect(output).toContain('src/main.js');
-    expect(output).toContain('src/utils.ts');
-    expect(output).toContain('package.json');
-    expect(output).not.toContain('*.log'); // This should be ignored
+      execSync(command, {
+        stdio: 'inherit',
+        env: { ...process.env, NODE_ENV: 'test' },
+        cwd: path.resolve(__dirname, '../..'), // Set working directory to project root
+      });
+
+      const output = fs.readFileSync(outputPath, 'utf-8');
+
+      expect(output).toContain('# Code Summary');
+      expect(output).toContain('## Files');
+      expect(output).toContain('src/main.js');
+      expect(output).toContain('src/utils.ts');
+      expect(output).toContain('package.json');
+      expect(output).not.toContain('*.log'); // This should be ignored
+    } catch (error) {
+      console.error('Error executing command:', error);
+      throw error;
+    }
   });
-
-  // Add more test cases as needed
 });

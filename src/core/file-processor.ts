@@ -28,18 +28,11 @@ interface ProcessOptions {
   cachePath?: string;
 }
 
-const isDist = path
-  .dirname(new URL(import.meta.url).pathname)
-  .includes('/dist/');
-const workerFilename = `file-worker.${isDist ? 'js' : 'ts'}`;
-const workerFilePath = new URL(
-  isDist ? path.join('../core', workerFilename) : workerFilename,
-  import.meta.url,
-).href;
+const workerFilename = 'file-worker.js';
+const workerFilePath = new URL(workerFilename, import.meta.url).href;
 
 const pool = new Piscina({
   filename: workerFilePath,
-  execArgv: process.env.VITEST ? ['-r', 'ts-node/register'] : undefined,
 });
 
 const DEFAULT_IGNORES = [

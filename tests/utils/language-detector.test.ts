@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detectLanguage } from '../../src/utils/language-detector';
+import { detectLanguage } from '../../src/core/file-worker';
 
 describe('language-detector', () => {
   it('should detect JavaScript', () => {

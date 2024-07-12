@@ -7,7 +7,7 @@ This project contains {{files.length}} file(s).
 ## File Listing
 
 {{#each files}}
-### {{this.path}}
+### {{relativePath this.path}}
 
 - **Language:** {{this.language}}
 - **Size:** {{this.size}} bytes
@@ -36,5 +36,3 @@ No custom data provided.
 {{else}}
 No custom data provided.
 {{/if}}
-
-## Generated on: {{now}}

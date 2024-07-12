@@ -67,34 +67,55 @@ describe('Markdown Generation Integration', () => {
       customTemplatePath,
       'utf-8',
     );
+
     const result = await generateMarkdown(mockFiles, customTemplateContent, {
       basePath: '/project',
       customData: { title: 'Test Project', version: '1.0.0' },
     });
 
-    expect(result).toContain('# Custom Template: Test Project');
-    expect(result).toContain('## Project Overview');
-    expect(result).toContain('This project contains 2 file(s).');
-    expect(result).toContain('## File Listing');
-    expect(result).toContain('### /project/src/index.ts');
-    expect(result).toContain('### /project/README.md');
-    expect(result).toContain('- **Language:** typescript');
-    expect(result).toContain('- **Language:** markdown');
-    expect(result).toContain('- **Size:** 100 bytes');
-    expect(result).toContain('- **Size:** 50 bytes');
-    expect(result).toContain('- **Last Modified:**');
-    expect(result).toContain('#### Content Preview:');
+    // Check for main sections
+    expect(decodeHTMLEntities(result)).toContain(
+      '# Custom Template: Test Project',
+    );
+    expect(decodeHTMLEntities(result)).toContain('## Project Overview');
+    expect(decodeHTMLEntities(result)).toContain(
+      'This project contains 2 file(s).',
+    );
+    expect(decodeHTMLEntities(result)).toContain('## File Listing');
+
+    // Check for file entries
+    expect(decodeHTMLEntities(result)).toContain('### src/index.ts');
+    expect(decodeHTMLEntities(result)).toContain('### README.md');
+
+    // Check for file details
+    expect(decodeHTMLEntities(result)).toContain('- **Language:** typescript');
+    expect(decodeHTMLEntities(result)).toContain('- **Language:** markdown');
+    expect(decodeHTMLEntities(result)).toContain('- **Size:** 100 bytes');
+    expect(decodeHTMLEntities(result)).toContain('- **Size:** 50 bytes');
+
+    // Check for last modified dates
+    expect(decodeHTMLEntities(result)).toContain(
+      '- **Last Modified:** Mon Jan 02 2023',
+    );
+    expect(decodeHTMLEntities(result)).toContain(
+      '- **Last Modified:** Sun Jan 01 2023',
+    );
+
+    // Check for content previews
+    expect(decodeHTMLEntities(result)).toContain('#### Content Preview:');
     expect(decodeHTMLEntities(result)).toContain(
       '```typescript\nconsole.log("Hello, World!");\n```',
     );
-    expect(result).toContain('```markdown\n# Project README\n```');
-    expect(result).toContain('## Custom Data');
-    expect(result).toContain('Custom data provided:');
-    expect(result).toContain('- title: Test Project');
-    expect(result).toContain('- version: 1.0.0');
-    expect(result).toContain('## Generated on:');
-  });
+    expect(decodeHTMLEntities(result)).toContain(
+      '```markdown\n# Project README\n```',
+    );
 
+    // Check for custom data section
+    expect(decodeHTMLEntities(result)).toContain('## Custom Data');
+    expect(decodeHTMLEntities(result)).toContain('Custom data provided:');
+    expect(decodeHTMLEntities(result)).toContain('- title: Test Project');
+    expect(decodeHTMLEntities(result)).toContain('- version: 1.0.0');
+  });
   it('should include custom data in template context', async () => {
     const customTemplateContent = await fs.readFile(
       customTemplatePath,
