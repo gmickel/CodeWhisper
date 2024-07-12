@@ -136,25 +136,25 @@ export async function processFiles(
   };
 
   const fileInfos: FileInfo[] = [];
-  const tasks: Promise<void>[] = [];
+  const cachePromises: Promise<void>[] = [];
 
   const globStream = fastGlob.stream('**/*', globOptions);
 
   return new Promise((resolve, reject) => {
     globStream.on('data', (filePath) => {
-      tasks.push(
+      const filePathStr = filePath.toString();
+      const relativePath = path.relative(basePath, filePathStr);
+
+      if (ig.ignores(relativePath)) return;
+
+      if (
+        filter.length > 0 &&
+        !filter.some((pattern) => new RegExp(pattern).test(filePathStr))
+      )
+        return;
+
+      cachePromises.push(
         (async () => {
-          const filePathStr = filePath.toString();
-          const relativePath = path.relative(basePath, filePathStr);
-
-          if (ig.ignores(relativePath)) return;
-
-          if (
-            filter.length > 0 &&
-            !filter.some((pattern) => new RegExp(pattern).test(filePathStr))
-          )
-            return;
-
           try {
             const cached = await fileCache.get(filePathStr);
             if (cached) {
@@ -186,7 +186,7 @@ export async function processFiles(
 
     globStream.on('end', async () => {
       try {
-        await Promise.all(tasks);
+        await Promise.all(cachePromises);
         fileInfos.sort((a, b) => a.path.localeCompare(b.path));
         await fileCache.flush();
         resolve(fileInfos);
@@ -199,7 +199,3 @@ export async function processFiles(
     globStream.on('error', reject);
   });
 }
-
-export const testExports = {
-  pool,
-};
