@@ -3,7 +3,7 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
   entry: {
     'cli/index': 'src/cli/index.ts',
-    'core/file-worker': 'src/core/file-worker.ts',
+    'core/file-worker': 'src/core/file-worker.js',
     cli: 'cli.js',
   },
   format: ['esm'],
@@ -16,7 +16,6 @@ export default defineConfig({
   dts: {
     entry: {
       'cli/index': 'src/cli/index.ts',
-      'core/file-worker': 'src/core/file-worker.ts',
     },
   },
   esbuildOptions: (options) => {

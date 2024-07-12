@@ -29,7 +29,7 @@ interface ProcessOptions {
 }
 
 const workerFilename = 'file-worker.js';
-const workerFilePath = new URL(workerFilename, import.meta.url).href;
+const workerFilePath = new URL('../core/file-worker.js', import.meta.url).href;
 
 const pool = new Piscina({
   filename: workerFilePath,
