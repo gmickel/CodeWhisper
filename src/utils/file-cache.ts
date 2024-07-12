@@ -12,68 +12,84 @@ export class FileCache {
   private cacheFile: string;
   private cache: Record<string, CacheEntry> = {};
   private isDirty = false;
+  private isLoaded = false;
+  private inMemoryLock = false;
 
   constructor(cacheFilePath: string) {
     this.cacheFile = cacheFilePath;
-    this.loadCache();
   }
 
-  private async loadCache() {
+  private async loadCache(): Promise<void> {
+    if (this.isLoaded) return;
+
+    if (this.inMemoryLock) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      return this.loadCache();
+    }
+
+    this.inMemoryLock = true;
+
     try {
       if (await fs.pathExists(this.cacheFile)) {
         const content = await fs.readFile(this.cacheFile, 'utf-8');
-        this.cache = JSON.parse(content);
+        try {
+          this.cache = JSON.parse(content);
+        } catch (parseError) {
+          console.warn(
+            `Failed to parse cache file ${this.cacheFile}:`,
+            parseError,
+          );
+          this.cache = {};
+        }
       }
+      this.isLoaded = true;
     } catch (error) {
       console.warn(`Failed to load cache from ${this.cacheFile}:`, error);
       this.cache = {};
+    } finally {
+      this.inMemoryLock = false;
     }
   }
 
-  private async saveCache() {
+  private async saveCache(): Promise<void> {
     if (!this.isDirty) return;
+
+    if (this.inMemoryLock) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      return this.saveCache();
+    }
+
+    this.inMemoryLock = true;
 
     try {
       await fs.ensureDir(path.dirname(this.cacheFile));
-      await fs.writeFile(this.cacheFile, JSON.stringify(this.cache), 'utf-8');
+      const tempFile = `${this.cacheFile}.tmp`;
+      await fs.writeFile(tempFile, JSON.stringify(this.cache), 'utf-8');
+      await fs.rename(tempFile, this.cacheFile);
       this.isDirty = false;
     } catch (error) {
       console.error(`Failed to save cache to ${this.cacheFile}:`, error);
+    } finally {
+      this.inMemoryLock = false;
     }
   }
 
   async get(filePath: string): Promise<FileInfo | null> {
-    try {
-      const stats = await fs.stat(filePath);
-      const currentHash = this.hashFile(stats);
-
-      if (this.cache[filePath] && this.cache[filePath].hash === currentHash) {
-        return this.cache[filePath].data;
-      }
-    } catch (error) {
-      console.warn(`Failed to get cache entry for ${filePath}:`, error);
-    }
-
-    return null;
+    await this.loadCache();
+    return this.cache[filePath]?.data || null;
   }
 
   async set(filePath: string, data: FileInfo): Promise<void> {
-    try {
-      const stats = await fs.stat(filePath);
-      const hash = this.hashFile(stats);
-
-      this.cache[filePath] = { hash, data };
-      this.isDirty = true;
-      await this.saveCache();
-    } catch (error) {
-      console.error(`Failed to set cache entry for ${filePath}:`, error);
-    }
+    await this.loadCache();
+    const hash = this.hashFile(data);
+    this.cache[filePath] = { hash, data };
+    this.isDirty = true;
   }
 
-  private hashFile(stats: fs.Stats): string {
+  private hashFile(data: FileInfo): string {
     return crypto
       .createHash('md5')
-      .update(`${stats.size}-${stats.mtime.getTime()}`)
+      .update(`${data.size}-${data.modified.getTime()}`)
       .digest('hex');
   }
 
@@ -81,5 +97,11 @@ export class FileCache {
     this.cache = {};
     this.isDirty = true;
     await this.saveCache();
+  }
+
+  async flush(): Promise<void> {
+    if (this.isDirty) {
+      await this.saveCache();
+    }
   }
 }

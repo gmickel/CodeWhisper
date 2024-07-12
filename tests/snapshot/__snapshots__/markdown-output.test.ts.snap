@@ -13,7 +13,7 @@ This project contains 3 file(s).
 
 - **Language:** json
 - **Size:** 51 bytes
-- **Last Modified:** 2024-07-10T21:40:47.688Z
+- **Last Modified:** Wed Jul 10 2024 23:40:47 GMT+0200 (Central European Summer Time)
 
 #### Content Preview:
 
@@ -30,7 +30,7 @@ This project contains 3 file(s).
 
 - **Language:** javascript
 - **Size:** 30 bytes
-- **Last Modified:** 2024-07-10T21:40:47.688Z
+- **Last Modified:** Wed Jul 10 2024 23:40:47 GMT+0200 (Central European Summer Time)
 
 #### Content Preview:
 
@@ -44,7 +44,7 @@ console.log('Hello, World!');
 
 - **Language:** typescript
 - **Size:** 70 bytes
-- **Last Modified:** 2024-07-10T21:40:47.688Z
+- **Last Modified:** Wed Jul 10 2024 23:40:47 GMT+0200 (Central European Summer Time)
 
 #### Content Preview:
 
@@ -80,7 +80,7 @@ This project contains 3 file(s).
 
 - **Language:** json
 - **Size:** 51 bytes
-- **Last Modified:** 2024-07-10T21:40:47.688Z
+- **Last Modified:** Wed Jul 10 2024 23:40:47 GMT+0200 (Central European Summer Time)
 
 #### Content Preview:
 
@@ -97,7 +97,7 @@ This project contains 3 file(s).
 
 - **Language:** javascript
 - **Size:** 30 bytes
-- **Last Modified:** 2024-07-10T21:40:47.688Z
+- **Last Modified:** Wed Jul 10 2024 23:40:47 GMT+0200 (Central European Summer Time)
 
 #### Content Preview:
 
@@ -111,7 +111,7 @@ console.log('Hello, World!');
 
 - **Language:** typescript
 - **Size:** 70 bytes
-- **Last Modified:** 2024-07-10T21:40:47.688Z
+- **Last Modified:** Wed Jul 10 2024 23:40:47 GMT+0200 (Central European Summer Time)
 
 #### Content Preview:
 
@@ -145,7 +145,7 @@ This project contains 3 file(s).
 
 - **Language:** json
 - **Size:** 51 bytes
-- **Last Modified:** 2024-07-10T21:40:47.688Z
+- **Last Modified:** Wed Jul 10 2024 23:40:47 GMT+0200 (Central European Summer Time)
 
 #### Content Preview:
 
@@ -162,7 +162,7 @@ This project contains 3 file(s).
 
 - **Language:** javascript
 - **Size:** 30 bytes
-- **Last Modified:** 2024-07-10T21:40:47.688Z
+- **Last Modified:** Wed Jul 10 2024 23:40:47 GMT+0200 (Central European Summer Time)
 
 #### Content Preview:
 
@@ -176,7 +176,7 @@ console.log('Hello, World!');
 
 - **Language:** typescript
 - **Size:** 70 bytes
-- **Last Modified:** 2024-07-10T21:40:47.688Z
+- **Last Modified:** Wed Jul 10 2024 23:40:47 GMT+0200 (Central European Summer Time)
 
 #### Content Preview:
 
@@ -208,7 +208,7 @@ exports[`Markdown Output > should match snapshot for default template 1`] = `
 
 - Language: json
 - Size: 51 bytes
-- Last modified: 2024-07-10T21:40:47.688Z
+- Last modified: Wed Jul 10 2024 23:40:47 GMT+0200 (Central European Summer Time)
 
 \`\`\`json
 {
@@ -222,7 +222,7 @@ exports[`Markdown Output > should match snapshot for default template 1`] = `
 
 - Language: javascript
 - Size: 30 bytes
-- Last modified: 2024-07-10T21:40:47.688Z
+- Last modified: Wed Jul 10 2024 23:40:47 GMT+0200 (Central European Summer Time)
 
 \`\`\`javascript
 console.log('Hello, World!');
@@ -233,7 +233,7 @@ console.log('Hello, World!');
 
 - Language: typescript
 - Size: 70 bytes
-- Last modified: 2024-07-10T21:40:47.688Z
+- Last modified: Wed Jul 10 2024 23:40:47 GMT+0200 (Central European Summer Time)
 
 \`\`\`typescript
 export function add(a: number, b: number): number {
@@ -258,7 +258,7 @@ exports[`Markdown Output > should match snapshot for default template with no co
 
 - Language: json
 - Size: 51 bytes
-- Last modified: 2024-07-10T21:40:47.688Z
+- Last modified: Wed Jul 10 2024 23:40:47 GMT+0200 (Central European Summer Time)
 
 {
   "name": "test-project",
@@ -270,7 +270,7 @@ exports[`Markdown Output > should match snapshot for default template with no co
 
 - Language: javascript
 - Size: 30 bytes
-- Last modified: 2024-07-10T21:40:47.688Z
+- Last modified: Wed Jul 10 2024 23:40:47 GMT+0200 (Central European Summer Time)
 
 console.log('Hello, World!');
 
@@ -279,7 +279,7 @@ console.log('Hello, World!');
 
 - Language: typescript
 - Size: 70 bytes
-- Last modified: 2024-07-10T21:40:47.688Z
+- Last modified: Wed Jul 10 2024 23:40:47 GMT+0200 (Central European Summer Time)
 
 export function add(a: number, b: number): number {
   return a + b;

@@ -1,6 +1,6 @@
 import path from 'node:path';
 import fs from 'fs-extra';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { type FileInfo, processFiles } from '../../src/core/file-processor';
 import { generateMarkdown } from '../../src/core/markdown-generator';
 
@@ -18,16 +18,9 @@ describe('Markdown Output', () => {
   let customTemplateContent: string;
 
   beforeAll(async () => {
-    // Set the TSNODE environment variable to enable the use of the `ts-node/register` module
-    // This is required for the `processFiles` function to work correctly in the test environment
-    process.env.TSNODE = 'true';
     processedFiles = await processFiles({ path: testDir });
     defaultTemplateContent = await fs.readFile(defaultTemplatePath, 'utf-8');
     customTemplateContent = await fs.readFile(customTemplatePath, 'utf-8');
-  });
-
-  afterAll(() => {
-    process.env.TSNODE = undefined;
   });
 
   async function generateMarkdownContent(

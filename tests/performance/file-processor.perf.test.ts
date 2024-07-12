@@ -1,58 +1,139 @@
+import os from 'node:os';
 import path from 'node:path';
+import { performance } from 'node:perf_hooks';
 import fs from 'fs-extra';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { processFiles } from '../../src/core/file-processor';
+import type { FileInfo } from '../../src/core/file-processor';
+import { generateMarkdown } from '../../src/core/markdown-generator';
 
-const resolvePath = (pathname: string) =>
-  new URL(pathname, import.meta.url).pathname;
+describe.sequential('Performance Tests', () => {
+  const TEST_DIR = path.join(__dirname, 'perf-test-files');
+  const DEFAULT_CACHE_PATH = path.join(os.tmpdir(), 'codewhisper-cache.json');
 
-describe('File Processor Performance', () => {
-  const largePath = resolvePath('../fixtures/large-project');
+  beforeAll(async () => {
+    await fs.ensureDir(TEST_DIR);
+    await fs.remove(DEFAULT_CACHE_PATH);
+  });
 
-  // Helper function to create a large project structure
-  async function createLargeProject() {
-    await fs.ensureDir(largePath);
-    for (let i = 0; i < 1000; i++) {
-      const content = `console.log('File ${i}');\n`.repeat(100);
-      await fs.writeFile(path.join(largePath, `file${i}.js`), content);
+  afterAll(async () => {
+    await fs.remove(TEST_DIR);
+    await fs.remove(DEFAULT_CACHE_PATH);
+  });
+
+  async function createTestFiles(
+    count: number,
+    sizeKB: number,
+    prefix: string,
+  ): Promise<void> {
+    const content = 'x'.repeat(sizeKB * 1024);
+    for (let i = 0; i < count; i++) {
+      await fs.writeFile(path.join(TEST_DIR, `${prefix}_${i}.txt`), content);
     }
   }
 
-  beforeAll(async () => {
-    await createLargeProject();
-  });
-
-  // Clean up after tests
-  afterAll(async () => {
-    await fs.remove(largePath);
-  });
-
-  it('should process a large number of files efficiently', async () => {
+  async function runProcessFiles(): Promise<[FileInfo[], number]> {
     const start = performance.now();
-    const result = await processFiles({ path: largePath });
+    const result = await processFiles({ path: TEST_DIR });
     const end = performance.now();
+    const duration = end - start;
+    console.log(`Processing took ${duration} ms`);
+    return [result, duration];
+  }
 
-    expect(result.length).toBe(1000);
-    console.log(`Processed 1000 files in ${end - start} ms`);
-    // You might want to add an assertion here to ensure it completes within a certain time
-    // expect(end - start).toBeLessThan(5000); // Should complete in less than 5 seconds, for example
-  });
+  async function runGenerateMarkdown(
+    files: FileInfo[],
+  ): Promise<[string, number]> {
+    const templateContent = '{{#each files}}{{this.path}}\n{{/each}}';
+    const start = performance.now();
+    const result = await generateMarkdown(files, templateContent);
+    const end = performance.now();
+    const duration = end - start;
+    console.log(`Markdown generation took ${duration} ms`);
+    return [result, duration];
+  }
 
-  it('should be faster on subsequent runs due to caching', async () => {
-    const firstRun = performance.now();
-    await processFiles({ path: largePath });
-    const firstEnd = performance.now();
+  it('should process 100 small files (1KB each) efficiently', async () => {
+    await fs.emptyDir(TEST_DIR);
+    await createTestFiles(100, 1, 'small');
+    const [files, processingTime] = await runProcessFiles();
+    expect(files).toHaveLength(100);
+    const [, markdownTime] = await runGenerateMarkdown(files);
+    console.log(`Total time: ${processingTime + markdownTime} ms`);
+  }, 10000);
 
-    const secondRun = performance.now();
-    await processFiles({ path: largePath });
-    const secondEnd = performance.now();
+  it('should process 10 large files (1MB each) efficiently', async () => {
+    await fs.emptyDir(TEST_DIR);
+    await createTestFiles(10, 1024, 'large');
+    const [files, processingTime] = await runProcessFiles();
+    expect(files).toHaveLength(10);
+    const [, markdownTime] = await runGenerateMarkdown(files);
+    console.log(`Total time: ${processingTime + markdownTime} ms`);
+  }, 30000);
 
-    const firstDuration = firstEnd - firstRun;
-    const secondDuration = secondEnd - secondRun;
+  it('should handle 1000 small files (1KB each)', async () => {
+    await fs.emptyDir(TEST_DIR);
+    await createTestFiles(1000, 1, 'many');
+    const [files, processingTime] = await runProcessFiles();
+    expect(files).toHaveLength(1000);
+    const [, markdownTime] = await runGenerateMarkdown(files);
+    console.log(`Total time: ${processingTime + markdownTime} ms`);
+  }, 60000);
 
-    console.log(`First run: ${firstDuration} ms`);
-    console.log(`Second run: ${secondDuration} ms`);
+  it('should benefit from caching on subsequent runs', async () => {
+    await fs.emptyDir(TEST_DIR);
+    await fs.remove(DEFAULT_CACHE_PATH);
+    await createTestFiles(1000, 10, 'cache'); // Increased to 1000 files
 
-    expect(secondDuration).toBeLessThan(firstDuration);
-  });
+    console.log('First run (no cache):');
+    const [firstRunFiles, firstRunTime] = await runProcessFiles();
+    expect(firstRunFiles).toHaveLength(1000);
+
+    console.log('Second run (with cache):');
+    const [secondRunFiles, secondRunTime] = await runProcessFiles();
+
+    console.log(`First run file count: ${firstRunFiles.length}`);
+    console.log(`Second run file count: ${secondRunFiles.length}`);
+
+    expect(secondRunFiles).toHaveLength(firstRunFiles.length);
+
+    console.log(`First run time: ${firstRunTime} ms`);
+    console.log(`Second run time: ${secondRunTime} ms`);
+    console.log(`Time saved: ${firstRunTime - secondRunTime} ms`);
+    console.log(
+      `Percentage faster: ${(((firstRunTime - secondRunTime) / firstRunTime) * 100).toFixed(2)}%`,
+    );
+
+    expect(secondRunTime).toBeLessThan(firstRunTime);
+    expect(secondRunTime).toBeLessThan(firstRunTime * 0.5);
+  }, 60000);
+
+  it('should handle a mix of file sizes efficiently', async () => {
+    await fs.emptyDir(TEST_DIR);
+    await createTestFiles(50, 1, 'small'); // 50 small files
+    await createTestFiles(30, 100, 'medium'); // 30 medium files
+    await createTestFiles(5, 1024, 'large'); // 5 large files
+
+    const [files, processingTime] = await runProcessFiles();
+    expect(files).toHaveLength(85);
+    const [, markdownTime] = await runGenerateMarkdown(files);
+    console.log(`Total time: ${processingTime + markdownTime} ms`);
+  }, 30000);
+
+  it('should process files with different extensions', async () => {
+    await fs.emptyDir(TEST_DIR);
+    const extensions = ['js', 'ts', 'json', 'md', 'txt'];
+    for (let i = 0; i < 50; i++) {
+      const ext = extensions[i % extensions.length];
+      await fs.writeFile(
+        path.join(TEST_DIR, `file_${i}.${ext}`),
+        `Content of file ${i}`,
+      );
+    }
+
+    const [files, processingTime] = await runProcessFiles();
+    expect(files).toHaveLength(50);
+    const [, markdownTime] = await runGenerateMarkdown(files);
+    console.log(`Total time: ${processingTime + markdownTime} ms`);
+  }, 15000);
 });

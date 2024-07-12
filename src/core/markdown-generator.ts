@@ -49,7 +49,7 @@ function registerHandlebarsHelpers(noCodeblock: boolean) {
 - Language: ${file.language}
 - Size: ${file.size} bytes
 - Last modified: ${file.modified}
-    `);
+`);
   });
 
   Handlebars.registerHelper('relativePath', (filePath: string, options) => {

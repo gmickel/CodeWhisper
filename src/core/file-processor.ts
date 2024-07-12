@@ -1,5 +1,5 @@
 import os from 'node:os';
-import path, { resolve } from 'node:path';
+import path from 'node:path';
 import fastGlob from 'fast-glob';
 import fs from 'fs-extra';
 import ignore from 'ignore';
@@ -185,9 +185,15 @@ export async function processFiles(
     });
 
     globStream.on('end', async () => {
-      await Promise.all(tasks);
-      fileInfos.sort((a, b) => a.path.localeCompare(b.path));
-      resolve(fileInfos);
+      try {
+        await Promise.all(tasks);
+        fileInfos.sort((a, b) => a.path.localeCompare(b.path));
+        await fileCache.flush();
+        resolve(fileInfos);
+      } catch (error) {
+        console.error('Error during file processing or cache flushing:', error);
+        reject(error instanceof Error ? error : new Error(String(error)));
+      }
     });
 
     globStream.on('error', reject);
