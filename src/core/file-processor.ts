@@ -36,7 +36,11 @@ const workerFilePath = new URL(
   isDist ? path.join('../core', workerFilename) : workerFilename,
   import.meta.url,
 ).href;
-const pool = new Piscina({ filename: workerFilePath });
+
+const pool = new Piscina({
+  filename: workerFilePath,
+  execArgv: process.env.VITEST ? ['-r', 'ts-node/register'] : undefined,
+});
 
 const DEFAULT_IGNORES = [
   // Version control
