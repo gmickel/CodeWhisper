@@ -6,7 +6,6 @@ import ignore from 'ignore';
 import { isBinaryFile } from 'isbinaryfile';
 import Piscina from 'piscina';
 import { FileCache } from '../utils/file-cache';
-import { filename } from './file-worker';
 
 export interface FileInfo {
   path: string;
@@ -32,13 +31,11 @@ interface ProcessOptions {
 const isDist = path
   .dirname(new URL(import.meta.url).pathname)
   .includes('/dist/');
-const workerFilename = 'file-worker.js';
-const workerFilePath = path.resolve(
-  path.dirname(new URL(import.meta.url).pathname),
-  '../core',
-  workerFilename,
-);
-
+const workerFilename = `file-worker.${isDist ? 'js' : 'ts'}`;
+const workerFilePath = new URL(
+  isDist ? path.join('../core', workerFilename) : workerFilename,
+  import.meta.url,
+).href;
 const pool = new Piscina({ filename: workerFilePath });
 
 const DEFAULT_IGNORES = [

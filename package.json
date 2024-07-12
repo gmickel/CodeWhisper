@@ -62,8 +62,7 @@
     "ora": "8.0.1",
     "piscina": "4.6.1",
     "simple-git": "3.25.0",
-    "strip-comments": "2.0.1",
-    "threads": "^1.7.0"
+    "strip-comments": "2.0.1"
   },
   "devDependencies": {
     "@antfu/utils": "0.7.10",
@@ -75,13 +74,11 @@
     "@vitest/ui": "2.0.2",
     "bumpp": "9.4.1",
     "cpx": "1.5.0",
-    "esbuild-register": "^3.5.0",
     "esno": "4.7.0",
     "lefthook": "1.7.2",
     "memfs": "^4.9.3",
     "ts-node": "10.9.2",
     "tsup": "8.1.0",
-    "tsx": "4.16.2",
     "typescript": "5.5.3",
     "vite": "5.3.3",
     "vitest": "2.0.2"
