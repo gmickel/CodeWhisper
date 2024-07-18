@@ -13,7 +13,8 @@
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
     "sourceMap": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "types": ["inquirer-file-tree-selection-prompt"]
   },
   "include": ["src/**/*", "tests/**/*", "cli.js"]
 }

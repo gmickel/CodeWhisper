@@ -7,6 +7,7 @@ import fs from 'fs-extra';
 import ora from 'ora';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
+import { interactiveMode } from './interactive-filtering';
 
 const isProduction = path
   .dirname(new URL(import.meta.url).pathname)
@@ -102,6 +103,19 @@ export function cli(args: string[]) {
       } catch (error) {
         spinner.fail('Error generating output');
         console.error(chalk.red((error as Error).message));
+        process.exit(1);
+      }
+    });
+
+  program
+    .command('interactive')
+    .description('Start interactive mode')
+    .option('-p, --path <path>', 'Path to the codebase', '.')
+    .action(async (options) => {
+      try {
+        await interactiveMode(options.path);
+      } catch (error) {
+        console.error(chalk.red('Error in interactive mode:'), error);
         process.exit(1);
       }
     });
