@@ -42,7 +42,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check . --write",
     "prepublishOnly": "nr build",
-    "release": "bumpp && npm publish",
+    "prerelease": "pnpm run lint && pnpm run test && pnpm run build",
+    "release": "semantic-release",
     "dev": "esno src/cli/index.ts",
     "start": "node dist/cli/index.js",
     "test": "vitest",
@@ -68,8 +69,10 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
+    "@semantic-release/changelog": "6.0.3",
+    "@semantic-release/git": "10.0.1",
     "@types/fs-extra": "11.0.4",
-    "@types/inquirer": "^9.0.7",
+    "@types/inquirer": "9.0.7",
     "@types/node": "20.14.11",
     "@types/strip-comments": "2.0.4",
     "@vitest/coverage-v8": "2.0.3",
@@ -77,6 +80,7 @@
     "bumpp": "9.4.1",
     "esno": "4.7.0",
     "lefthook": "1.7.4",
+    "semantic-release": "24.0.0",
     "tsup": "8.2.0",
     "typescript": "5.5.3",
     "vite": "5.3.4",
@@ -84,5 +88,9 @@
   },
   "packageManager": "pnpm@9.5.0",
   "workspaces": ["apps/*", "packages/*"],
-  "trustedDependencies": ["@biomejs/biome", "lefthook"]
+  "trustedDependencies": ["@biomejs/biome", "lefthook"],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  }
 }

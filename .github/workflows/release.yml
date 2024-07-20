@@ -1,8 +1,4 @@
 name: Release
-
-permissions:
-  contents: write
-
 on:
   push:
     tags:
@@ -10,20 +6,27 @@ on:
 
 jobs:
   release:
+    name: Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-
-      - name: Set node
-        uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: lts/*
-
-      - run: npx changelogithub
+          node-version: 'lts/*'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm build
+      - name: Release
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm semantic-release
