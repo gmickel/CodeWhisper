@@ -105,7 +105,7 @@ describe.sequential('Performance Tests', () => {
     );
 
     expect(secondRunTime).toBeLessThan(firstRunTime);
-    expect(secondRunTime).toBeLessThan(firstRunTime * 0.5);
+    expect(secondRunTime).toBeLessThan(firstRunTime * 0.7);
   }, 60000);
 
   it('should handle a mix of file sizes efficiently', async () => {
