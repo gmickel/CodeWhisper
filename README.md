@@ -10,21 +10,13 @@ add blazing fast AI-friendly prompts to your codebase
 
 _description_
 
-## Sponsors
+## Sponsors ❤️
 
-<p align="center">
-  <a href="https://cdn.jsdelivr.net/gh/gmickel/static/sponsors.svg">
-
-    <img src='https://cdn.jsdelivr.net/gh/gmickel/static/sponsors.svg'/>
-
-  </a>
-</p>
-
-## License
+## License 📄
 
 [MIT](./LICENSE) License © 2024-PRESENT [Gordon Mickel](https://github.com/gmickel)
 
-## Stargazers
+## Stargazers ⭐
 
 [![Stargazers repo roster for @gmickel/CodeWhisper](https://reporoster.com/stars/gmickel/CodeWhisper)](https://github.com/gmickel/CodeWhisper/stargazers)
 
@@ -41,4 +33,4 @@ _description_
 
 [![Star History Chart](https://api.star-history.com/svg?repos=gmickel/CodeWhisper&type=Date)](https://star-history.com/#gmickel/CodeWhisper&Date)
 
-Made with ❤️ by Gordon Mickel.
+Made with ❤️ by [Gordon Mickel](https://github.com/gmickel).
