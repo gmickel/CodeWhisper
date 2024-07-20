@@ -121,7 +121,7 @@ describe('processFiles', () => {
 
   it('should use cache for unchanged files', async () => {
     const cachedFile: FileInfo = {
-      path: path.join(normalizedFixturesPath, 'src/main.js'),
+      path: path.join(normalizedFixturesPath, 'src', 'main.js'),
       extension: 'js',
       language: 'javascript',
       content: 'cached content',
@@ -131,16 +131,16 @@ describe('processFiles', () => {
     };
 
     vi.mocked(FileCache.prototype.get).mockImplementation((filePath) => {
-      return filePath === cachedFile.path
+      return path.normalize(filePath) === path.normalize(cachedFile.path)
         ? Promise.resolve(cachedFile)
         : Promise.resolve(null);
     });
 
+    const mockFiles = ['src/main.js', 'src/utils.ts', 'package.json'];
     vi.mocked(fastGlob.stream).mockReturnValue(
       new Readable({
         read() {
-          const files = ['src/main.js', 'src/utils.ts', 'package.json'];
-          for (const file of files) {
+          for (const file of mockFiles) {
             this.push(path.join(normalizedFixturesPath, file));
           }
           this.push(null);
@@ -151,7 +151,7 @@ describe('processFiles', () => {
     const mockFileInfos: { [key: string]: FileInfo } = {
       'src/main.js': cachedFile,
       'src/utils.ts': {
-        path: path.join(normalizedFixturesPath, 'src/utils.ts'),
+        path: path.join(normalizedFixturesPath, 'src', 'utils.ts'),
         extension: 'ts',
         language: 'typescript',
         size: 100,
@@ -173,7 +173,7 @@ describe('processFiles', () => {
     vi.mocked(Piscina.prototype.run).mockImplementation(
       async ({ filePath }) => {
         const relativePath = path.relative(normalizedFixturesPath, filePath);
-        return mockFileInfos[relativePath];
+        return mockFileInfos[relativePath.replace(/\\/g, '/')];
       },
     );
 
@@ -182,13 +182,13 @@ describe('processFiles', () => {
       gitignorePath: tempGitignorePath,
     });
 
-    expect(result.length).toBe(3);
+    expect(result.length).toBe(mockFiles.length);
     const mainJsFile = result.find(
       (file) => path.normalize(file.path) === path.normalize(cachedFile.path),
     );
     expect(mainJsFile).toEqual(cachedFile);
 
-    expect(FileCache.prototype.get).toHaveBeenCalledTimes(3);
-    expect(FileCache.prototype.set).toHaveBeenCalledTimes(2);
+    expect(FileCache.prototype.get).toHaveBeenCalledTimes(mockFiles.length);
+    expect(FileCache.prototype.set).toHaveBeenCalledTimes(mockFiles.length - 1);
   });
 });
