@@ -7,23 +7,10 @@ import fs from 'fs-extra';
 import ora from 'ora';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
+import { getTemplatesDir } from '../utils/template-utils';
 import { interactiveMode } from './interactive-filtering';
 
-const templatesDir =
-  process.env.TEMPLATES_DIR ??
-  (() => {
-    const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-    if (__dirname.includes('node_modules')) {
-      // We're running from an installed package
-      return path.resolve(__dirname, '..');
-    }
-    if (__dirname.includes(`${path.sep}dist`)) {
-      // We're running in production mode
-      return path.resolve(__dirname, '..');
-    }
-    // We're running in development mode
-    return path.resolve(__dirname, '..', 'templates');
-  })();
+const templatesDir = getTemplatesDir();
 
 const program = new Command();
 
@@ -117,9 +104,26 @@ export function cli(args: string[]) {
     .command('interactive')
     .description('Start interactive mode')
     .option('-p, --path <path>', 'Path to the codebase', '.')
+    .option('-t, --template <template>', 'Template to use')
+    .option('-g, --gitignore <path>', 'Path to .gitignore file')
+    .option('-f, --filter <patterns...>', 'File patterns to include')
+    .option('-e, --exclude <patterns...>', 'File patterns to exclude')
+    .option('-s, --suppress-comments', 'Strip comments from the code')
+    .option('--case-sensitive', 'Use case-sensitive pattern matching')
+    .option(
+      '--no-codeblock',
+      'Disable wrapping code inside markdown code blocks',
+    )
+    .option(
+      '--custom-data <json>',
+      'Custom data to pass to the template (JSON string)',
+    )
+    .option('--custom-template <path>', 'Path to a custom Handlebars template')
+    .option('--custom-ignores <patterns...>', 'Additional patterns to ignore')
+    .option('--cache-path <path>', 'Custom path for the cache file')
     .action(async (options) => {
       try {
-        await interactiveMode(options.path);
+        await interactiveMode(options);
       } catch (error) {
         console.error(chalk.red('Error in interactive mode:'), error);
         process.exit(1);

@@ -2,7 +2,7 @@ import path from 'node:path';
 import Handlebars from 'handlebars';
 import type { FileInfo } from './file-processor';
 
-interface MarkdownOptions {
+export interface MarkdownOptions {
   template?: string;
   noCodeblock?: boolean;
   customData?: Record<string, unknown>;

@@ -4,6 +4,7 @@ import fastGlob from 'fast-glob';
 import fs from 'fs-extra';
 import ignore from 'ignore';
 import { isBinaryFile } from 'isbinaryfile';
+import micromatch from 'micromatch';
 import Piscina from 'piscina';
 import { FileCache } from '../utils/file-cache';
 
@@ -139,6 +140,10 @@ export async function processFiles(
 
   const globStream = fastGlob.stream('**/*', globOptions);
 
+  const normalizedFilters = filter.map((f) =>
+    path.isAbsolute(f) ? path.relative(basePath, f) : f,
+  );
+
   return new Promise((resolve, reject) => {
     globStream.on('data', (filePath) => {
       const filePathStr = filePath.toString();
@@ -147,11 +152,22 @@ export async function processFiles(
       if (ig.ignores(relativePath)) return;
 
       if (
-        filter.length > 0 &&
-        !filter.some((pattern) => new RegExp(pattern).test(filePathStr))
+        normalizedFilters.length > 0 &&
+        !micromatch.isMatch(relativePath, normalizedFilters, {
+          dot: true,
+          nocase: !caseSensitive,
+        })
       )
         return;
 
+      if (
+        exclude.length > 0 &&
+        micromatch.isMatch(relativePath, exclude, {
+          dot: true,
+          nocase: !caseSensitive,
+        })
+      )
+        return;
       cachePromises.push(
         (async () => {
           try {

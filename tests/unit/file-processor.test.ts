@@ -19,6 +19,35 @@ describe('processFiles', () => {
     vi.clearAllMocks();
   });
 
+  function setupMockFileSystem(mockFiles: string[]) {
+    vi.mocked(FileCache.prototype.get).mockResolvedValue(null);
+    vi.mocked(FileCache.prototype.set).mockResolvedValue();
+
+    vi.mocked(fastGlob.stream).mockReturnValue(
+      new Readable({
+        read() {
+          for (const file of mockFiles) {
+            this.push(path.join(normalizedFixturesPath, file));
+          }
+          this.push(null);
+        },
+      }),
+    );
+
+    const mockFileInfo = (filePath: string): FileInfo => ({
+      path: path.join(normalizedFixturesPath, filePath),
+      extension: path.extname(filePath).slice(1),
+      language: 'javascript',
+      size: 100,
+      created: new Date(2023, 0, 1),
+      modified: new Date(2023, 0, 1),
+      content: `mock content for ${filePath}`,
+    });
+
+    vi.mocked(Piscina.prototype.run).mockImplementation(async ({ filePath }) =>
+      mockFileInfo(path.relative(normalizedFixturesPath, filePath)),
+    );
+  }
   it('should process files correctly', async () => {
     vi.mocked(FileCache.prototype.get).mockResolvedValue(null);
     vi.mocked(FileCache.prototype.set).mockResolvedValue();
@@ -190,5 +219,81 @@ describe('processFiles', () => {
 
     expect(FileCache.prototype.get).toHaveBeenCalledTimes(mockFiles.length);
     expect(FileCache.prototype.set).toHaveBeenCalledTimes(mockFiles.length - 1);
+  });
+
+  it('should apply filters correctly', async () => {
+    const mockFiles = ['src/main.js', 'src/utils.ts', 'package.json'];
+    setupMockFileSystem(mockFiles);
+
+    const result = await processFiles({
+      path: normalizedFixturesPath,
+      gitignorePath: tempGitignorePath,
+      filter: ['**/*.js', '**/*.ts'],
+    });
+
+    expect(result).toHaveLength(2);
+    expect(
+      result
+        .map((file) => path.basename(file.path))
+        .sort((a, b) => a.localeCompare(b)),
+    ).toEqual(['main.js', 'utils.ts']);
+  });
+
+  it('should handle multiple filters correctly', async () => {
+    const mockFiles = ['src/main.js', 'src/utils.ts', 'package.json'];
+    setupMockFileSystem(mockFiles);
+
+    const result = await processFiles({
+      path: normalizedFixturesPath,
+      gitignorePath: tempGitignorePath,
+      filter: ['**/*.js', '**/package.json'],
+    });
+
+    expect(result).toHaveLength(2);
+    expect(
+      result
+        .map((file) => path.basename(file.path))
+        .sort((a, b) => a.localeCompare(b)),
+    ).toEqual(['main.js', 'package.json']);
+  });
+
+  it('should handle both include and exclude filters', async () => {
+    const mockFiles = ['src/main.js', 'src/utils.ts', 'package.json'];
+    setupMockFileSystem(mockFiles);
+
+    const result = await processFiles({
+      path: normalizedFixturesPath,
+      gitignorePath: tempGitignorePath,
+      filter: ['**/*'],
+      exclude: ['**/*.ts'],
+    });
+
+    expect(result).toHaveLength(2);
+    expect(
+      result
+        .map((file) => path.basename(file.path))
+        .sort((a, b) => a.localeCompare(b)),
+    ).toEqual(['main.js', 'package.json']);
+  });
+
+  it('should handle absolute path filters', async () => {
+    const mockFiles = ['src/main.js', 'src/utils.ts', 'package.json'];
+    setupMockFileSystem(mockFiles);
+
+    const result = await processFiles({
+      path: normalizedFixturesPath,
+      gitignorePath: tempGitignorePath,
+      filter: [
+        path.join(normalizedFixturesPath, 'src', 'main.js'),
+        '**/package.json',
+      ],
+    });
+
+    expect(result).toHaveLength(2);
+    expect(
+      result
+        .map((file) => path.basename(file.path))
+        .sort((a, b) => a.localeCompare(b)),
+    ).toEqual(['main.js', 'package.json']);
   });
 });

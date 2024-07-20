@@ -1,48 +1,105 @@
 import path from 'node:path';
-import url from 'node:url';
 import { input, select } from '@inquirer/prompts';
 import chalk from 'chalk';
 import fs from 'fs-extra';
 import inquirer from 'inquirer';
 import inquirerFileTreeSelection from 'inquirer-file-tree-selection-prompt';
-import { type FileInfo, processFiles } from '../core/file-processor';
-import { generateMarkdown } from '../core/markdown-generator';
+import ora from 'ora';
+import { processFiles } from '../core/file-processor';
+import {
+  type MarkdownOptions,
+  generateMarkdown,
+} from '../core/markdown-generator';
+import {
+  getAvailableTemplates,
+  getTemplatePath,
+} from '../utils/template-utils';
 
 inquirer.registerPrompt('file-tree-selection', inquirerFileTreeSelection);
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
-export async function interactiveMode(basePath: string) {
+interface InteractiveModeOptions {
+  path?: string;
+  template?: string;
+  gitignore?: string;
+  filter?: string[];
+  exclude?: string[];
+  suppressComments?: boolean;
+  caseSensitive?: boolean;
+  noCodeblock?: boolean;
+  customData?: string;
+  customTemplate?: string;
+  customIgnores?: string[];
+  cachePath?: string;
+}
+
+export async function interactiveMode(options: InteractiveModeOptions) {
+  const spinner = ora();
   try {
+    const basePath = path.resolve(options.path ?? '.');
+
+    const userFilters = options.filter || [];
+
     const selectedFiles = await selectFiles(basePath);
-    const template = await selectTemplate();
+
+    // Combine user filters with selected files
+    const combinedFilters = [...new Set([...userFilters, ...selectedFiles])];
+
+    console.log(chalk.cyan('Files to be processed:'));
+    for (const filter of combinedFilters) {
+      console.log(chalk.cyan(`  ${filter}`));
+    }
+
+    let templatePath: string;
+    if (options.template) {
+      templatePath = getTemplatePath(options.template);
+    } else if (options.customTemplate) {
+      templatePath = options.customTemplate;
+    } else {
+      templatePath = await selectTemplate();
+    }
+
     const outputPath = await getOutputPath(basePath);
 
-    console.log(chalk.cyan('\nProcessing selected files...'));
-    const processedFiles = await processSelectedFiles(basePath, selectedFiles);
-
-    console.log(chalk.cyan('\nGenerating markdown...'));
-    const templateContent = await fs.readFile(
-      path.join(__dirname, '../templates', `${template}.hbs`),
-      'utf-8',
-    );
-    const markdown = await generateMarkdown(processedFiles, templateContent, {
-      basePath,
+    spinner.start('Processing files...');
+    const processedFiles = await processFiles({
+      ...options,
+      path: basePath,
+      filter: combinedFilters,
     });
+    spinner.succeed('Files processed successfully');
 
-    // Decode HTML entities
-    const decodedMarkdown = decodeHTMLEntities(markdown);
+    spinner.start('Generating markdown...');
+    const templateContent = await fs.readFile(templatePath, 'utf-8');
+    const markdownOptions: MarkdownOptions = {
+      noCodeblock: options.noCodeblock,
+      basePath,
+      customData: options.customData
+        ? JSON.parse(options.customData)
+        : undefined,
+    };
+
+    const markdown = await generateMarkdown(
+      processedFiles,
+      templateContent,
+      markdownOptions,
+    );
+
+    spinner.succeed('Markdown generated successfully');
 
     if (outputPath === 'stdout') {
-      console.log(chalk.green('\nGenerated Markdown:'));
-      console.log(decodedMarkdown);
+      console.log(chalk.cyan('\nGenerated Markdown:'));
+      console.log(markdown);
     } else {
-      await fs.writeFile(outputPath, decodedMarkdown, 'utf8');
-      console.log(chalk.green(`\nMarkdown saved to: ${outputPath}`));
+      await fs.writeFile(outputPath, markdown, 'utf8');
+      console.log(chalk.cyan(`\nMarkdown saved to: ${outputPath}`));
     }
 
     console.log(chalk.green('\nInteractive mode completed!'));
   } catch (error) {
-    console.error(chalk.red('Error in interactive mode:'), error);
+    spinner.fail('Error in interactive mode');
+    console.error(
+      chalk.red(error instanceof Error ? error.message : String(error)),
+    );
   }
 }
 
@@ -57,59 +114,41 @@ async function selectFiles(basePath: string): Promise<string[]> {
       enableGoUpperDirectory: true,
       onlyShowValid: false,
       hideChildrenOfValid: false,
-      validate: (item: string) => true, // You can implement custom validation here
+      validate: () => true,
+      transformer: (item: string) => path.basename(item),
     },
   ]);
 
-  return Array.isArray(answer.selectedFiles)
+  let selectedFiles = Array.isArray(answer.selectedFiles)
     ? answer.selectedFiles.map((file: string) => path.relative(basePath, file))
     : [path.relative(basePath, answer.selectedFiles)];
+
+  // Add "All Files" option
+  if (selectedFiles.includes('*')) {
+    selectedFiles = ['**/*'];
+  }
+
+  return selectedFiles;
 }
 
 async function selectTemplate(): Promise<string> {
-  const templates = await fs.readdir(path.join(__dirname, '../templates'));
-  return select({
+  const templates = await getAvailableTemplates();
+  const selected = await select({
     message: 'Select a template:',
     choices: templates.map((t) => ({
-      value: t.replace('.hbs', ''),
-      name: t.replace('.hbs', ''),
+      value: t.path,
+      name: t.name,
     })),
   });
+  return selected;
 }
 
 async function getOutputPath(basePath: string): Promise<string> {
   const defaultFileName = `${path.basename(basePath)}.md`;
   const defaultPath = path.join(basePath, defaultFileName);
-  return input({
-    message:
-      'Enter the output file path (or "" (empty string) for console/stdout output):',
+  const outputPath = await input({
+    message: 'Enter the output file path (or "" for console/stdout output):',
     default: defaultPath,
-    transformer: (input: string) => {
-      return input === defaultPath ? defaultFileName : input;
-    },
   });
-}
-
-async function processSelectedFiles(
-  basePath: string,
-  selectedPaths: string[],
-): Promise<FileInfo[]> {
-  const processOptions = {
-    path: basePath,
-    filter: selectedPaths.map((p) => (p.endsWith('/') ? `${p}**/*` : p)), // Handle directories
-    // Add other options as needed
-  };
-
-  // debug this
-
-  return processFiles(processOptions);
-}
-
-function decodeHTMLEntities(text: string): string {
-  return text
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&');
+  return outputPath.trim() === '' ? 'stdout' : outputPath;
 }
