@@ -7,6 +7,7 @@ import { isBinaryFile } from 'isbinaryfile';
 import micromatch from 'micromatch';
 import Piscina from 'piscina';
 import { FileCache } from '../utils/file-cache';
+import { normalizePath } from '../utils/normalize-path';
 
 export interface FileInfo {
   path: string;
@@ -193,7 +194,7 @@ export async function processFiles(
       cachePromises.push(
         (async () => {
           try {
-            const cached = await fileCache.get(filePath);
+            const cached = await fileCache.get(normalizePath(filePathStr));
             if (cached) {
               fileInfos.push(cached);
               return; // Skip processing and setting cache for cached files
@@ -212,7 +213,10 @@ export async function processFiles(
             });
 
             if (result) {
-              await fileCache.set(filePathStr, result as FileInfo);
+              await fileCache.set(
+                normalizePath(filePathStr),
+                result as FileInfo,
+              );
               fileInfos.push(result as FileInfo);
             }
           } catch (error) {

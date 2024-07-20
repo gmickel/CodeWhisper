@@ -7,14 +7,11 @@ import Piscina from 'piscina';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { type FileInfo, processFiles } from '../../src/core/file-processor';
 import { FileCache } from '../../src/utils/file-cache';
+import { normalizePath } from '../../src/utils/normalize-path';
 
 vi.mock('fast-glob');
 vi.mock('piscina');
 vi.mock('../../src/utils/file-cache');
-
-function normalizePath(filePath: string): string {
-  return filePath.replace(/\\/g, '/');
-}
 
 describe('processFiles', () => {
   const fixturesPath = path.resolve(__dirname, '../fixtures/test-project');

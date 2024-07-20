@@ -86,26 +86,45 @@ describe.sequential('Performance Tests', () => {
     await createTestFiles(1000, 10, 'cache'); // Increased to 1000 files
 
     console.log('First run (no cache):');
-    const [firstRunFiles, firstRunTime] = await runProcessFiles();
+    const startFirstRun = performance.now();
+    const firstRunFiles = await processFiles({
+      path: TEST_DIR,
+      cachePath: DEFAULT_CACHE_PATH,
+    });
+    const endFirstRun = performance.now();
+    const firstRunDuration = endFirstRun - startFirstRun;
+    console.log(`First run duration: ${firstRunDuration} ms`);
     expect(firstRunFiles).toHaveLength(1000);
 
     console.log('Second run (with cache):');
-    const [secondRunFiles, secondRunTime] = await runProcessFiles();
+    const startSecondRun = performance.now();
+    const secondRunFiles = await processFiles({
+      path: TEST_DIR,
+      cachePath: DEFAULT_CACHE_PATH,
+    });
+    const endSecondRun = performance.now();
+    const secondRunDuration = endSecondRun - startSecondRun;
+    console.log(`Second run duration: ${secondRunDuration} ms`);
 
     console.log(`First run file count: ${firstRunFiles.length}`);
     console.log(`Second run file count: ${secondRunFiles.length}`);
 
     expect(secondRunFiles).toHaveLength(firstRunFiles.length);
 
-    console.log(`First run time: ${firstRunTime} ms`);
-    console.log(`Second run time: ${secondRunTime} ms`);
-    console.log(`Time saved: ${firstRunTime - secondRunTime} ms`);
+    console.log(`First run time: ${firstRunDuration} ms`);
+    console.log(`Second run time: ${secondRunDuration} ms`);
+    console.log(`Time saved: ${firstRunDuration - secondRunDuration} ms`);
     console.log(
-      `Percentage faster: ${(((firstRunTime - secondRunTime) / firstRunTime) * 100).toFixed(2)}%`,
+      `Percentage faster: ${(((firstRunDuration - secondRunDuration) / firstRunDuration) * 100).toFixed(2)}%`,
     );
 
-    expect(secondRunTime).toBeLessThan(firstRunTime);
-    expect(secondRunTime).toBeLessThan(firstRunTime * 0.7);
+    // Change this to ensure the improvement is noticeable across platforms
+    const improvementPercentage =
+      ((firstRunDuration - secondRunDuration) / firstRunDuration) * 100;
+    console.log(`Improvement Percentage: ${improvementPercentage}%`);
+
+    expect(secondRunDuration).toBeLessThan(firstRunDuration);
+    expect(improvementPercentage).toBeGreaterThan(30); // Adjust as per your requirements and observed performance patterns
   }, 60000);
 
   it('should handle a mix of file sizes efficiently', async () => {
