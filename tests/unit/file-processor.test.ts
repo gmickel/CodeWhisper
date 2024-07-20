@@ -7,11 +7,14 @@ import Piscina from 'piscina';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { type FileInfo, processFiles } from '../../src/core/file-processor';
 import { FileCache } from '../../src/utils/file-cache';
-import { normalizePath } from '../../src/utils/normalize-path';
 
 vi.mock('fast-glob');
 vi.mock('piscina');
 vi.mock('../../src/utils/file-cache');
+
+function normalizePath(filePath: string): string {
+  return filePath.replace(/\\/g, '/');
+}
 
 describe('processFiles', () => {
   const fixturesPath = path.resolve(__dirname, '../fixtures/test-project');
@@ -307,7 +310,7 @@ describe('processFiles', () => {
     await fs.ensureDir(TEST_DIR);
 
     const mockFileInfo: FileInfo = {
-      path: path.join(TEST_DIR, 'file1.js'),
+      path: normalizePath(path.join(TEST_DIR, 'file1.js')),
       extension: 'js',
       language: 'javascript',
       size: 50,
@@ -324,7 +327,7 @@ describe('processFiles', () => {
       async ({ filePath }) => {
         return {
           ...mockFileInfo,
-          path: filePath,
+          path: normalizePath(filePath),
           content: `mock content for ${path.basename(filePath)}`,
           size: 100,
         };
@@ -336,7 +339,7 @@ describe('processFiles', () => {
       const stream = new Readable({
         objectMode: true,
         read() {
-          this.push(path.join(TEST_DIR, 'file1.js'));
+          this.push(normalizePath(path.join(TEST_DIR, 'file1.js')));
           this.push(null);
         },
       });
@@ -359,7 +362,7 @@ describe('processFiles', () => {
     // Mock FileCache.get to return cached data for subsequent run (cache hit)
     vi.mocked(FileCache.prototype.get).mockImplementation(
       async (filePath: string) => {
-        if (filePath === mockFileInfo.path) {
+        if (normalizePath(filePath) === mockFileInfo.path) {
           return mockFileInfo;
         }
         return null;
