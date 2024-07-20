@@ -28,10 +28,6 @@ _description_
 
 [![Stargazers repo roster for @gmickel/CodeWhisper](https://reporoster.com/stars/gmickel/CodeWhisper)](https://github.com/gmickel/CodeWhisper/stargazers)
 
-## Contributors
-
-[![Contributors repo roster for @gmickel/CodeWhisper](https://reporoster.com/contributors/gmickel/CodeWhisper)](https://github.com/gmickel/CodeWhisper/graphs/contributors)
-
 ## Contributors 👨‍💻
 
 <!-- readme: collaborators, contributors -start -->
