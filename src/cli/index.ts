@@ -9,16 +9,20 @@ import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
 import { interactiveMode } from './interactive-filtering';
 
-const isProduction = path
-  .dirname(new URL(import.meta.url).pathname)
-  .includes('/dist/');
-const templatesDir = isProduction
-  ? path.resolve(path.dirname(new URL(import.meta.url).pathname), '../')
-  : path.resolve(
-      path.dirname(new URL(import.meta.url).pathname),
-      '../templates',
-    );
-
+const templatesDir =
+  process.env.TEMPLATES_DIR ??
+  (() => {
+    const isProduction = path
+      .dirname(new URL(import.meta.url).pathname)
+      .includes(`${path.sep}dist`);
+    return isProduction
+      ? path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
+      : path.resolve(
+          path.dirname(new URL(import.meta.url).pathname),
+          '..',
+          'templates',
+        );
+  })();
 const program = new Command();
 
 export function cli(args: string[]) {

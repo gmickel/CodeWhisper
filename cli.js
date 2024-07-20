@@ -10,6 +10,18 @@ if (__dirname.includes(`${path.sep}dist`)) {
   cliPath = path.resolve(__dirname, 'src', 'cli', 'index.ts');
 }
 
+// Add this function to determine the templates directory
+function getTemplatesDir() {
+  const isProduction = __dirname.includes(`${path.sep}dist`);
+  if (isProduction) {
+    return path.resolve(__dirname, '..');
+  }
+  return path.resolve(__dirname, 'src', 'templates');
+}
+
+// Set the TEMPLATES_DIR environment variable
+process.env.TEMPLATES_DIR = getTemplatesDir();
+
 import(url.pathToFileURL(cliPath).href)
   .then((cliModule) => {
     if (cliModule.default) {

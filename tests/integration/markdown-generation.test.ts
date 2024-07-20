@@ -17,8 +17,12 @@ function decodeHTMLEntities(text: string): string {
 
 describe('Markdown Generation Integration', () => {
   const fixturesPath = path.resolve(__dirname, '../fixtures');
-  const customTemplatePath = path.join(fixturesPath, 'custom-template.hbs');
-  const defaultTemplatePath = path.join(fixturesPath, 'default.hbs');
+  const normalizedFixturesPath = path.normalize(fixturesPath);
+  const customTemplatePath = path.join(
+    normalizedFixturesPath,
+    'custom-template.hbs',
+  );
+  const defaultTemplatePath = path.join(normalizedFixturesPath, 'default.hbs');
 
   const mockFiles: FileInfo[] = [
     {

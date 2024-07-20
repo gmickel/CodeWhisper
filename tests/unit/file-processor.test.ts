@@ -12,7 +12,8 @@ vi.mock('../../src/utils/file-cache');
 
 describe('processFiles', () => {
   const fixturesPath = path.resolve(__dirname, '../fixtures/test-project');
-  const tempGitignorePath = path.join(fixturesPath, '.gitignore');
+  const normalizedFixturesPath = path.normalize(fixturesPath);
+  const tempGitignorePath = path.join(normalizedFixturesPath, '.gitignore');
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -27,7 +28,7 @@ describe('processFiles', () => {
         read() {
           const files = ['src/main.js', 'src/utils.ts', 'package.json'];
           for (const file of files) {
-            this.push(path.join(fixturesPath, file));
+            this.push(path.join(normalizedFixturesPath, file));
           }
           this.push(null);
         },
@@ -35,7 +36,7 @@ describe('processFiles', () => {
     );
 
     const mockFileInfo: FileInfo = {
-      path: path.join(fixturesPath, 'src/main.js'),
+      path: path.join(normalizedFixturesPath, 'src/main.js'),
       extension: 'js',
       language: 'javascript',
       size: 100,
@@ -47,7 +48,7 @@ describe('processFiles', () => {
     vi.mocked(Piscina.prototype.run).mockResolvedValue(mockFileInfo);
 
     const result = await processFiles({
-      path: fixturesPath,
+      path: normalizedFixturesPath,
       gitignorePath: tempGitignorePath,
     });
 
@@ -64,7 +65,7 @@ describe('processFiles', () => {
         read() {
           const files = ['src/main.js', 'src/utils.ts', 'package.json'];
           for (const file of files) {
-            this.push(path.join(fixturesPath, file));
+            this.push(path.join(normalizedFixturesPath, file));
           }
           this.push(null);
         },
@@ -73,7 +74,7 @@ describe('processFiles', () => {
 
     const mockFileInfos: { [key: string]: FileInfo } = {
       'src/main.js': {
-        path: path.join(fixturesPath, 'src/main.js'),
+        path: path.join(normalizedFixturesPath, 'src/main.js'),
         extension: 'js',
         language: 'javascript',
         size: 100,
@@ -82,7 +83,7 @@ describe('processFiles', () => {
         content: 'mock content for main.js',
       },
       'src/utils.ts': {
-        path: path.join(fixturesPath, 'src/utils.ts'),
+        path: path.join(normalizedFixturesPath, 'src/utils.ts'),
         extension: 'ts',
         language: 'typescript',
         size: 100,
@@ -91,7 +92,7 @@ describe('processFiles', () => {
         content: 'mock content for utils.ts',
       },
       'package.json': {
-        path: path.join(fixturesPath, 'package.json'),
+        path: path.join(normalizedFixturesPath, 'package.json'),
         extension: 'json',
         language: 'json',
         size: 100,
@@ -103,13 +104,13 @@ describe('processFiles', () => {
 
     vi.mocked(Piscina.prototype.run).mockImplementation(
       async ({ filePath }) => {
-        const relativePath = path.relative(fixturesPath, filePath);
+        const relativePath = path.relative(normalizedFixturesPath, filePath);
         return mockFileInfos[relativePath];
       },
     );
 
     const result = await processFiles({
-      path: fixturesPath,
+      path: normalizedFixturesPath,
       gitignorePath: tempGitignorePath,
       customIgnores: ['**/*.js'],
     });
@@ -120,7 +121,7 @@ describe('processFiles', () => {
 
   it('should use cache for unchanged files', async () => {
     const cachedFile: FileInfo = {
-      path: path.join(fixturesPath, 'src/main.js'),
+      path: path.join(normalizedFixturesPath, 'src/main.js'),
       extension: 'js',
       language: 'javascript',
       content: 'cached content',
@@ -140,7 +141,7 @@ describe('processFiles', () => {
         read() {
           const files = ['src/main.js', 'src/utils.ts', 'package.json'];
           for (const file of files) {
-            this.push(path.join(fixturesPath, file));
+            this.push(path.join(normalizedFixturesPath, file));
           }
           this.push(null);
         },
@@ -150,7 +151,7 @@ describe('processFiles', () => {
     const mockFileInfos: { [key: string]: FileInfo } = {
       'src/main.js': cachedFile,
       'src/utils.ts': {
-        path: path.join(fixturesPath, 'src/utils.ts'),
+        path: path.join(normalizedFixturesPath, 'src/utils.ts'),
         extension: 'ts',
         language: 'typescript',
         size: 100,
@@ -159,7 +160,7 @@ describe('processFiles', () => {
         content: 'mock content',
       },
       'package.json': {
-        path: path.join(fixturesPath, 'package.json'),
+        path: path.join(normalizedFixturesPath, 'package.json'),
         extension: 'json',
         language: 'json',
         size: 100,
@@ -171,13 +172,13 @@ describe('processFiles', () => {
 
     vi.mocked(Piscina.prototype.run).mockImplementation(
       async ({ filePath }) => {
-        const relativePath = path.relative(fixturesPath, filePath);
+        const relativePath = path.relative(normalizedFixturesPath, filePath);
         return mockFileInfos[relativePath];
       },
     );
 
     const result = await processFiles({
-      path: fixturesPath,
+      path: normalizedFixturesPath,
       gitignorePath: tempGitignorePath,
     });
 
