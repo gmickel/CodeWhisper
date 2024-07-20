@@ -1,6 +1,8 @@
+import os from 'node:os';
 import path from 'node:path';
 import { Readable } from 'node:stream';
 import fastGlob from 'fast-glob';
+import fs from 'fs-extra'; // Import fs-extra module
 import Piscina from 'piscina';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { type FileInfo, processFiles } from '../../src/core/file-processor';
@@ -25,6 +27,7 @@ describe('processFiles', () => {
 
     vi.mocked(fastGlob.stream).mockReturnValue(
       new Readable({
+        objectMode: true, // Ensure Readable stream supports object mode
         read() {
           for (const file of mockFiles) {
             this.push(path.join(normalizedFixturesPath, file));
@@ -37,7 +40,8 @@ describe('processFiles', () => {
     const mockFileInfo = (filePath: string): FileInfo => ({
       path: path.join(normalizedFixturesPath, filePath),
       extension: path.extname(filePath).slice(1),
-      language: 'javascript',
+      language:
+        path.extname(filePath).slice(1) === 'ts' ? 'typescript' : 'javascript',
       size: 100,
       created: new Date(2023, 0, 1),
       modified: new Date(2023, 0, 1),
@@ -48,33 +52,10 @@ describe('processFiles', () => {
       mockFileInfo(path.relative(normalizedFixturesPath, filePath)),
     );
   }
+
   it('should process files correctly', async () => {
-    vi.mocked(FileCache.prototype.get).mockResolvedValue(null);
-    vi.mocked(FileCache.prototype.set).mockResolvedValue();
-
-    vi.mocked(fastGlob.stream).mockReturnValue(
-      new Readable({
-        read() {
-          const files = ['src/main.js', 'src/utils.ts', 'package.json'];
-          for (const file of files) {
-            this.push(path.join(normalizedFixturesPath, file));
-          }
-          this.push(null);
-        },
-      }),
-    );
-
-    const mockFileInfo: FileInfo = {
-      path: path.join(normalizedFixturesPath, 'src/main.js'),
-      extension: 'js',
-      language: 'javascript',
-      size: 100,
-      created: new Date(2023, 0, 1),
-      modified: new Date(2023, 0, 1),
-      content: 'mock content',
-    };
-
-    vi.mocked(Piscina.prototype.run).mockResolvedValue(mockFileInfo);
+    const mockFiles = ['src/main.js', 'src/utils.ts', 'package.json'];
+    setupMockFileSystem(mockFiles);
 
     const result = await processFiles({
       path: normalizedFixturesPath,
@@ -82,61 +63,45 @@ describe('processFiles', () => {
     });
 
     expect(result).toHaveLength(3);
-    expect(result[0].path).toEqual(mockFileInfo.path);
-    expect(result[1].path).toEqual(mockFileInfo.path);
-    expect(result[2].path).toEqual(mockFileInfo.path);
-    expect(result[0].content).toBe('mock content');
+    expect(
+      result
+        .map((file) => path.basename(file.path))
+        .sort((a, b) => a.localeCompare(b)),
+    ).toEqual(['main.js', 'package.json', 'utils.ts']);
+    expect(result[0].content).toBe('mock content for package.json');
+  });
+
+  it('should handle directory and file selections correctly', async () => {
+    const mockFiles = [
+      'src/main.js',
+      'src/utils.ts',
+      'src/components/Button.jsx',
+      'package.json',
+    ];
+    setupMockFileSystem(mockFiles);
+
+    const result = await processFiles({
+      path: normalizedFixturesPath,
+      gitignorePath: tempGitignorePath,
+      filter: ['src/**/*.{js,jsx}', 'package.json'],
+    });
+
+    expect(result).toHaveLength(3);
+    expect(
+      result
+        .map((file) => path.relative(normalizedFixturesPath, file.path))
+        .sort((a, b) => a.localeCompare(b)),
+    ).toEqual(['package.json', 'src/components/Button.jsx', 'src/main.js']);
   });
 
   it('should respect custom ignore patterns', async () => {
-    vi.mocked(fastGlob.stream).mockReturnValue(
-      new Readable({
-        read() {
-          const files = ['src/main.js', 'src/utils.ts', 'package.json'];
-          for (const file of files) {
-            this.push(path.join(normalizedFixturesPath, file));
-          }
-          this.push(null);
-        },
-      }),
-    );
-
-    const mockFileInfos: { [key: string]: FileInfo } = {
-      'src/main.js': {
-        path: path.join(normalizedFixturesPath, 'src/main.js'),
-        extension: 'js',
-        language: 'javascript',
-        size: 100,
-        created: new Date(2023, 0, 1),
-        modified: new Date(2023, 0, 1),
-        content: 'mock content for main.js',
-      },
-      'src/utils.ts': {
-        path: path.join(normalizedFixturesPath, 'src/utils.ts'),
-        extension: 'ts',
-        language: 'typescript',
-        size: 100,
-        created: new Date(2023, 0, 1),
-        modified: new Date(2023, 0, 1),
-        content: 'mock content for utils.ts',
-      },
-      'package.json': {
-        path: path.join(normalizedFixturesPath, 'package.json'),
-        extension: 'json',
-        language: 'json',
-        size: 100,
-        created: new Date(2023, 0, 1),
-        modified: new Date(2023, 0, 1),
-        content: 'mock content for package.json',
-      },
-    };
-
-    vi.mocked(Piscina.prototype.run).mockImplementation(
-      async ({ filePath }) => {
-        const relativePath = path.relative(normalizedFixturesPath, filePath);
-        return mockFileInfos[relativePath];
-      },
-    );
+    const mockFiles = [
+      'src/main.js',
+      'src/utils.ts',
+      'src/components/Button.jsx',
+      'package.json',
+    ];
+    setupMockFileSystem(mockFiles);
 
     const result = await processFiles({
       path: normalizedFixturesPath,
@@ -146,83 +111,16 @@ describe('processFiles', () => {
 
     const jsFiles = result.filter((file) => file.extension === 'js');
     expect(jsFiles.length).toBe(0);
-  });
-
-  it('should use cache for unchanged files', async () => {
-    const cachedFile: FileInfo = {
-      path: path.join(normalizedFixturesPath, 'src', 'main.js'),
-      extension: 'js',
-      language: 'javascript',
-      content: 'cached content',
-      size: 50,
-      created: new Date(2023, 0, 1),
-      modified: new Date(2023, 0, 1),
-    };
-
-    vi.mocked(FileCache.prototype.get).mockImplementation((filePath) => {
-      return path.normalize(filePath) === path.normalize(cachedFile.path)
-        ? Promise.resolve(cachedFile)
-        : Promise.resolve(null);
-    });
-
-    const mockFiles = ['src/main.js', 'src/utils.ts', 'package.json'];
-    vi.mocked(fastGlob.stream).mockReturnValue(
-      new Readable({
-        read() {
-          for (const file of mockFiles) {
-            this.push(path.join(normalizedFixturesPath, file));
-          }
-          this.push(null);
-        },
-      }),
-    );
-
-    const mockFileInfos: { [key: string]: FileInfo } = {
-      'src/main.js': cachedFile,
-      'src/utils.ts': {
-        path: path.join(normalizedFixturesPath, 'src', 'utils.ts'),
-        extension: 'ts',
-        language: 'typescript',
-        size: 100,
-        created: new Date(2023, 0, 1),
-        modified: new Date(2023, 0, 1),
-        content: 'mock content',
-      },
-      'package.json': {
-        path: path.join(normalizedFixturesPath, 'package.json'),
-        extension: 'json',
-        language: 'json',
-        size: 100,
-        created: new Date(2023, 0, 1),
-        modified: new Date(2023, 0, 1),
-        content: 'mock content',
-      },
-    };
-
-    vi.mocked(Piscina.prototype.run).mockImplementation(
-      async ({ filePath }) => {
-        const relativePath = path.relative(normalizedFixturesPath, filePath);
-        return mockFileInfos[relativePath.replace(/\\/g, '/')];
-      },
-    );
-
-    const result = await processFiles({
-      path: normalizedFixturesPath,
-      gitignorePath: tempGitignorePath,
-    });
-
-    expect(result.length).toBe(mockFiles.length);
-    const mainJsFile = result.find(
-      (file) => path.normalize(file.path) === path.normalize(cachedFile.path),
-    );
-    expect(mainJsFile).toEqual(cachedFile);
-
-    expect(FileCache.prototype.get).toHaveBeenCalledTimes(mockFiles.length);
-    expect(FileCache.prototype.set).toHaveBeenCalledTimes(mockFiles.length - 1);
+    expect(result.length).toBe(3); // Only .ts, .jsx, and .json files should be processed
   });
 
   it('should apply filters correctly', async () => {
-    const mockFiles = ['src/main.js', 'src/utils.ts', 'package.json'];
+    const mockFiles = [
+      'src/main.js',
+      'src/utils.ts',
+      'src/components/Button.jsx',
+      'package.json',
+    ];
     setupMockFileSystem(mockFiles);
 
     const result = await processFiles({
@@ -240,25 +138,35 @@ describe('processFiles', () => {
   });
 
   it('should handle multiple filters correctly', async () => {
-    const mockFiles = ['src/main.js', 'src/utils.ts', 'package.json'];
+    const mockFiles = [
+      'src/main.js',
+      'src/utils.ts',
+      'src/components/Button.jsx',
+      'package.json',
+    ];
     setupMockFileSystem(mockFiles);
 
     const result = await processFiles({
       path: normalizedFixturesPath,
       gitignorePath: tempGitignorePath,
-      filter: ['**/*.js', '**/package.json'],
+      filter: ['**/*.js*', '**/package.json'],
     });
 
-    expect(result).toHaveLength(2);
+    expect(result).toHaveLength(3);
     expect(
       result
         .map((file) => path.basename(file.path))
         .sort((a, b) => a.localeCompare(b)),
-    ).toEqual(['main.js', 'package.json']);
+    ).toEqual(['Button.jsx', 'main.js', 'package.json']);
   });
 
   it('should handle both include and exclude filters', async () => {
-    const mockFiles = ['src/main.js', 'src/utils.ts', 'package.json'];
+    const mockFiles = [
+      'src/main.js',
+      'src/utils.ts',
+      'src/components/Button.jsx',
+      'package.json',
+    ];
     setupMockFileSystem(mockFiles);
 
     const result = await processFiles({
@@ -268,16 +176,21 @@ describe('processFiles', () => {
       exclude: ['**/*.ts'],
     });
 
-    expect(result).toHaveLength(2);
+    expect(result).toHaveLength(3);
     expect(
       result
         .map((file) => path.basename(file.path))
         .sort((a, b) => a.localeCompare(b)),
-    ).toEqual(['main.js', 'package.json']);
+    ).toEqual(['Button.jsx', 'main.js', 'package.json']);
   });
 
   it('should handle absolute path filters', async () => {
-    const mockFiles = ['src/main.js', 'src/utils.ts', 'package.json'];
+    const mockFiles = [
+      'src/main.js',
+      'src/utils.ts',
+      'src/components/Button.jsx',
+      'package.json',
+    ];
     setupMockFileSystem(mockFiles);
 
     const result = await processFiles({
@@ -295,5 +208,168 @@ describe('processFiles', () => {
         .map((file) => path.basename(file.path))
         .sort((a, b) => a.localeCompare(b)),
     ).toEqual(['main.js', 'package.json']);
+  });
+
+  it('should process all files when no filter is provided', async () => {
+    const mockFiles = [
+      'src/main.js',
+      'src/utils.ts',
+      'src/components/Button.jsx',
+      'package.json',
+    ];
+    setupMockFileSystem(mockFiles);
+
+    const result = await processFiles({
+      path: normalizedFixturesPath,
+      gitignorePath: tempGitignorePath,
+      filter: [],
+    });
+
+    expect(result).toHaveLength(4);
+    expect(
+      result
+        .map((file) => path.basename(file.path))
+        .sort((a, b) => a.localeCompare(b)),
+    ).toEqual(['Button.jsx', 'main.js', 'package.json', 'utils.ts']);
+  });
+
+  it('should handle complex glob patterns and directory selections correctly', async () => {
+    const mockFiles = [
+      'src/main.js',
+      'src/utils.ts',
+      'src/components/Button.jsx',
+      'src/components/Input.tsx',
+      'tests/unit/main.test.js',
+      'tests/integration/api.test.js',
+      'docs/README.md',
+      'LICENSE',
+      'package.json',
+    ];
+    setupMockFileSystem(mockFiles);
+
+    const result = await processFiles({
+      path: normalizedFixturesPath,
+      gitignorePath: tempGitignorePath,
+      filter: ['src/**/*.{js,jsx}', 'tests', '**/README.md'],
+      exclude: ['**/*.test.js'],
+      customIgnores: ['**/Input.tsx'],
+    });
+
+    expect(result).toHaveLength(3);
+    expect(
+      result
+        .map((file) => path.relative(normalizedFixturesPath, file.path))
+        .sort((a, b) => a.localeCompare(b)),
+    ).toEqual(['docs/README.md', 'src/components/Button.jsx', 'src/main.js']);
+  });
+
+  it('should handle basename matching correctly', async () => {
+    const mockFiles = [
+      'src/main.js',
+      'src/utils.ts',
+      'src/components/Button.jsx',
+      'src/components/Input.tsx',
+      'tests/integration/api.test.js',
+      'tests/unit/main.test.js',
+      'docs/README.md',
+      'LICENSE',
+      'package.json',
+    ];
+    setupMockFileSystem(mockFiles);
+
+    const result = await processFiles({
+      path: normalizedFixturesPath,
+      gitignorePath: tempGitignorePath,
+      filter: ['main.js', 'README.md', 'Input.tsx'],
+      matchBase: true,
+    });
+
+    expect(result).toHaveLength(3);
+    expect(
+      result
+        .map((file) => path.relative(normalizedFixturesPath, file.path))
+        .sort((a, b) => a.localeCompare(b)),
+    ).toEqual(['docs/README.md', 'src/components/Input.tsx', 'src/main.js']);
+  });
+
+  it('should process and cache files, then use cached data on reprocessing', async () => {
+    const TEST_DIR = path.join(os.tmpdir(), 'file-processor-test');
+    const CACHE_FILE = path.join(TEST_DIR, 'test-cache.json');
+    let fileCache: FileCache;
+
+    await fs.ensureDir(TEST_DIR);
+
+    const mockFileInfo: FileInfo = {
+      path: path.join(TEST_DIR, 'file1.js'),
+      extension: 'js',
+      language: 'javascript',
+      size: 50,
+      created: new Date(2022, 11, 31),
+      modified: new Date(2022, 11, 31),
+      content: 'mock cached content for file1.js',
+    };
+
+    // Mock FileCache.get initial return of null (cache miss)
+    vi.mocked(FileCache.prototype.get).mockResolvedValue(null);
+
+    // Mock Piscina.run for initial processing
+    vi.mocked(Piscina.prototype.run).mockImplementation(
+      async ({ filePath }) => {
+        return {
+          ...mockFileInfo,
+          path: filePath,
+          content: `mock content for ${path.basename(filePath)}`,
+          size: 100,
+        };
+      },
+    );
+
+    // Mock fastGlob.stream to list files
+    vi.mocked(fastGlob.stream).mockImplementation(() => {
+      const stream = new Readable({
+        objectMode: true,
+        read() {
+          this.push(path.join(TEST_DIR, 'file1.js'));
+          this.push(null);
+        },
+      });
+      return stream;
+    });
+
+    // First processing (no cache hit)
+    await fs.writeFile(
+      path.join(TEST_DIR, 'file1.js'),
+      'console.log("Hello file1");',
+    );
+    const firstResults = await processFiles({
+      path: TEST_DIR,
+      cachePath: CACHE_FILE,
+    });
+
+    expect(firstResults).toHaveLength(1);
+    expect(firstResults[0].content).toBe('mock content for file1.js');
+
+    // Mock FileCache.get to return cached data for subsequent run (cache hit)
+    vi.mocked(FileCache.prototype.get).mockImplementation(
+      async (filePath: string) => {
+        if (filePath === mockFileInfo.path) {
+          return mockFileInfo;
+        }
+        return null;
+      },
+    );
+
+    // Second processing (cache hit, should not reprocess file1.js)
+    const secondResults = await processFiles({
+      path: TEST_DIR,
+      cachePath: CACHE_FILE,
+    });
+
+    expect(secondResults).toHaveLength(1);
+    expect(secondResults[0].content).toBe('mock cached content for file1.js');
+
+    // Ensure Piscina.run was only called once for initial processing
+    const piscinaRunCalls = vi.mocked(Piscina.prototype.run).mock.calls;
+    expect(piscinaRunCalls.length).toBe(1);
   });
 });

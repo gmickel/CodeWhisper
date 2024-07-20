@@ -27,8 +27,14 @@ export function cli(args: string[]) {
     .option('-o, --output <output>', 'Output file name')
     .option('-t, --template <template>', 'Template to use', 'default')
     .option('-g, --gitignore <path>', 'Path to .gitignore file')
-    .option('-f, --filter <patterns...>', 'File patterns to include')
-    .option('-e, --exclude <patterns...>', 'File patterns to exclude')
+    .option(
+      '-f, --filter <patterns...>',
+      'File patterns to include (use glob patterns, e.g., "src/**/*.js")',
+    )
+    .option(
+      '-e, --exclude <patterns...>',
+      'File patterns to exclude (use glob patterns, e.g., "**/*.test.js")',
+    )
     .option('-s, --suppress-comments', 'Strip comments from the code')
     .option('--case-sensitive', 'Use case-sensitive pattern matching')
     .option(
@@ -106,8 +112,14 @@ export function cli(args: string[]) {
     .option('-p, --path <path>', 'Path to the codebase', '.')
     .option('-t, --template <template>', 'Template to use')
     .option('-g, --gitignore <path>', 'Path to .gitignore file')
-    .option('-f, --filter <patterns...>', 'File patterns to include')
-    .option('-e, --exclude <patterns...>', 'File patterns to exclude')
+    .option(
+      '-f, --filter <patterns...>',
+      'File patterns to include (use glob patterns, e.g., "src/**/*.js")',
+    )
+    .option(
+      '-e, --exclude <patterns...>',
+      'File patterns to exclude (use glob patterns, e.g., "**/*.test.js")',
+    )
     .option('-s, --suppress-comments', 'Strip comments from the code')
     .option('--case-sensitive', 'Use case-sensitive pattern matching')
     .option(

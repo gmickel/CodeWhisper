@@ -27,6 +27,7 @@ interface ProcessOptions {
   caseSensitive?: boolean;
   customIgnores?: string[];
   cachePath?: string;
+  matchBase?: boolean;
 }
 
 const workerFilePath = new URL('../core/file-worker.js', import.meta.url).href;
@@ -114,11 +115,12 @@ export async function processFiles(
     caseSensitive = false,
     customIgnores = [],
     cachePath = path.join(os.tmpdir(), 'codewhisper-cache.json'),
+    matchBase = false,
   } = options;
 
   const fileCache = new FileCache(cachePath);
 
-  const ig = ignore().add(DEFAULT_IGNORES).add(customIgnores);
+  const ig = ignore().add(DEFAULT_IGNORES);
 
   if (await fs.pathExists(gitignorePath)) {
     const gitignoreContent = await fs.readFile(gitignorePath, 'utf-8');
@@ -132,51 +134,72 @@ export async function processFiles(
     onlyFiles: true,
     followSymbolicLinks: false,
     caseSensitiveMatch: caseSensitive,
-    ignore: exclude,
   };
 
   const fileInfos: FileInfo[] = [];
   const cachePromises: Promise<void>[] = [];
 
-  const globStream = fastGlob.stream('**/*', globOptions);
+  const normalizedFilters =
+    filter.length > 0
+      ? filter.map((f) => (path.isAbsolute(f) ? path.relative(basePath, f) : f))
+      : ['**/*'];
 
-  const normalizedFilters = filter.map((f) =>
-    path.isAbsolute(f) ? path.relative(basePath, f) : f,
-  );
+  const globPattern =
+    normalizedFilters.length > 1
+      ? `{${normalizedFilters.join(',')}}`
+      : normalizedFilters[0];
+
+  const globStream = fastGlob.stream(globPattern, globOptions);
+
+  const matchFile = (relativePath: string, patterns: string[]) => {
+    const matchOptions = {
+      dot: true,
+      nocase: !caseSensitive,
+      matchBase,
+      bash: true,
+    };
+
+    if (matchBase) {
+      const basename = path.basename(relativePath);
+      return patterns.some(
+        (pattern) =>
+          micromatch.isMatch(basename, pattern, matchOptions) ||
+          micromatch.isMatch(relativePath, pattern, matchOptions),
+      );
+    }
+
+    return micromatch.isMatch(relativePath, patterns, matchOptions);
+  };
 
   return new Promise((resolve, reject) => {
     globStream.on('data', (filePath) => {
-      const filePathStr = filePath.toString();
+      const filePathStr = path.resolve(filePath.toString());
       const relativePath = path.relative(basePath, filePathStr);
 
       if (ig.ignores(relativePath)) return;
 
+      if (customIgnores.length > 0 && matchFile(relativePath, customIgnores)) {
+        return;
+      }
+
       if (
         normalizedFilters.length > 0 &&
-        !micromatch.isMatch(relativePath, normalizedFilters, {
-          dot: true,
-          nocase: !caseSensitive,
-        })
+        !matchFile(relativePath, normalizedFilters)
       )
         return;
 
-      if (
-        exclude.length > 0 &&
-        micromatch.isMatch(relativePath, exclude, {
-          dot: true,
-          nocase: !caseSensitive,
-        })
-      )
-        return;
+      if (exclude.length > 0 && matchFile(relativePath, exclude)) return;
+
       cachePromises.push(
         (async () => {
           try {
-            const cached = await fileCache.get(filePathStr);
+            const cached = await fileCache.get(filePath);
             if (cached) {
               fileInfos.push(cached);
-              return;
+              return; // Skip processing and setting cache for cached files
             }
 
+            // Only proceed with file processing if not cached
             const stats = await fs.stat(filePathStr);
             if (!stats.isFile()) return;
 

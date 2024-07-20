@@ -119,16 +119,25 @@ async function selectFiles(basePath: string): Promise<string[]> {
     },
   ]);
 
-  let selectedFiles = Array.isArray(answer.selectedFiles)
+  let selectedFilesOrDirs = Array.isArray(answer.selectedFiles)
     ? answer.selectedFiles.map((file: string) => path.relative(basePath, file))
     : [path.relative(basePath, answer.selectedFiles)];
 
-  // Add "All Files" option
-  if (selectedFiles.includes('*')) {
-    selectedFiles = ['**/*'];
+  // Process the selected files/directories
+  selectedFilesOrDirs = selectedFilesOrDirs.map((fileOrDir: string) => {
+    const fullPath = path.join(basePath, fileOrDir);
+    if (fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory()) {
+      return path.join(fileOrDir, '**/*');
+    }
+    return fileOrDir;
+  });
+
+  // If the top-level directory is selected, use '**/*' to include all files
+  if (selectedFilesOrDirs.length === 1 && selectedFilesOrDirs[0] === '') {
+    selectedFilesOrDirs = ['**/*'];
   }
 
-  return selectedFiles;
+  return selectedFilesOrDirs;
 }
 
 async function selectTemplate(): Promise<string> {
