@@ -55,16 +55,16 @@ importers:
         specifier: 1.8.3
         version: 1.8.3
       '@semantic-release/changelog':
-        specifier: ^6.0.3
+        specifier: 6.0.3
         version: 6.0.3(semantic-release@24.0.0(typescript@5.5.3))
       '@semantic-release/git':
-        specifier: ^10.0.1
+        specifier: 10.0.1
         version: 10.0.1(semantic-release@24.0.0(typescript@5.5.3))
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
       '@types/inquirer':
-        specifier: ^9.0.7
+        specifier: 9.0.7
         version: 9.0.7
       '@types/node':
         specifier: 20.14.11
@@ -88,7 +88,7 @@ importers:
         specifier: 1.7.4
         version: 1.7.4
       semantic-release:
-        specifier: ^24.0.0
+        specifier: 24.0.0
         version: 24.0.0(typescript@5.5.3)
       tsup:
         specifier: 8.2.0
@@ -125,8 +125,8 @@ packages:
     resolution: {integrity: sha512-EStJpq4OuY8xYfhGVXngigBJRWxftKX9ksiGDnmlY3o7B/V7KIAc9X4oiK87uPJSc/vs5L869bem5fhZa8caZw==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/parser@7.24.7':
-    resolution: {integrity: sha512-9uUYRm6OqQrCqQdG1iCBwBPZgN8ciDBro2nIOFaiRz1/BCxaI7CNvQbDHvsArAC7Tw9Hda/B3U+6ui9u4HWXPw==}
+  '@babel/parser@7.24.8':
+    resolution: {integrity: sha512-WzfbgXOkGzZiXXCqk43kKwZjzwx4oulxZi3nq2TYL9mOjQv6kYwul9mz6ID36njuL7Xkp6nJEfok848Zj10j/w==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -2761,7 +2761,7 @@ snapshots:
       js-tokens: 4.0.0
       picocolors: 1.0.1
 
-  '@babel/parser@7.24.7':
+  '@babel/parser@7.24.8':
     dependencies:
       '@babel/types': 7.24.7
 
@@ -4376,7 +4376,7 @@ snapshots:
 
   magicast@0.3.4:
     dependencies:
-      '@babel/parser': 7.24.7
+      '@babel/parser': 7.24.8
       '@babel/types': 7.24.7
       source-map-js: 1.2.0
 
