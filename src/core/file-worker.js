@@ -21,6 +21,12 @@ export function stripComments(code, language) {
     preserveNewlines: true,
   };
 
+  // Check if the language is supported by strip-comments
+  if (!stripCommentsLib.languages[language]) {
+    console.warn(`Language "${language}" is not supported by strip-comments`);
+    return code;
+  }
+
   return stripCommentsLib(code, options);
 }
 

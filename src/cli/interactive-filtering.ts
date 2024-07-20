@@ -30,6 +30,7 @@ interface InteractiveModeOptions {
   customTemplate?: string;
   customIgnores?: string[];
   cachePath?: string;
+  respectGitignore?: boolean;
 }
 
 export async function interactiveMode(options: InteractiveModeOptions) {

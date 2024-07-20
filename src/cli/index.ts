@@ -52,20 +52,17 @@ export function cli(args: string[]) {
       'Custom path for the cache file',
       path.join(os.tmpdir(), 'codewhisper-cache.json'),
     )
+    .option('--respect-gitignore', 'Respect entries in .gitignore', true)
+    .option(
+      '--no-respect-gitignore',
+      'Do not respect entries in .gitignore',
+      false,
+    )
     .action(async (options) => {
       const spinner = ora('Processing files...').start();
 
       try {
-        const files = await processFiles({
-          path: options.path,
-          gitignorePath: options.gitignore,
-          filter: options.filter,
-          exclude: options.exclude,
-          suppressComments: options.suppressComments,
-          caseSensitive: options.caseSensitive,
-          customIgnores: options.customIgnores,
-          cachePath: options.cachePath,
-        });
+        const files = await processFiles(options);
 
         spinner.text = 'Generating markdown...';
 
@@ -133,6 +130,12 @@ export function cli(args: string[]) {
     .option('--custom-template <path>', 'Path to a custom Handlebars template')
     .option('--custom-ignores <patterns...>', 'Additional patterns to ignore')
     .option('--cache-path <path>', 'Custom path for the cache file')
+    .option('--respect-gitignore', 'Respect entries in .gitignore', true)
+    .option(
+      '--no-respect-gitignore',
+      'Do not respect entries in .gitignore',
+      false,
+    )
     .action(async (options) => {
       try {
         await interactiveMode(options);

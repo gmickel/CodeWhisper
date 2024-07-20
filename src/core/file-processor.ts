@@ -28,6 +28,7 @@ interface ProcessOptions {
   caseSensitive?: boolean;
   customIgnores?: string[];
   cachePath?: string;
+  respectGitignore?: boolean;
   matchBase?: boolean;
 }
 
@@ -116,6 +117,7 @@ export async function processFiles(
     caseSensitive = false,
     customIgnores = [],
     cachePath = path.join(os.tmpdir(), 'codewhisper-cache.json'),
+    respectGitignore = true,
     matchBase = false,
   } = options;
 
@@ -177,20 +179,26 @@ export async function processFiles(
       const filePathStr = path.resolve(filePath.toString());
       const relativePath = path.relative(basePath, filePathStr);
 
-      if (ig.ignores(relativePath)) return;
-
+      // Check customIgnores first
       if (customIgnores.length > 0 && matchFile(relativePath, customIgnores)) {
         return;
       }
 
+      // Check normalizedFilters first to ensure interactive mode selections are considered
       if (
         normalizedFilters.length > 0 &&
         !matchFile(relativePath, normalizedFilters)
-      )
+      ) {
         return;
+      }
 
-      if (exclude.length > 0 && matchFile(relativePath, exclude)) return;
+      // Conditionally check .gitignore patterns
+      if (respectGitignore && ig.ignores(relativePath)) return;
 
+      // Check exclude patterns
+      if (exclude.length > 0 && matchFile(relativePath, exclude)) {
+        return;
+      }
       cachePromises.push(
         (async () => {
           try {
