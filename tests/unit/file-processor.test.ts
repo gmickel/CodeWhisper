@@ -16,7 +16,7 @@ function normalizePath(filePath: string): string {
   return filePath.replace(/\\/g, '/');
 }
 
-describe('processFiles', () => {
+describe.sequential('processFiles', () => {
   const fixturesPath = path.resolve(__dirname, '../fixtures/test-project');
   const normalizedFixturesPath = path.normalize(fixturesPath);
   const tempGitignorePath = path.join(normalizedFixturesPath, '.gitignore');
