@@ -16,5 +16,6 @@
     "forceConsistentCasingInFileNames": true,
     "types": ["inquirer-file-tree-selection-prompt"]
   },
-  "include": ["src/**/*", "tests/**/*", "cli.js"]
+  "include": ["src/**/*", "tests/**/*", "cli.js"],
+  "exclude": ["tests/fixtures"]
 }
