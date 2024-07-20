@@ -14,7 +14,9 @@ _description_
 
 <p align="center">
   <a href="https://cdn.jsdelivr.net/gh/gmickel/static/sponsors.svg">
+
     <img src='https://cdn.jsdelivr.net/gh/gmickel/static/sponsors.svg'/>
+
   </a>
 </p>
 
@@ -34,3 +36,23 @@ _description_
 [license-href]: https://github.com/gmickel/code-whisper/blob/main/LICENSE
 [jsdocs-src]: https://img.shields.io/badge/jsdocs-reference-080f12?style=flat&colorA=080f12&colorB=1fa669
 [jsdocs-href]: https://www.jsdocs.io/package/code-whisper
+
+## Contributors 👨‍💻
+
+<!-- readme: collaborators, contributors -start -->
+<table>
+
+	<tbody>
+		<tr>
+            <td align="center">
+                <a href="https://github.com/gmickel">
+                    <img src="https://avatars.githubusercontent.com/u/139907?v=4" width="100;" alt="gmickel"/>
+                    <br />
+                    <sub><b>Gordon Mickel</b></sub>
+                </a>
+            </td>
+		</tr>
+	<tbody>
+
+</table>
+<!-- readme: collaborators, contributors -end -->
