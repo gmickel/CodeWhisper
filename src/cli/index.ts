@@ -12,17 +12,19 @@ import { interactiveMode } from './interactive-filtering';
 const templatesDir =
   process.env.TEMPLATES_DIR ??
   (() => {
-    const isProduction = path
-      .dirname(new URL(import.meta.url).pathname)
-      .includes(`${path.sep}dist`);
-    return isProduction
-      ? path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
-      : path.resolve(
-          path.dirname(new URL(import.meta.url).pathname),
-          '..',
-          'templates',
-        );
+    const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+    if (__dirname.includes('node_modules')) {
+      // We're running from an installed package
+      return path.resolve(__dirname, '..');
+    }
+    if (__dirname.includes(`${path.sep}dist`)) {
+      // We're running in production mode
+      return path.resolve(__dirname, '..');
+    }
+    // We're running in development mode
+    return path.resolve(__dirname, '..', 'templates');
   })();
+
 const program = new Command();
 
 export function cli(args: string[]) {

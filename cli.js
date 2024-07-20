@@ -12,10 +12,15 @@ if (__dirname.includes(`${path.sep}dist`)) {
 
 // Add this function to determine the templates directory
 function getTemplatesDir() {
-  const isProduction = __dirname.includes(`${path.sep}dist`);
-  if (isProduction) {
-    return path.resolve(__dirname, '..');
+  if (__dirname.includes('node_modules')) {
+    // We're running from an installed package
+    return __dirname;
   }
+  if (__dirname.includes(`${path.sep}dist`)) {
+    // We're running in production mode
+    return __dirname;
+  }
+  // We're running in development mode
   return path.resolve(__dirname, 'src', 'templates');
 }
 
