@@ -90,5 +90,8 @@ export async function generateMarkdown(
     customData,
   };
 
-  return compiledTemplate(data);
+  const result = compiledTemplate(data);
+
+  // Normalize line endings to LF
+  return result.replace(/\r\n/g, '\n');
 }
