@@ -183,7 +183,9 @@ describe('processFiles', () => {
     });
 
     expect(result.length).toBe(3);
-    const mainJsFile = result.find((file) => file.path === cachedFile.path);
+    const mainJsFile = result.find(
+      (file) => path.normalize(file.path) === path.normalize(cachedFile.path),
+    );
     expect(mainJsFile).toEqual(cachedFile);
 
     expect(FileCache.prototype.get).toHaveBeenCalledTimes(3);
