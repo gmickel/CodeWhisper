@@ -30,11 +30,11 @@ importers:
         specifier: 5.3.1
         version: 5.3.1
       inquirer:
-        specifier: 9.2.10
-        version: 9.2.10
+        specifier: 9.2.23
+        version: 9.2.23
       inquirer-file-tree-selection-prompt:
         specifier: ^2.0.5
-        version: 2.0.5(inquirer@9.2.10)
+        version: 2.0.5(inquirer@9.2.23)
       isbinaryfile:
         specifier: 5.0.2
         version: 5.0.2
@@ -55,16 +55,16 @@ importers:
         specifier: 1.8.3
         version: 1.8.3
       '@semantic-release/changelog':
-        specifier: ^6.0.3
+        specifier: 6.0.3
         version: 6.0.3(semantic-release@24.0.0(typescript@5.5.3))
       '@semantic-release/git':
-        specifier: ^10.0.1
+        specifier: 10.0.1
         version: 10.0.1(semantic-release@24.0.0(typescript@5.5.3))
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
       '@types/inquirer':
-        specifier: ^9.0.7
+        specifier: 9.0.7
         version: 9.0.7
       '@types/node':
         specifier: 20.14.11
@@ -88,7 +88,7 @@ importers:
         specifier: 1.7.4
         version: 1.7.4
       semantic-release:
-        specifier: ^24.0.0
+        specifier: 24.0.0
         version: 24.0.0(typescript@5.5.3)
       tsup:
         specifier: 8.2.0
@@ -1283,10 +1283,6 @@ packages:
     resolution: {integrity: sha512-rElJwkA/xS04Vfg+CaZodpso7VqBknOYbzi6I76hI4X80RUjkSxO2oAyPmGbuXUppywjqndOrQDl817hDnI++w==}
     engines: {node: '>=12'}
 
-  figures@5.0.0:
-    resolution: {integrity: sha512-ej8ksPF4x6e5wvK9yevct0UCXh8TTFlWGVLlgjZuoBH1HwjIfKE/IdL5mq89sFA7zELi1VhKpmtDnrs7zWyeyg==}
-    engines: {node: '>=14'}
-
   figures@6.1.0:
     resolution: {integrity: sha512-d+l3qxjSesT4V7v2fh+QnmFnUWv9lSpjarhShNTgBOfA0ttejbQUAlHLitbjkoRiDulW0OPoQPYIGhIC8ohejg==}
     engines: {node: '>=18'}
@@ -1511,9 +1507,9 @@ packages:
     peerDependencies:
       inquirer: ^9.0.0
 
-  inquirer@9.2.10:
-    resolution: {integrity: sha512-tVVNFIXU8qNHoULiazz612GFl+yqNfjMTbLuViNJE/d860Qxrd3NMrse8dm40VUQLOQeULvaQF8lpAhvysjeyA==}
-    engines: {node: '>=14.18.0'}
+  inquirer@9.2.23:
+    resolution: {integrity: sha512-kod5s+FBPIDM2xiy9fu+6wdU/SkK5le5GS9lh4FEBjBHqiMgD9lLFbCbuqFNAjNL2ZOy9Wd9F694IOzN9pZHBA==}
+    engines: {node: '>=18'}
 
   into-stream@7.0.0:
     resolution: {integrity: sha512-2dYz766i9HprMBasCMvHMuazJ7u4WzhJwo5kb3iPSiW/iRYV6uPari3zHoqZlnuaR7V1bEiNMxikhp37rdBXbw==}
@@ -3923,11 +3919,6 @@ snapshots:
       escape-string-regexp: 5.0.0
       is-unicode-supported: 1.3.0
 
-  figures@5.0.0:
-    dependencies:
-      escape-string-regexp: 5.0.0
-      is-unicode-supported: 1.3.0
-
   figures@6.1.0:
     dependencies:
       is-unicode-supported: 2.0.0
@@ -4151,23 +4142,23 @@ snapshots:
 
   ini@1.3.8: {}
 
-  inquirer-file-tree-selection-prompt@2.0.5(inquirer@9.2.10):
+  inquirer-file-tree-selection-prompt@2.0.5(inquirer@9.2.23):
     dependencies:
       chalk: 5.3.0
       cli-cursor: 4.0.0
       figures: 4.0.1
-      inquirer: 9.2.10
+      inquirer: 9.2.23
       rxjs: 7.8.1
 
-  inquirer@9.2.10:
+  inquirer@9.2.23:
     dependencies:
+      '@inquirer/figures': 1.0.4
       '@ljharb/through': 2.3.13
       ansi-escapes: 4.3.2
       chalk: 5.3.0
       cli-cursor: 3.1.0
       cli-width: 4.1.0
       external-editor: 3.1.0
-      figures: 5.0.0
       lodash: 4.17.21
       mute-stream: 1.0.0
       ora: 5.4.1
