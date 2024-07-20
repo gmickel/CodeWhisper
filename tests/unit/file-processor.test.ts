@@ -12,6 +12,10 @@ vi.mock('fast-glob');
 vi.mock('piscina');
 vi.mock('../../src/utils/file-cache');
 
+function normalizePath(filePath: string): string {
+  return filePath.replace(/\\/g, '/');
+}
+
 describe('processFiles', () => {
   const fixturesPath = path.resolve(__dirname, '../fixtures/test-project');
   const normalizedFixturesPath = path.normalize(fixturesPath);
@@ -45,7 +49,7 @@ describe('processFiles', () => {
       size: 100,
       created: new Date(2023, 0, 1),
       modified: new Date(2023, 0, 1),
-      content: `mock content for ${filePath}`,
+      content: `mock content for ${normalizePath(filePath)}`, // Normalize path
     });
 
     vi.mocked(Piscina.prototype.run).mockImplementation(async ({ filePath }) =>
@@ -65,7 +69,7 @@ describe('processFiles', () => {
     expect(result).toHaveLength(3);
     expect(
       result
-        .map((file) => path.basename(file.path))
+        .map((file) => normalizePath(path.basename(file.path)))
         .sort((a, b) => a.localeCompare(b)),
     ).toEqual(['main.js', 'package.json', 'utils.ts']);
     expect(result[0].content).toBe('mock content for package.json');
@@ -89,7 +93,9 @@ describe('processFiles', () => {
     expect(result).toHaveLength(3);
     expect(
       result
-        .map((file) => path.relative(normalizedFixturesPath, file.path))
+        .map((file) =>
+          normalizePath(path.relative(normalizedFixturesPath, file.path)),
+        )
         .sort((a, b) => a.localeCompare(b)),
     ).toEqual(['package.json', 'src/components/Button.jsx', 'src/main.js']);
   });
@@ -132,7 +138,7 @@ describe('processFiles', () => {
     expect(result).toHaveLength(2);
     expect(
       result
-        .map((file) => path.basename(file.path))
+        .map((file) => normalizePath(path.basename(file.path)))
         .sort((a, b) => a.localeCompare(b)),
     ).toEqual(['main.js', 'utils.ts']);
   });
@@ -155,7 +161,7 @@ describe('processFiles', () => {
     expect(result).toHaveLength(3);
     expect(
       result
-        .map((file) => path.basename(file.path))
+        .map((file) => normalizePath(path.basename(file.path)))
         .sort((a, b) => a.localeCompare(b)),
     ).toEqual(['Button.jsx', 'main.js', 'package.json']);
   });
@@ -179,7 +185,7 @@ describe('processFiles', () => {
     expect(result).toHaveLength(3);
     expect(
       result
-        .map((file) => path.basename(file.path))
+        .map((file) => normalizePath(path.basename(file.path)))
         .sort((a, b) => a.localeCompare(b)),
     ).toEqual(['Button.jsx', 'main.js', 'package.json']);
   });
@@ -205,7 +211,7 @@ describe('processFiles', () => {
     expect(result).toHaveLength(2);
     expect(
       result
-        .map((file) => path.basename(file.path))
+        .map((file) => normalizePath(path.basename(file.path)))
         .sort((a, b) => a.localeCompare(b)),
     ).toEqual(['main.js', 'package.json']);
   });
@@ -228,7 +234,7 @@ describe('processFiles', () => {
     expect(result).toHaveLength(4);
     expect(
       result
-        .map((file) => path.basename(file.path))
+        .map((file) => normalizePath(path.basename(file.path)))
         .sort((a, b) => a.localeCompare(b)),
     ).toEqual(['Button.jsx', 'main.js', 'package.json', 'utils.ts']);
   });
@@ -258,7 +264,9 @@ describe('processFiles', () => {
     expect(result).toHaveLength(3);
     expect(
       result
-        .map((file) => path.relative(normalizedFixturesPath, file.path))
+        .map((file) =>
+          normalizePath(path.relative(normalizedFixturesPath, file.path)),
+        )
         .sort((a, b) => a.localeCompare(b)),
     ).toEqual(['docs/README.md', 'src/components/Button.jsx', 'src/main.js']);
   });
@@ -287,7 +295,9 @@ describe('processFiles', () => {
     expect(result).toHaveLength(3);
     expect(
       result
-        .map((file) => path.relative(normalizedFixturesPath, file.path))
+        .map((file) =>
+          normalizePath(path.relative(normalizedFixturesPath, file.path)),
+        )
         .sort((a, b) => a.localeCompare(b)),
     ).toEqual(['docs/README.md', 'src/components/Input.tsx', 'src/main.js']);
   });
