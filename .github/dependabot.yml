@@ -1,14 +1,13 @@
 version: 2
 updates:
-  # Root package.json
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     allow:
-      - dependency-type: "all"
-    open-pull-requests-limit: 10
+      - dependency-type: "direct"
     versioning-strategy: "auto"
+    open-pull-requests-limit: 10
     commit-message:
       prefix: "chore"
       include: "scope"
@@ -18,12 +17,13 @@ updates:
       - dependency-name: "*"
         update-types:
           ["version-update:semver-major", "version-update:semver-minor"]
+    # Add this line to specify the package manager
+    package-manager: "pnpm"
 
-  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     commit-message:
       prefix: "chore"
       include: "scope"
