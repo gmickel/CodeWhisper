@@ -41,7 +41,7 @@ export async function interactiveMode(options: InteractiveModeOptions) {
 
     const userFilters = options.filter || [];
 
-    const selectedFiles = await selectFiles(basePath, options.invert);
+    const selectedFiles = await selectFiles(basePath, options.invert ?? false);
 
     // Combine user filters with selected files
     const combinedFilters = [...new Set([...userFilters, ...selectedFiles])];
