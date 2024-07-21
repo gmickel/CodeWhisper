@@ -74,8 +74,8 @@ Provide your analysis in the following structure:
 {{#each files}}
 ### {{relativePath this.path}}
 
-```{{this.language}}
-{{this.content}}
+{{#codeblock this.content this.language}}{{/codeblock}}
+
 {{/each}}
 </code>
 
