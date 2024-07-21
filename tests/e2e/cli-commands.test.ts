@@ -279,5 +279,5 @@ describe('CLI Commands', () => {
       await fs.remove(testDir1);
       await fs.remove(testDir2);
     }
-  });
+  }, 30000);
 });

@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import path from 'node:path';
 import fs from 'fs-extra';
 import type { FileInfo } from '../core/file-processor';
+import { normalizePath } from './normalize-path';
 
 interface CacheEntry {
   hash: string;
@@ -36,8 +37,17 @@ export class FileCache {
         const content = await fs.readFile(this.cacheFile, 'utf-8');
         try {
           this.cache = JSON.parse(content, (key, value) => {
-            if (key === 'created' || key === 'modified') {
-              return new Date(value);
+            if (typeof value === 'object' && value !== null) {
+              if (value.type === 'Date') {
+                return new Date(value.value);
+              }
+              if (value.created && value.modified) {
+                value.created = new Date(value.created);
+                value.modified = new Date(value.modified);
+              }
+            }
+            if (key === 'path') {
+              return normalizePath(value);
             }
             return value;
           });
@@ -72,19 +82,18 @@ export class FileCache {
       await fs.ensureDir(path.dirname(this.cacheFile));
       const tempFile = `${this.cacheFile}.tmp`;
 
-      // Stringify cache items individually
-      const cacheEntries = Object.entries(this.cache)
-        .map(([key, value]) => {
-          try {
-            return `"${key}":${JSON.stringify(value)}`;
-          } catch (error) {
-            console.warn(`Failed to stringify cache entry for ${key}:`, error);
-            return null;
-          }
-        })
-        .filter(Boolean);
-
-      const cacheString = `{${cacheEntries.join(',')}}`;
+      const cacheString = JSON.stringify(this.cache, (key, value) => {
+        if (value instanceof Date) {
+          return { type: 'Date', value: value.toISOString() };
+        }
+        if (key === 'created' || key === 'modified') {
+          return { type: 'Date', value: new Date(value).toISOString() };
+        }
+        if (key === 'path') {
+          return normalizePath(value);
+        }
+        return value;
+      });
 
       await fs.writeFile(tempFile, cacheString, 'utf-8');
       await fs.rename(tempFile, this.cacheFile);
