@@ -41,7 +41,7 @@
     "build": "tsup",
     "lint": "biome check .",
     "lint:fix": "biome check . --write",
-    "prepublishOnly": "nr build",
+    "prepublishOnly": "pnpm run build",
     "prerelease": "pnpm run lint && pnpm run test && pnpm run build",
     "release": "semantic-release",
     "dev": "esno src/cli/index.ts",
