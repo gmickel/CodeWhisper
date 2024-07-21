@@ -31,6 +31,7 @@ interface InteractiveModeOptions {
   customIgnores?: string[];
   cachePath?: string;
   respectGitignore?: boolean;
+  invert?: boolean;
 }
 
 export async function interactiveMode(options: InteractiveModeOptions) {
@@ -40,12 +41,14 @@ export async function interactiveMode(options: InteractiveModeOptions) {
 
     const userFilters = options.filter || [];
 
-    const selectedFiles = await selectFiles(basePath);
+    const selectedFiles = await selectFiles(basePath, options.invert);
 
     // Combine user filters with selected files
     const combinedFilters = [...new Set([...userFilters, ...selectedFiles])];
 
-    console.log(chalk.cyan('Files to be processed:'));
+    console.log(
+      chalk.cyan(`Files to be ${options.invert ? 'excluded' : 'included'}:`),
+    );
     for (const filter of combinedFilters) {
       console.log(chalk.cyan(`  ${filter}`));
     }
@@ -65,7 +68,8 @@ export async function interactiveMode(options: InteractiveModeOptions) {
     const processedFiles = await processFiles({
       ...options,
       path: basePath,
-      filter: combinedFilters,
+      filter: options.invert ? undefined : combinedFilters,
+      exclude: options.invert ? combinedFilters : options.exclude,
     });
     spinner.succeed('Files processed successfully');
 
@@ -104,12 +108,15 @@ export async function interactiveMode(options: InteractiveModeOptions) {
   }
 }
 
-async function selectFiles(basePath: string): Promise<string[]> {
+async function selectFiles(
+  basePath: string,
+  invert: boolean,
+): Promise<string[]> {
   const answer = await inquirer.prompt([
     {
       type: 'file-tree-selection',
       name: 'selectedFiles',
-      message: 'Select files and directories:',
+      message: `Select files and directories to be ${invert ? 'excluded' : 'included'}:`,
       root: basePath,
       multiple: true,
       enableGoUpperDirectory: true,
