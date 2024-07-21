@@ -6,12 +6,12 @@
   "author": "Gordon Mickel <gordon@mickel.tech>",
   "license": "MIT",
   "funding": "https://github.com/sponsors/gmickel",
-  "homepage": "https://github.com/gmickel/code-whisper#readme",
+  "homepage": "https://github.com/gmickel/CodeWhisper",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gmickel/code-whisper.git"
+    "url": "git+https://github.com/gmickel/CodeWhisper.git"
   },
-  "bugs": "https://github.com/gmickel/code-whisper/issues",
+  "bugs": "https://github.com/gmickel/CodeWhisper/issues",
   "keywords": ["code", "ai", "prompt", "git"],
   "sideEffects": false,
   "exports": {
