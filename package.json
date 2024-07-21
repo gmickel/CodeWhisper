@@ -60,7 +60,7 @@
     "handlebars": "4.7.8",
     "ignore": "5.3.1",
     "inquirer": "9.2.23",
-    "inquirer-file-tree-selection-prompt": "^2.0.5",
+    "inquirer-file-tree-selection-prompt": "2.0.5",
     "isbinaryfile": "5.0.2",
     "micromatch": "^4.0.7",
     "ora": "8.0.1",
@@ -83,7 +83,7 @@
     "esno": "4.7.0",
     "lefthook": "1.7.4",
     "semantic-release": "24.0.0",
-    "tsup": "8.2.0",
+    "tsup": "8.2.1",
     "typescript": "5.5.3",
     "vite": "5.3.4",
     "vitest": "2.0.3"
