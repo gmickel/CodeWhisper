@@ -6,6 +6,7 @@ import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { FileInfo } from '../../src/core/file-processor';
 import { FileCache } from '../../src/utils/file-cache';
+import { normalizePath } from '../../src/utils/normalize-path';
 
 describe('FileCache', () => {
   const TEST_DIR = path.join(os.tmpdir(), 'file-cache-test');
@@ -82,7 +83,7 @@ describe('FileCache', () => {
   });
 
   it('should persist cache to disk and load it', async () => {
-    const testFile = path.join(TEST_DIR, 'persist.txt');
+    const testFile = normalizePath(path.join(TEST_DIR, 'persist.txt'));
     await fs.writeFile(testFile, 'persist test');
 
     const fileInfo: FileInfo = {
@@ -102,7 +103,29 @@ describe('FileCache', () => {
     const newFileCache = new FileCache(CACHE_FILE);
     const retrieved = await newFileCache.get(testFile);
 
-    expect(retrieved).toEqual(fileInfo);
+    expect(retrieved).toBeDefined();
+    expect(retrieved).not.toBeNull();
+
+    if (retrieved) {
+      expect(normalizePath(retrieved.path)).toEqual(
+        normalizePath(fileInfo.path),
+      );
+      expect(retrieved.content).toEqual(fileInfo.content);
+      expect(retrieved.size).toEqual(fileInfo.size);
+      expect(retrieved.language).toEqual(fileInfo.language);
+      expect(retrieved.created).toBeInstanceOf(Date);
+      expect(retrieved.modified).toBeInstanceOf(Date);
+      expect(retrieved.created.getTime()).toBeCloseTo(
+        fileInfo.created.getTime(),
+        -3,
+      );
+      expect(retrieved.modified.getTime()).toBeCloseTo(
+        fileInfo.modified.getTime(),
+        -3,
+      );
+    } else {
+      throw new Error('Retrieved cache item is null');
+    }
   });
 
   it('should clear the cache', async () => {

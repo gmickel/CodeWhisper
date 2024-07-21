@@ -33,6 +33,7 @@ interface InteractiveModeOptions {
   cachePath?: string;
   respectGitignore?: boolean;
   invert?: boolean;
+  lineNumbers?: boolean;
 }
 
 export async function interactiveMode(options: InteractiveModeOptions) {
@@ -82,6 +83,7 @@ export async function interactiveMode(options: InteractiveModeOptions) {
       customData: options.customData
         ? JSON.parse(options.customData)
         : undefined,
+      lineNumbers: options.lineNumbers,
     };
 
     let markdown = await generateMarkdown(

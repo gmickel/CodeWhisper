@@ -41,6 +41,7 @@ export function cli(args: string[]) {
       'File patterns to exclude (use glob patterns, e.g., "**/*.test.js")',
     )
     .option('-s, --suppress-comments', 'Strip comments from the code')
+    .option('-l, --line-numbers', 'Add line numbers to code blocks')
     .option('--case-sensitive', 'Use case-sensitive pattern matching')
     .option(
       '--no-codeblock',
@@ -92,6 +93,7 @@ export function cli(args: string[]) {
           noCodeblock: !options.codeblock,
           basePath: options.path,
           customData,
+          lineNumbers: options.lineNumbers,
         });
 
         if (options.prompt) {
@@ -132,6 +134,7 @@ export function cli(args: string[]) {
       'File patterns to exclude (use glob patterns, e.g., "**/*.test.js")',
     )
     .option('-s, --suppress-comments', 'Strip comments from the code')
+    .option('-l, --line-numbers', 'Add line numbers to code blocks')
     .option('--case-sensitive', 'Use case-sensitive pattern matching')
     .option(
       '--no-codeblock',

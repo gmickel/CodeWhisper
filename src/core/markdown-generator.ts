@@ -7,16 +7,29 @@ export interface MarkdownOptions {
   noCodeblock?: boolean;
   customData?: Record<string, unknown>;
   basePath?: string;
+  lineNumbers?: boolean;
 }
 
-function registerHandlebarsHelpers(noCodeblock: boolean) {
+function registerHandlebarsHelpers(
+  noCodeblock: boolean,
+  options: MarkdownOptions,
+) {
   Handlebars.registerHelper(
     'codeblock',
     (content: string, language: string) => {
-      if (noCodeblock) {
-        return content;
+      let numberedContent = content;
+      if (options.lineNumbers) {
+        numberedContent = content
+          .split('\n')
+          .map((line, index) => `${index + 1} ${line}`)
+          .join('\n');
       }
-      return new Handlebars.SafeString(`\`\`\`${language}\n${content}\n\`\`\``);
+      if (options.noCodeblock) {
+        return numberedContent;
+      }
+      return new Handlebars.SafeString(
+        `\`\`\`${language}\n${numberedContent}\n\`\`\``,
+      );
     },
   );
 
@@ -87,7 +100,7 @@ export async function generateMarkdown(
     basePath = process.cwd(),
   } = options;
 
-  registerHandlebarsHelpers(noCodeblock);
+  registerHandlebarsHelpers(noCodeblock, options);
 
   const compiledTemplate = Handlebars.compile(templateContent);
 
