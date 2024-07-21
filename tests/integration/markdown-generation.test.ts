@@ -120,6 +120,7 @@ describe('Markdown Generation Integration', () => {
     expect(decodeHTMLEntities(result)).toContain('- title: Test Project');
     expect(decodeHTMLEntities(result)).toContain('- version: 1.0.0');
   });
+
   it('should include custom data in template context', async () => {
     const customTemplateContent = await fs.readFile(
       customTemplatePath,

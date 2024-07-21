@@ -20,6 +20,7 @@ inquirer.registerPrompt('file-tree-selection', inquirerFileTreeSelection);
 interface InteractiveModeOptions {
   path?: string;
   template?: string;
+  prompt?: string;
   gitignore?: string;
   filter?: string[];
   exclude?: string[];
@@ -83,11 +84,15 @@ export async function interactiveMode(options: InteractiveModeOptions) {
         : undefined,
     };
 
-    const markdown = await generateMarkdown(
+    let markdown = await generateMarkdown(
       processedFiles,
       templateContent,
       markdownOptions,
     );
+
+    if (options.prompt) {
+      markdown += `\n\n## Your Task\n\n${options.prompt}`;
+    }
 
     spinner.succeed('Markdown generated successfully');
 

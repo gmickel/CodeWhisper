@@ -24,9 +24,16 @@ function registerHandlebarsHelpers(noCodeblock: boolean) {
   Handlebars.registerHelper('objectKeys', Object.keys);
   Handlebars.registerHelper('gt', (a, b) => a > b);
 
-  Handlebars.registerHelper('hasCustomData', (customData) => {
-    return customData && Object.keys(customData).length > 0;
-  });
+  Handlebars.registerHelper('hasCustomData', (context) =>
+    Object.keys(context).some(
+      (key) => key !== 'files' && key !== 'base' && Object.hasOwn(context, key),
+    ),
+  );
+
+  Handlebars.registerHelper(
+    'isCustomData',
+    (key) => key !== 'files' && key !== 'base',
+  );
 
   Handlebars.registerHelper('lineNumbers', (content: string) => {
     const lines = content.split('\n');
@@ -87,7 +94,7 @@ export async function generateMarkdown(
   const data = {
     files,
     base: basePath,
-    customData,
+    ...customData,
   };
 
   const result = compiledTemplate(data);

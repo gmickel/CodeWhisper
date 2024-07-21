@@ -24,6 +24,11 @@ export function cli(args: string[]) {
     .command('generate')
     .description('Generate a markdown file from your codebase')
     .option('-p, --path <path>', 'Path to the codebase', '.')
+    .option(
+      '-pr, --prompt <prompt>',
+      'Custom prompt to append to the output',
+      (value) => value,
+    )
     .option('-o, --output <output>', 'Output file name')
     .option('-t, --template <template>', 'Template to use', 'default')
     .option('-g, --gitignore <path>', 'Path to .gitignore file')
@@ -69,7 +74,7 @@ export function cli(args: string[]) {
         let customData = {};
         if (options.customData) {
           try {
-            customData = JSON.parse(options.customData);
+            customData = JSON.parse(options.customData || '{}');
           } catch (error) {
             spinner.fail('Error parsing custom data JSON');
             console.error(chalk.red((error as Error).message));
@@ -83,11 +88,15 @@ export function cli(args: string[]) {
 
         const templateContent = await fs.readFile(templatePath, 'utf-8');
 
-        const markdown = await generateMarkdown(files, templateContent, {
+        let markdown = await generateMarkdown(files, templateContent, {
           noCodeblock: !options.codeblock,
           basePath: options.path,
           customData,
         });
+
+        if (options.prompt) {
+          markdown += `\n\n## Your Task\n\n${options.prompt}`;
+        }
 
         if (options.output) {
           await fs.writeFile(options.output, markdown);
@@ -107,6 +116,11 @@ export function cli(args: string[]) {
     .command('interactive')
     .description('Start interactive mode')
     .option('-p, --path <path>', 'Path to the codebase', '.')
+    .option(
+      '-pr, --prompt <prompt>',
+      'Custom prompt to append to the output',
+      (value) => value,
+    )
     .option('-t, --template <template>', 'Template to use')
     .option('-g, --gitignore <path>', 'Path to .gitignore file')
     .option(

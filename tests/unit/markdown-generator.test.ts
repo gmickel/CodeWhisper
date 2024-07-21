@@ -88,14 +88,30 @@ describe('Markdown Generator', () => {
     expect(resultWithoutCodeblock).not.toContain('```markdown');
   });
 
-  it('should include custom data in template context', async () => {
-    const template = 'Custom data: {{customData.key}}';
+  it('should handle custom data in templates', async () => {
+    const template =
+      '# {{projectName}}\n\n{{projectDescription}}\n\n{{#each files}}{{this.path}}{{/each}}';
+    const customData = {
+      projectName: 'My Awesome Project',
+      projectDescription: 'A fantastic tool for developers',
+    };
 
-    const result = await generateMarkdown(mockFiles, template, {
-      customData: { key: 'value' },
-    });
+    const result = await generateMarkdown(mockFiles, template, { customData });
 
-    expect(result).toBe('Custom data: value');
+    expect(result).toContain('# My Awesome Project');
+    expect(result).toContain('A fantastic tool for developers');
+    expect(result).toContain('/project/src/index.ts');
+  });
+
+  it('should support direct custom data access', async () => {
+    const template = '{{key}}';
+    const customData = {
+      key: 'Direct Value',
+    };
+
+    const result = await generateMarkdown(mockFiles, template, { customData });
+
+    expect(result).toBe('Direct Value');
   });
 
   it('should use provided basePath for relative paths', async () => {
@@ -117,6 +133,59 @@ describe('Markdown Generator', () => {
 
     expect(decodeHTMLEntities(result)).toContain(
       'Missing helper: "invalidHelper"',
+    );
+  });
+  it('should handle custom data in templates', async () => {
+    const mockFiles = [
+      {
+        path: '/project/src/index.ts',
+        extension: 'ts',
+        language: 'typescript',
+        size: 100,
+        created: new Date('2023-01-01'),
+        modified: new Date('2023-01-02'),
+        content: 'console.log("Hello, World!");',
+      },
+    ];
+
+    const template =
+      '# {{projectName}}\n\n{{projectDescription}}\n\n{{#each files}}{{this.path}}{{/each}}';
+    const customData = {
+      projectName: 'My Awesome Project',
+      projectDescription: 'A fantastic tool for developers',
+    };
+
+    const result = await generateMarkdown(mockFiles, template, { customData });
+
+    expect(result).toContain('# My Awesome Project');
+    expect(result).toContain('A fantastic tool for developers');
+    expect(result).toContain('/project/src/index.ts');
+  });
+
+  it('should append custom prompt to the generated markdown', async () => {
+    const mockFiles = [
+      {
+        path: '/project/src/index.ts',
+        extension: 'ts',
+        language: 'typescript',
+        size: 100,
+        created: new Date('2023-01-01'),
+        modified: new Date('2023-01-02'),
+        content: 'console.log("Hello, World!");',
+      },
+    ];
+
+    const template = '# Project\n\n{{#each files}}{{this.path}}{{/each}}';
+    const customPrompt = 'Please review this code and provide feedback.';
+
+    const result = await generateMarkdown(mockFiles, template);
+    const finalResult = `${result}\n\n## Custom Prompt\n\n${customPrompt}`;
+
+    expect(finalResult).toContain('# Project');
+    expect(finalResult).toContain('/project/src/index.ts');
+    expect(finalResult).toContain('## Custom Prompt');
+    expect(finalResult).toContain(
+      'Please review this code and provide feedback.',
     );
   });
 });
