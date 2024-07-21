@@ -44,6 +44,7 @@
     "prepublishOnly": "pnpm run build",
     "prerelease": "pnpm run lint && pnpm run test && pnpm run build",
     "release": "semantic-release",
+    "postinstall": "chmod +x ./dist/cli.js",
     "dev": "esno src/cli/index.ts",
     "start": "node dist/cli/index.js",
     "test": "vitest",
