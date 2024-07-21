@@ -1,8 +1,12 @@
-import { execSync } from 'node:child_process';
+import { exec, execSync } from 'node:child_process';
+import os from 'node:os';
 import path from 'node:path';
+import { promisify } from 'node:util';
 import fs from 'fs-extra';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { normalizePath } from '../../src/utils/normalize-path';
+
+const execAsync = promisify(exec);
 
 describe('CLI Commands', () => {
   const cliPath = path.resolve(__dirname, '../../cli.js');
@@ -172,6 +176,7 @@ describe('CLI Commands', () => {
       fs.removeSync(customCachePath);
     }
   });
+
   it('should generate markdown with custom data and prompt', () => {
     const customData = JSON.stringify({
       projectName: 'My Awesome Project',
@@ -216,5 +221,63 @@ describe('CLI Commands', () => {
     expect(output).toContain('A fantastic tool for developers');
     expect(output).toContain('## Your Task');
     expect(output).toContain('Please review this code and provide feedback.');
+  });
+
+  it('should generate markdown with line numbers when --line-numbers flag is used', async () => {
+    const testDir1 = path.join(os.tmpdir(), 'test-project-1');
+    const testDir2 = path.join(os.tmpdir(), 'test-project-2');
+
+    await fs.ensureDir(testDir1);
+    await fs.ensureDir(testDir2);
+
+    const testFile1 = path.join(testDir1, 'test-file.js');
+    const testFile2 = path.join(testDir2, 'test-file.js');
+
+    await fs.writeFile(
+      testFile1,
+      'const x = 1;\nconst y = 2;\nconsole.log(x + y);',
+    );
+    await fs.writeFile(
+      testFile2,
+      'const x = 1;\nconst y = 2;\nconsole.log(x + y);',
+    );
+
+    const outputPath1 = path.join(testDir1, 'output-with-line-numbers.md');
+    const outputPath2 = path.join(testDir2, 'output-without-line-numbers.md');
+
+    const commandWithLineNumbers = `pnpm exec esno ${cliPath} generate -p "${normalizePath(testDir1)}" -o "${normalizePath(outputPath1)}" --line-numbers`;
+    const commandWithoutLineNumbers = `pnpm exec esno ${cliPath} generate -p "${normalizePath(testDir2)}" -o "${normalizePath(outputPath2)}"`;
+
+    try {
+      await execAsync(commandWithLineNumbers, {
+        env: { ...process.env, NODE_ENV: 'test' },
+        cwd: path.resolve(__dirname, '../..'),
+      });
+
+      // Add a small delay to ensure file system operations are complete
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      await execAsync(commandWithoutLineNumbers, {
+        env: { ...process.env, NODE_ENV: 'test' },
+        cwd: path.resolve(__dirname, '../..'),
+      });
+
+      const outputWithLineNumbers = await fs.readFile(outputPath1, 'utf-8');
+      const outputWithoutLineNumbers = await fs.readFile(outputPath2, 'utf-8');
+
+      expect(outputWithLineNumbers).toContain('1 const x = 1;');
+      expect(outputWithLineNumbers).toContain('2 const y = 2;');
+      expect(outputWithLineNumbers).toContain('3 console.log(x + y);');
+
+      expect(outputWithoutLineNumbers).not.toContain('1 const x = 1;');
+      expect(outputWithoutLineNumbers).toContain('const x = 1;');
+    } catch (error) {
+      console.error('Error executing commands:', error);
+      throw error;
+    } finally {
+      // Clean up
+      await fs.remove(testDir1);
+      await fs.remove(testDir2);
+    }
   });
 });

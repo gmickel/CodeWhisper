@@ -8,6 +8,8 @@ interface CacheEntry {
   data: FileInfo;
 }
 
+const MAX_CACHE_ITEM_SIZE = 1024 * 1024; // 1 MB
+
 export class FileCache {
   private cacheFile: string;
   private cache: Record<string, CacheEntry> = {};
@@ -69,16 +71,22 @@ export class FileCache {
     try {
       await fs.ensureDir(path.dirname(this.cacheFile));
       const tempFile = `${this.cacheFile}.tmp`;
-      await fs.writeFile(
-        tempFile,
-        JSON.stringify(this.cache, (key, value) => {
-          if (value instanceof Date) {
-            return value.toISOString();
+
+      // Stringify cache items individually
+      const cacheEntries = Object.entries(this.cache)
+        .map(([key, value]) => {
+          try {
+            return `"${key}":${JSON.stringify(value)}`;
+          } catch (error) {
+            console.warn(`Failed to stringify cache entry for ${key}:`, error);
+            return null;
           }
-          return value;
-        }),
-        'utf-8',
-      );
+        })
+        .filter(Boolean);
+
+      const cacheString = `{${cacheEntries.join(',')}}`;
+
+      await fs.writeFile(tempFile, cacheString, 'utf-8');
       await fs.rename(tempFile, this.cacheFile);
       this.isDirty = false;
     } catch (error) {
@@ -103,6 +111,14 @@ export class FileCache {
   async set(filePath: string, data: FileInfo): Promise<void> {
     await this.loadCache();
     const hash = await this.calculateFileHash(filePath);
+
+    // Check the size of the data
+    const dataSize = JSON.stringify(data).length;
+    if (dataSize > MAX_CACHE_ITEM_SIZE) {
+      console.warn(`Skipping cache for large file: ${filePath}`);
+      return;
+    }
+
     this.cache[filePath] = { hash, data };
     this.isDirty = true;
   }

@@ -188,4 +188,36 @@ describe('Markdown Generator', () => {
       'Please review this code and provide feedback.',
     );
   });
+
+  it('should add line numbers to code blocks when lineNumbers option is true', async () => {
+    const mockFiles = [
+      {
+        path: '/project/src/index.ts',
+        extension: 'ts',
+        language: 'typescript',
+        size: 100,
+        created: new Date('2023-01-01'),
+        modified: new Date('2023-01-02'),
+        content: 'const greeting = "Hello";\nconsole.log(greeting);',
+      },
+    ];
+
+    const template =
+      '{{#each files}}{{#codeblock this.content this.language}}{{/codeblock}}{{/each}}';
+
+    const resultWithoutLineNumbers = await generateMarkdown(
+      mockFiles,
+      template,
+      { lineNumbers: false },
+    );
+    const resultWithLineNumbers = await generateMarkdown(mockFiles, template, {
+      lineNumbers: true,
+    });
+
+    expect(resultWithoutLineNumbers).not.toContain('1 const');
+    expect(resultWithoutLineNumbers).not.toContain('2 console');
+
+    expect(resultWithLineNumbers).toContain('1 const greeting = "Hello";');
+    expect(resultWithLineNumbers).toContain('2 console.log(greeting);');
+  });
 });
