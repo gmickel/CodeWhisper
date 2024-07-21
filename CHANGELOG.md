@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/gmickel/CodeWhisper/compare/v1.0.0...v1.0.1) (2024-07-21)
+
+
+### Bug Fixes
+
+* trigger release after fixing permissions ([d077481](https://github.com/gmickel/CodeWhisper/commit/d077481d2ad5a7f9e294202e462939b0cd286ef4))
+
 # 1.0.0 (2024-07-21)
 
 
