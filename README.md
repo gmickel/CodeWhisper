@@ -1,14 +1,12 @@
 # CodeWhisper
 
-![CodeWhisper logo](/api/placeholder/200/200)
-
 add blazing fast AI-friendly prompts to your codebase
 
 [![CI](https://github.com/gmickel/CodeWhisper/actions/workflows/ci.yml/badge.svg)](https://github.com/gmickel/CodeWhisper/actions/workflows/ci.yml)
 [![Known Vulnerabilities](https://snyk.io/test/github/gmickel/CodeWhisper/badge.svg)](https://snyk.io/test/github/gmickel/CodeWhisper)
-[![License](https://img.shields.io/github/license/gmickel/CodeWhisper.svg)](https://github.com/gmickel/CodeWhisper/blob/main/LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/gmickel/CodeWhisper.svg)](https://github.com/gmickel/CodeWhisper/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/gmickel/CodeWhisper.svg)](https://github.com/gmickel/CodeWhisper/network)
+[![License](https://img.shields.io/github/license/gmickel/codewhisper)](https://github.com/gmickel/CodeWhisper/blob/main/LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/gmickel/codewhisper)](https://github.com/gmickel/CodeWhisper/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/gmickel/codewhisper)](https://github.com/gmickel/CodeWhisper/network)
 
 [Key Features](#-key-features) •
 [Quick Start](#-quick-start) •
@@ -23,7 +21,7 @@ add blazing fast AI-friendly prompts to your codebase
 
 CodeWhisper is a powerful tool designed to convert your repository code into AI-friendly prompts. It streamlines the process of generating comprehensive code summaries, making it easier to integrate your codebase with AI-powered tools and workflows.
 
-![CodeWhisper](/images/worker_sm.jpg)
+![CodeWhisper](https://raw.githubusercontent.com/gmickel/CodeWhisper/main/assets/worker_sm.jpg)
 
 ## ✨ Key Features
 
@@ -37,7 +35,23 @@ CodeWhisper is a powerful tool designed to convert your repository code into AI-
 * 🤖 Interactive mode for granular file selection
 * ⚡ Optimized for large repositories
 
+## 📺 Demo
+
+[![Watch the video](https://raw.githubusercontent.com/gmickel/CodeWhisper/main/assets/interactive.png)](https://raw.githubusercontent.com/gmickel/CodeWhisper/main/assets/CodeWhisper.mp4)
+
 ## 🚀 Quick Start
+
+You can quickly use CodeWhisper without installing it globally using `npx` :
+
+```bash
+# Navigate to your project directory
+cd /path/to/your/project
+
+# Generate an AI-friendly prompt using npx
+npx codewhisper generate
+```
+
+Or, if you prefer to install globally:
 
 ```bash
 # Install CodeWhisper globally
@@ -52,7 +66,15 @@ codewhisper generate
 
 ## 📦 Installation
 
-You can install CodeWhisper using your preferred package manager:
+You can use CodeWhisper without installation using `npx` , or install it globally using your preferred package manager:
+
+### Using npx (no installation required)
+
+```bash
+npx codewhisper <command>
+```
+
+### Global Installation
 
 ```bash
 # Using npm
@@ -75,6 +97,10 @@ bun add -g codewhisper
 Generate a markdown file from your codebase:
 
 ```bash
+# Using npx
+npx codewhisper generate -p /path/to/your/project -o output.md
+
+# Or if installed globally
 codewhisper generate -p /path/to/your/project -o output.md
 ```
 
@@ -123,7 +149,7 @@ CodeWhisper ignores all binary files by default.
 Start an interactive session to select files:
 
 ```bash
-codewhisper interactive
+npx codewhisper interactive
 ```
 
 Interactive mode supports all the options available in generate mode. Additionally, it includes:
@@ -135,55 +161,55 @@ Interactive mode supports all the options available in generate mode. Additional
 1. Include only JavaScript and TypeScript files:
 
 ```bash
-   codewhisper generate -f "**/*.js" "**/*.ts"
+   npx codewhisper generate -f "**/*.js" "**/*.ts"
    ```
 
 2. Exclude test files and the `dist` directory:
 
 ```bash
-   codewhisper generate -e "**/*.test.js" "dist/**/*"
+   npx codewhisper generate -e "**/*.test.js" "dist/**/*"
    ```
 
 3. Combine include and exclude patterns:
 
 ```bash
-   codewhisper generate -f "src/**/*" -e "**/*.test.js" "**/*.spec.js"
+   npx codewhisper generate -f "src/**/*" -e "**/*.test.js" "**/*.spec.js"
    ```
 
 4. Use custom data in a template:
 
 ```bash
-   codewhisper generate --custom-data '{"projectName": "MyApp", "version": "1.0.0"}' --custom-template my-template.hbs
+   npx codewhisper generate --custom-data '{"projectName": "MyApp", "version": "1.0.0"}' --custom-template my-template.hbs
    ```
 
 5. Generate a diff-based summary:
 
 ```bash
-   codewhisper generate --filter $(git diff --name-only HEAD^)
+   npx codewhisper generate --filter $(git diff --name-only HEAD^)
    ```
 
 6. Analyze a specific subdirectory:
 
 ```bash
-   codewhisper generate -p ./src/components -f "**/*.tsx"
+   npx codewhisper generate -p ./src/components -f "**/*.tsx"
    ```
 
-7. Generate a summary with a custom prompt which will be appended to the generated output:
+7. Generate a summary with a custom prompt:
 
 ```bash
-   codewhisper generate -pr "Analyze this code for potential security vulnerabilities"
+   npx codewhisper generate -pr "Analyze this code for potential security vulnerabilities"
    ```
 
 8. Use interactive mode with inverted selection:
 
 ```bash
-   codewhisper interactive --invert
+   npx codewhisper interactive --invert
    ```
 
 9. Generate output with line numbers in code blocks:
 
 ```bash
-   codewhisper generate -l
+   npx codewhisper generate -l
    ```
 
 ### CI/CD Integration
