@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/gmickel/CodeWhisper/compare/v1.0.1...v1.0.2) (2024-07-21)
+
+
+### Bug Fixes
+
+* npm cli.js entrypoint ([265a481](https://github.com/gmickel/CodeWhisper/commit/265a481a3f7d6d527c8a3dafbeb316004b896406))
+
 ## [1.0.1](https://github.com/gmickel/CodeWhisper/compare/v1.0.0...v1.0.1) (2024-07-21)
 
 
