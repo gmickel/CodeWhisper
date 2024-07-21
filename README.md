@@ -23,6 +23,8 @@ add blazing fast AI-friendly prompts to your codebase
 
 CodeWhisper is a powerful tool designed to convert your repository code into AI-friendly prompts. It streamlines the process of generating comprehensive code summaries, making it easier to integrate your codebase with AI-powered tools and workflows.
 
+![CodeWhisper](/images/worker_sm.jpg)
+
 ## ✨ Key Features
 
 * 🚀 Blazingly fast code processing with concurrent workers

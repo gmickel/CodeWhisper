@@ -9,7 +9,7 @@
   "homepage": "https://github.com/gmickel/CodeWhisper",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gmickel/CodeWhisper.git"
+    "url": "https://github.com/gmickel/CodeWhisper.git"
   },
   "bugs": "https://github.com/gmickel/CodeWhisper/issues",
   "keywords": ["code", "ai", "prompt", "git"],
