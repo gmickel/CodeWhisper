@@ -166,7 +166,7 @@ Interactive mode supports all the options available in generate mode. Additional
    codewhisper generate -p ./src/components -f "**/*.tsx"
    ```
 
-7. Generate a summary with a custom prompt:
+7. Generate a summary with a custom prompt which will be appended to the generated output:
 
 ```bash
    codewhisper generate -pr "Analyze this code for potential security vulnerabilities"
