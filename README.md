@@ -37,7 +37,7 @@ CodeWhisper is a powerful tool designed to convert your repository code into AI-
 
 ## 📺 Video
 
-[![Watch the video](https://raw.githubusercontent.com/gmickel/CodeWhisper/main/assets/interactive.png)](https://raw.githubusercontent.com/gmickel/CodeWhisper/main/assets/CodeWhisper.mp4)
+https://github.com/user-attachments/assets/a3a1ad99-d402-4781-9672-7228c0aa2f93
 
 ## 🚀 Quick Start
 
