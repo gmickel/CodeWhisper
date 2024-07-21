@@ -55,8 +55,8 @@ will enhance the project's visibility, adoption, and community engagement.
 {{#each files}}
 ### {{relativePath this.path}}
 
-```{{this.language}}
-{{this.content}}
+{{#codeblock this.content this.language}}{{/codeblock}}
+
 {{/each}}
 </code>
 
