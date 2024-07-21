@@ -181,7 +181,11 @@ describe('CLI Commands', () => {
 
     const command = `pnpm exec esno ${cliPath} generate -p "${testProjectPath}" -o "${outputPath}" --custom-template "${normalizePath(customReadmeTemplatePath)}" --custom-data '${customData}' --prompt "${customPrompt}"`;
 
-    execSync(command, { stdio: 'inherit' });
+    execSync(command, {
+      stdio: 'inherit',
+      env: { ...process.env, NODE_ENV: 'test' },
+      cwd: path.resolve(__dirname, '../..'), // Set working directory to project root
+    });
 
     const output = fs.readFileSync(outputPath, 'utf-8');
 
