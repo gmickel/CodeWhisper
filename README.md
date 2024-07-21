@@ -10,6 +10,17 @@ add blazing fast AI-friendly prompts to your codebase
 
 _description_
 
+Notes about what to document:
+
+all cli options with examples, make a short use case for each, "lets say we want to ..." -> or better, examples: "include only...", "exclude only", "include specific file types", come up with lots
+all custom hbs helper functions with examples and link to built-in helpers
+
+## 🏎️ Roadmap
+
+* [ ] Add better support for other languages
+* [ ] Add support for other prompting techniques
+* [ ] Add direct integration with LLMs
+
 ## Sponsors ❤️
 
 ## License 📄

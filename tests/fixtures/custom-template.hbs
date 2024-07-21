@@ -1,4 +1,4 @@
-# Custom Template: {{#if customData.title}}{{customData.title}}{{else}}Untitled Project{{/if}}
+# Custom Template: {{#if title}}{{title}}{{else}}Untitled Project{{/if}}
 
 ## Project Overview
 
@@ -24,15 +24,13 @@ This project contains {{files.length}} file(s).
 
 ## Custom Data
 
-{{#if customData}}
-{{#if (hasCustomData customData)}}
+{{#if (hasCustomData this)}}
 Custom data provided:
-{{#each customData}}
+{{#each this}}
+{{#if (isCustomData @key)}}
 - {{@key}}: {{this}}
-{{/each}}
-{{else}}
-No custom data provided.
 {{/if}}
+{{/each}}
 {{else}}
 No custom data provided.
 {{/if}}

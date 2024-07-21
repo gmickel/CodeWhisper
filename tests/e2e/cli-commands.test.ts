@@ -11,6 +11,11 @@ describe('CLI Commands', () => {
   const tempGitignorePath = path.join(testProjectPath, '.gitignore');
   const tempTodosPath = path.join(testProjectPath, 'todos.md');
   const customTemplatePath = path.join(testProjectPath, 'custom-template.hbs');
+  const customReadmeTemplatePath = path.join(
+    testProjectPath,
+    '..',
+    'generate-readme.hbs',
+  );
 
   beforeAll(async () => {
     // Ensure .gitignore and todos.md exists
@@ -166,5 +171,23 @@ describe('CLI Commands', () => {
       // Clean up custom cache path
       fs.removeSync(customCachePath);
     }
+  });
+  it('should generate markdown with custom data and prompt', () => {
+    const customData = JSON.stringify({
+      projectName: 'My Awesome Project',
+      projectDescription: 'A fantastic tool for developers',
+    });
+    const customPrompt = 'Please review this code and provide feedback.';
+
+    const command = `pnpm exec esno ${cliPath} generate -p "${testProjectPath}" -o "${outputPath}" --custom-template "${normalizePath(customReadmeTemplatePath)}" --custom-data '${customData}' --prompt "${customPrompt}"`;
+
+    execSync(command, { stdio: 'inherit' });
+
+    const output = fs.readFileSync(outputPath, 'utf-8');
+
+    expect(output).toContain('<h1 align="center">My Awesome Project</h1>');
+    expect(output).toContain('A fantastic tool for developers');
+    expect(output).toContain('## Your Task');
+    expect(output).toContain('Please review this code and provide feedback.');
   });
 });
