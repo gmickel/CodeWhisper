@@ -203,11 +203,39 @@ jobs:
     - name: Install dependencies
       run: |
         npm install -g codewhisper
-        npm install -g @anthropic-ai/sdk
+        npm install @anthropic-ai/sdk
     - name: Analyze codebase
       run: |
         codewhisper generate --path . --output codebase_summary.md
-        cat codebase_summary.md | anthropic "Perform a comprehensive analysis of this codebase. Identify areas for improvement, potential bugs, and suggest optimizations." > analysis.md
+        node -e '
+          const fs = require("fs");
+          const Anthropic = require("@anthropic-ai/sdk");
+
+          const anthropic = new Anthropic({
+            apiKey: process.env.ANTHROPIC_API_KEY,
+          });
+
+          async function analyzeCode() {
+            const summary = fs.readFileSync("codebase_summary.md", "utf8");
+            const msg = await anthropic.messages.create({
+              model: "claude-3-5-sonnet-20240620",
+              max_tokens: 8192,
+              messages: [
+                {
+                  role: "user",
+                  content: `Analyze this codebase summary and provide insights:
+
+${summary}
+
+Perform a comprehensive analysis of this codebase. Identify areas for improvement, potential bugs, and suggest optimizations.`
+                }
+              ],
+            });
+            fs.writeFileSync("analysis.md", msg.content[0].text);
+          }
+
+          analyzeCode();
+        '
       env:
         ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     - name: Upload analysis
