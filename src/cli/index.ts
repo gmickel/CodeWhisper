@@ -136,7 +136,7 @@ export function cli(args: string[]) {
       'Do not respect entries in .gitignore',
       false,
     )
-    .option('--invert', 'Selected files will be excluded')
+    .option('--invert', 'Selected files will be excluded', false)
     .action(async (options) => {
       try {
         await interactiveMode(options);
