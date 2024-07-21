@@ -14,6 +14,7 @@ add blazing fast AI-friendly prompts to your codebase
 [Quick Start](#-quick-start) •
 [Installation](#-installation) •
 [Usage](#-usage) •
+[Templates and Handlebars](#-templates-and-handlebars) •
 [API](#-api) •
 [Contributing](#-contributing) •
 [License](#-license)
@@ -266,6 +267,162 @@ This workflow:
 6. Uploads the analysis as an artifact
 
 You can adapt these workflows to use any LLM or analysis tool of your choice. The key is to generate the codebase summary with CodeWhisper and then pass that summary to your preferred analysis tool.
+
+## 📝 Templates and Handlebars
+
+CodeWhisper uses Handlebars templates to generate output. This section covers the available templates, how to use them, and how to create your own custom templates.
+
+### Available Templates
+
+CodeWhisper comes with several pre-defined templates:
+
+1. `codebase-summary`: Generates a comprehensive summary of your codebase.
+2. `create-readme`: Creates a README file for your project.
+3. `deep-code-review`: Produces a detailed code review report.
+4. `default`: The default template for general use.
+5. `generate-project-documentation`: Creates full project documentation.
+6. `minimal`: A minimal output format for quick overviews.
+7. `optimize-llm-prompt`: Optimizes the output for use with language models.
+8. `security-focused-review`: Generates a security-focused code review.
+
+### Using Templates
+
+To use a specific template, use the `-t` or `--template` option:
+
+```bash
+codewhisper generate -t deep-code-review
+```
+
+Some templates may require custom data. You can provide this using the `--custom-data` option:
+
+```bash
+codewhisper generate -t create-readme --custom-data '{"projectName": "MyProject", "description": "A cool project"}'
+```
+
+### Creating Custom Templates
+
+You can create your own Handlebars templates for use with CodeWhisper. Here's how:
+
+1. Create a new `.hbs` file with your template content.
+2. Use the `--custom-template` option to specify your template file:
+
+```bash
+codewhisper generate --custom-template path/to/your-template.hbs
+```
+
+### Handlebars Helpers
+
+CodeWhisper provides several custom Handlebars helpers to assist in template creation:
+
+* `codeblock`: Wraps content in a code block with optional line numbers.
+
+```handlebars
+  {{#codeblock file.content file.language}}{{/codeblock}}
+  ```
+
+* `eq`: Checks if two values are equal.
+
+```handlebars
+  {{#if (eq value1 value2)}}They are equal{{/if}}
+  ```
+
+* `objectKeys`: Returns the keys of an object.
+
+```handlebars
+  {{#each (objectKeys myObject)}}{{this}}{{/each}}
+  ```
+
+* `gt`: Checks if one value is greater than another.
+
+```handlebars
+  {{#if (gt value1 value2)}}Value1 is greater{{/if}}
+  ```
+
+* `hasCustomData`: Checks if custom data is present.
+
+```handlebars
+  {{#if (hasCustomData this)}}Custom data exists{{/if}}
+  ```
+
+* `isCustomData`: Checks if a key is custom data.
+
+```handlebars
+  {{#if (isCustomData key)}}This is custom data{{/if}}
+  ```
+
+* `lineNumbers`: Adds line numbers to content.
+
+```handlebars
+  {{lineNumbers file.content}}
+  ```
+
+* `tableOfContents`: Generates a table of contents for files.
+
+```handlebars
+  {{tableOfContents files}}
+  ```
+
+* `fileInfo`: Displays information about a file.
+
+```handlebars
+  {{fileInfo file}}
+  ```
+
+* `relativePath`: Generates a relative path for a file.
+
+```handlebars
+  {{relativePath file.path}}
+  ```
+
+For more information on Handlebars syntax and built-in helpers, refer to the [Handlebars documentation](https://handlebarsjs.com/guide/).
+
+### Template Context
+
+Your templates have access to the following context:
+
+* `files`: An array of `FileInfo` objects representing the processed files.
+* `base`: The base path of the project.
+* Any custom data provided via the `--custom-data` option.
+
+A `FileInfo` object contains:
+* `path`: The file path
+* `extension`: The file extension
+* `language`: The detected language
+* `size`: File size in bytes
+* `created`: Creation date
+* `modified`: Last modified date
+* `content`: The file content
+
+### Example Custom Template
+
+Here's an example of a custom template that generates a simple code overview:
+
+```handlebars
+# Code Overview
+
+{{tableOfContents files}}
+
+{{#each files}}
+
+## {{relativePath this.path}}
+
+{{fileInfo this}}
+
+```{{this.language}}
+{{#codeblock this.content this.language}}{{/codeblock}}
+```
+
+{{/each}}
+
+```
+
+Save this as `code-overview.hbs` and use it with:
+
+```bash
+codewhisper generate --custom-template code-overview.hbs
+```
+
+This template will create a markdown file with a table of contents, followed by each file's content wrapped in a code block, along with file information.
 
 ## 🔧 Configuration
 
