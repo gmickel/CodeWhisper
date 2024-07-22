@@ -168,58 +168,88 @@ npx codewhisper list-templates
 
 ### Typical Usage Examples
 
-1. Include only JavaScript and TypeScript files:
+01. Include only JavaScript and TypeScript files:
 
 ```bash
    npx codewhisper generate -f "**/*.js" "**/*.ts"
    ```
 
-2. Exclude test files and the `dist` directory:
+02. Exclude test files and the `dist` directory:
 
 ```bash
    npx codewhisper generate -e "**/*.test.js" "dist/**/*"
    ```
 
-3. Combine include and exclude patterns:
+03. Combine include and exclude patterns:
 
 ```bash
    npx codewhisper generate -f "src/**/*" -e "**/*.test.js" "**/*.spec.js"
    ```
 
-4. Use custom data in a template:
+04. Use custom data in a template:
 
 ```bash
    npx codewhisper generate --custom-data '{"projectName": "MyApp", "version": "1.0.0"}' --custom-template my-template.hbs
    ```
 
-5. Generate a diff-based summary:
+05. Generate a diff-based summary:
 
 ```bash
    npx codewhisper generate --filter $(git diff --name-only HEAD^)
    ```
 
-6. Analyze a specific subdirectory:
+06. Analyze a specific subdirectory:
 
 ```bash
    npx codewhisper generate -p ./src/components -f "**/*.tsx"
    ```
 
-7. Generate a summary with a custom prompt:
+07. Generate a summary with a custom prompt:
 
 ```bash
    npx codewhisper generate -pr "Analyze this code for potential security vulnerabilities"
    ```
 
-8. Use interactive mode with inverted selection:
+08. Use interactive mode with inverted (exclude all selected files) selection:
 
 ```bash
    npx codewhisper interactive --invert
    ```
 
-9. Generate output with line numbers in code blocks:
+09. Generate output with line numbers in code blocks:
 
 ```bash
    npx codewhisper generate -l
+   ```
+
+10. Review changes in a specific branch compared to main:
+
+```bash
+   npx codewhisper generate --filter $(git diff --name-only main...feature-branch) --template deep-code-review
+   ```
+
+11. Generate documentation for a new release:
+
+```bash
+   npx codewhisper generate --filter $(git diff --name-only v1.0.0...v1.1.0) --template generate-project-documentation
+   ```
+
+12. Perform a security audit on recent changes:
+
+```bash
+   npx codewhisper generate --filter $(git diff --name-only HEAD~10) --template security-focused-review
+   ```
+
+13. Create a code overview for onboarding new team members:
+
+```bash
+   npx codewhisper generate -f "src/**/*" --template codebase-summary -o onboarding-guide.md
+   ```
+
+14. Generate an optimized LLM prompt for code explanation:
+
+```bash
+   npx codewhisper generate --template optimize-llm-prompt --custom-data '{"prompt": "your prompt goes here"}'
    ```
 
 ### CI/CD Integration
@@ -284,12 +314,12 @@ Perform a comprehensive analysis of this codebase. Identify areas for improvemen
 ```
 
 This workflow does the following:
-1. Checks out your repository
-2. Sets up Node.js
-3. Installs CodeWhisper and the Anthropic AI SDK
-4. Generates a codebase summary using CodeWhisper
-5. Sends the summary to Anthropic's AI for analysis
-6. Uploads the analysis as an artifact
+01. Checks out your repository
+02. Sets up Node.js
+03. Installs CodeWhisper and the Anthropic AI SDK
+04. Generates a codebase summary using CodeWhisper
+05. Sends the summary to Anthropic's AI for analysis
+06. Uploads the analysis as an artifact
 
 You can also use other LLM libraries or tools. For instance, here's an example combining CodeWhisper with the Python-based `llm` library:
 
@@ -325,12 +355,12 @@ jobs:
 ```
 
 This workflow:
-1. Checks out your repository
-2. Sets up both Node.js and Python
-3. Installs CodeWhisper (npm) and llm (pip)
-4. Generates a codebase summary using CodeWhisper
-5. Pipes the summary to llm for analysis
-6. Uploads the analysis as an artifact
+01. Checks out your repository
+02. Sets up both Node.js and Python
+03. Installs CodeWhisper (npm) and llm (pip)
+04. Generates a codebase summary using CodeWhisper
+05. Pipes the summary to llm for analysis
+06. Uploads the analysis as an artifact
 
 You can adapt these workflows to use any LLM or analysis tool of your choice. The key is to generate the codebase summary with CodeWhisper and then pass that summary to your preferred analysis tool.
 
@@ -342,14 +372,14 @@ CodeWhisper uses Handlebars templates to generate output. This section covers th
 
 CodeWhisper comes with several pre-defined templates:
 
-1. `codebase-summary`: Generates a comprehensive summary of your codebase.
-2. `create-readme`: Creates a README file for your project.
-3. `deep-code-review`: Produces a detailed code review report.
-4. `default`: The default template for general use.
-5. `generate-project-documentation`: Creates full project documentation.
-6. `minimal`: A minimal output format for quick overviews.
-7. `optimize-llm-prompt`: Optimizes the output for use with language models.
-8. `security-focused-review`: Generates a security-focused code review.
+01. `codebase-summary`: Generates a comprehensive summary of your codebase.
+02. `create-readme`: Creates a README file for your project.
+03. `deep-code-review`: Produces a detailed code review report.
+04. `default`: The default template for general use.
+05. `generate-project-documentation`: Creates full project documentation.
+06. `minimal`: A minimal output format for quick overviews.
+07. `optimize-llm-prompt`: Optimizes the output for use with language models.
+08. `security-focused-review`: Generates a security-focused code review.
 
 ### Using Templates
 
@@ -369,8 +399,8 @@ codewhisper generate -t create-readme --custom-data '{"projectName": "MyProject"
 
 You can create your own Handlebars templates for use with CodeWhisper. Here's how:
 
-1. Create a new `.hbs` file with your template content.
-2. Use the `--custom-template` option to specify your template file:
+01. Create a new `.hbs` file with your template content.
+02. Use the `--custom-template` option to specify your template file:
 
 ```bash
 codewhisper generate --custom-template path/to/your-template.hbs
@@ -494,7 +524,7 @@ This template will create a markdown file with a table of contents, followed by 
 
 CodeWhisper uses sensible defaults, but you can customize its behavior:
 
-1. Create a `.codewhisperrc` file in your project root:
+01. Create a `.codewhisperrc` file in your project root:
 
 ```json
 {
@@ -536,11 +566,11 @@ For detailed API documentation, please refer to the [API Documentation](docs/api
 
 We welcome contributions to CodeWhisper! Please follow these steps:
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+01. Fork the repository
+02. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+03. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+04. Push to the branch (`git push origin feature/AmazingFeature`)
+05. Open a Pull Request
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
