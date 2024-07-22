@@ -1,7 +1,7 @@
 {
   "name": "codewhisper",
   "type": "module",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A powerful tool for converting repository code to AI-friendly prompts",
   "author": "Gordon Mickel <gordon@mickel.tech>",
   "license": "MIT",

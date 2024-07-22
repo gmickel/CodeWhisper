@@ -1,3 +1,10 @@
+## [1.0.7](https://github.com/gmickel/CodeWhisper/compare/v1.0.6...v1.0.7) (2024-07-22)
+
+
+### Bug Fixes
+
+* improve path resolution in different environments ([44bbe2b](https://github.com/gmickel/CodeWhisper/commit/44bbe2b606e3c24c7a4c7cb76f888445a96e8446))
+
 ## [1.0.6](https://github.com/gmickel/CodeWhisper/compare/v1.0.5...v1.0.6) (2024-07-22)
 
 
