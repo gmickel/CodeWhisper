@@ -156,6 +156,16 @@ Interactive mode supports all the options available in generate mode. Additional
 
 * `--invert`: Selected files will be excluded instead of included
 
+### Listing Available Templates
+
+CodeWhisper comes with several pre-defined templates:
+
+You can list the available templates using the `list-templates` command:
+
+```bash
+npx codewhisper list-templates
+```
+
 ### Typical Usage Examples
 
 1. Include only JavaScript and TypeScript files:
