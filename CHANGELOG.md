@@ -1,3 +1,11 @@
+## [1.0.10](https://github.com/gmickel/CodeWhisper/compare/v1.0.9...v1.0.10) (2024-07-22)
+
+
+### Bug Fixes
+
+* template path resolution ([ce9e6d9](https://github.com/gmickel/CodeWhisper/commit/ce9e6d9e09b4918d5760028c079ce8f4d467eae6))
+* trigger release after fixing template path resolution ([96696e2](https://github.com/gmickel/CodeWhisper/commit/96696e20dee5cf1c80e7e58c2fe2fe3a56d99c45))
+
 ## [1.0.9](https://github.com/gmickel/CodeWhisper/compare/v1.0.8...v1.0.9) (2024-07-22)
 
 
