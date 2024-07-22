@@ -12,7 +12,26 @@
     "url": "https://github.com/gmickel/CodeWhisper.git"
   },
   "bugs": "https://github.com/gmickel/CodeWhisper/issues",
-  "keywords": ["code", "ai", "prompt", "git"],
+  "keywords": [
+    "code-analysis",
+    "ai-tools",
+    "developer-tools",
+    "code-summarization",
+    "static-analysis",
+    "llm-integration",
+    "documentation-generator",
+    "code-review",
+    "cli-tool",
+    "github-actions",
+    "ci-cd",
+    "codebase-analysis",
+    "ai-prompts",
+    "code-intelligence",
+    "productivity",
+    "code-to-prompt",
+    "ai-code-analysis",
+    "automated-documentation"
+  ],
   "sideEffects": false,
   "exports": {
     ".": {
@@ -104,5 +123,8 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }
