@@ -494,13 +494,6 @@ CodeWhisper uses sensible defaults, but you can customize its behavior:
 }
 ```
 
-2. Set environment variables:
-
-```bash
-export CODEWHISPER_CACHE_PATH="/custom/cache/path"
-export CODEWHISPER_RESPECT_GITIGNORE="false"
-```
-
 ## 📚 API Reference
 
 CodeWhisper can be used programmatically in your Node.js projects:
@@ -529,36 +522,6 @@ console.log(markdown);
 
 For detailed API documentation, please refer to the [API Documentation](docs/api.md).
 
-## 🌳 Project Structure
-
-```
-codewhisper/
-├── src/
-│   ├── cli/
-│   │   ├── index.ts
-│   │   ├── git-tools.ts
-│   │   └── interactive-filtering.ts
-│   ├── core/
-│   │   ├── file-processor.ts
-│   │   ├── file-worker.js
-│   │   └── markdown-generator.ts
-│   ├── templates/
-│   │   ├── default.hbs
-│   │   └── custom-template.hbs
-│   └── utils/
-│       ├── file-cache.ts
-│       ├── gitignore-parser.ts
-│       └── template-utils.ts
-├── tests/
-│   ├── e2e/
-│   ├── integration/
-│   ├── performance/
-│   └── unit/
-├── cli.js
-├── package.json
-└── README.md
-```
-
 ## 🤝 Contributing
 
 We welcome contributions to CodeWhisper! Please follow these steps:
@@ -576,13 +539,13 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 To run the test suite:
 
 ```bash
-npm run test
+pnpm run test
 ```
 
 For coverage report:
 
 ```bash
-npm run test:coverage
+pnpm run test:coverage
 ```
 
 ## 🚢 Deployment
@@ -607,7 +570,7 @@ CodeWhisper uses semantic-release for automated versioning and package publishin
 
 ## Sponsors ❤️
 
-[Your sponsors here]
+[Your sponsors here](https://github.com/sponsors/gmickel)
 
 ## Stargazers ⭐
 

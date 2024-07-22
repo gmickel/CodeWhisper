@@ -15,6 +15,10 @@
   "keywords": ["code", "ai", "prompt", "git"],
   "sideEffects": false,
   "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
     "./cli": {
       "types": "./dist/cli/index.d.ts",
       "import": "./dist/cli/index.js"
@@ -24,12 +28,12 @@
       "import": "./dist/core/file-worker.js"
     }
   },
-  "main": "./dist/cli/index.js",
-  "module": "./dist/cli/index.js",
-  "types": "./dist/cli/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "typesVersions": {
     "*": {
-      "*": ["./dist/*", "./dist/cli/index.d.ts"]
+      "*": ["./dist/*", "./dist/index.d.ts"]
     }
   },
   "bin": {

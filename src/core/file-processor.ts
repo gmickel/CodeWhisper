@@ -38,7 +38,7 @@ const pool = new Piscina({
   filename: workerFilePath,
 });
 
-const DEFAULT_IGNORES = [
+export const DEFAULT_IGNORES = [
   // Version control
   '**/.git',
   '**/.gitignore',
