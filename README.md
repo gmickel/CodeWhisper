@@ -411,6 +411,8 @@ CodeWhisper comes with several pre-defined templates:
 06. `minimal`: A minimal output format for quick overviews.
 07. `optimize-llm-prompt`: Optimizes the output for use with language models.
 08. `security-focused-review`: Generates a security-focused code review.
+09. `prompt-to-few-shot-prompt`: Converts a prompt into a few-shot prompt for use with cheaper models.
+10. `task-to-few-shot-prompt`: Converts a task description into a few-shot prompt for use with cheaper models.
 
 ### Using Templates
 
