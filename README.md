@@ -166,6 +166,18 @@ You can list the available templates using the `list-templates` command:
 npx codewhisper list-templates
 ```
 
+### Export Example Templates
+
+You can export the built-in templates to a specified directory:
+
+```bash
+npx codewhisper export-templates -d /path/to/export/directory
+```
+
+Options:
+
+* `-d, --dir <directory>`: Target directory for exported templates
+
 ### Typical Usage Examples
 
 01. Include only JavaScript and TypeScript files:

@@ -191,7 +191,16 @@ export function cli(args: string[]) {
 
       try {
         await fs.ensureDir(targetDir);
-        await fs.copy(templatesDir, targetDir, { overwrite: false });
+
+        const templateFiles = await fs.readdir(templatesDir);
+        const hbsFiles = templateFiles.filter((file) => file.endsWith('.hbs'));
+
+        for (const file of hbsFiles) {
+          const srcPath = path.join(templatesDir, file);
+          const destPath = path.join(targetDir, file);
+          await fs.copy(srcPath, destPath, { overwrite: false });
+        }
+
         console.log(chalk.green(`Templates exported to ${targetDir}`));
       } catch (error) {
         console.error(
