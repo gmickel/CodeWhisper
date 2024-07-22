@@ -3,6 +3,8 @@
 import path from 'node:path';
 import url from 'node:url';
 
+process.env.CODEWHISPER_CLI = 'true';
+
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 

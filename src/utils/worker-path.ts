@@ -5,33 +5,23 @@ export function getWorkerPath(): string {
   const __filename = url.fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
 
-  // Check if we're running from a package runner
-  const isPackageRunner =
-    process.execPath.includes('npx') ||
-    process.execPath.includes('pnpx') ||
-    process.execPath.includes('bunx') ||
-    process.execPath.includes('.npm') ||
-    process.execPath.includes('.pnpm') ||
-    process.execPath.includes('.bun');
+  const isCLI = process.env.CODEWHISPER_CLI === 'true';
 
-  // Check if we're in a node_modules directory
-  const isInNodeModules = __dirname.includes('node_modules');
-
-  // Check if we're in the dist directory
-  const isInDist = __dirname.includes(`${path.sep}dist`);
-
-  if (isInNodeModules) {
-    if (isPackageRunner) {
-      // We're running from a package runner (npx, pnpx, bunx, etc.)
-      return path.resolve(__dirname, '..', 'core', 'file-worker.js');
-    }
-    // We're running as an installed package (programmatic usage)
-    return path.resolve(__dirname, '..', 'dist', 'core', 'file-worker.js');
-  }
-  if (isInDist) {
-    // We're running in production mode (e.g., pnpm run start)
+  if (isCLI) {
+    // We're running from CLI (global install or npx)
     return path.resolve(__dirname, '..', 'core', 'file-worker.js');
   }
+
+  if (__dirname.includes(`${path.sep}node_modules`)) {
+    // We're running in production mode (e.g., programmatic usage of installed package)
+    return path.resolve(__dirname, '..', 'dist', 'core', 'file-worker.js');
+  }
+
+  if (__dirname.includes(`${path.sep}dist`)) {
+    // We're running in production mode (e.g., programmatic usage of installed package)
+    return path.resolve(__dirname, '..', 'core', 'file-worker.js');
+  }
+
   // We're running in development mode
   return path.resolve(__dirname, '..', '..', 'src', 'core', 'file-worker.js');
 }

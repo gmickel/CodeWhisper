@@ -74,7 +74,6 @@
     "fixPermissions": "chmod +x ./dist/cli.js",
     "dev": "esno src/cli/index.ts",
     "start": "node dist/cli/index.js",
-    "startFromCli": "node dist/cli.js",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "typecheck": "tsc --noEmit",
