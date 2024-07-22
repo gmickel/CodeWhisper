@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/gmickel/CodeWhisper/compare/v1.0.12...v1.1.0) (2024-07-22)
+
+
+### Features
+
+* Add interactive Template Variable prompting ([2f67212](https://github.com/gmickel/CodeWhisper/commit/2f67212460f8292f3e6e15782102039015e08dd7))
+
 ## [1.0.12](https://github.com/gmickel/CodeWhisper/compare/v1.0.11...v1.0.12) (2024-07-22)
 
 
