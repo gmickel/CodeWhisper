@@ -14,7 +14,13 @@ export function getWorkerPath(): string {
     process.execPath.includes('.pnpm') ||
     process.execPath.includes('.bun');
 
-  if (__dirname.includes('node_modules')) {
+  // Check if we're in a node_modules directory
+  const isInNodeModules = __dirname.includes('node_modules');
+
+  // Check if we're in the dist directory
+  const isInDist = __dirname.includes(`${path.sep}dist`);
+
+  if (isInNodeModules) {
     if (isPackageRunner) {
       // We're running from a package runner (npx, pnpx, bunx, etc.)
       return path.resolve(__dirname, '..', 'core', 'file-worker.js');
@@ -22,12 +28,10 @@ export function getWorkerPath(): string {
     // We're running as an installed package (programmatic usage)
     return path.resolve(__dirname, '..', 'dist', 'core', 'file-worker.js');
   }
-
-  if (__dirname.includes(`${path.sep}dist`)) {
+  if (isInDist) {
     // We're running in production mode (e.g., pnpm run start)
     return path.resolve(__dirname, '..', 'core', 'file-worker.js');
   }
-
   // We're running in development mode
   return path.resolve(__dirname, '..', '..', 'src', 'core', 'file-worker.js');
 }
