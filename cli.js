@@ -16,12 +16,24 @@ if (__dirname.includes(`${path.sep}dist`)) {
 }
 
 function getTemplatesDir() {
-  if (__dirname.includes('node_modules')) {
-    return path.resolve(__dirname, 'templates');
+  const isCLI = process.env.CODEWHISPER_CLI === 'true';
+
+  if (isCLI) {
+    // We're running from CLI (global install or npx)
+    return path.resolve(__dirname);
   }
+
+  if (__dirname.includes(`${path.sep}node_modules`)) {
+    // We're running in production mode (e.g., programmatic usage of installed package)
+    return path.resolve(__dirname, '..', 'dist');
+  }
+
   if (__dirname.includes(`${path.sep}dist`)) {
+    // We're running in production mode (e.g., local build)
     return __dirname;
   }
+
+  // We're running in development mode
   return path.resolve(__dirname, 'src', 'templates');
 }
 

@@ -9,8 +9,13 @@ import { normalizePath } from '../../src/utils/normalize-path';
 const execAsync = promisify(exec);
 
 describe('CLI Commands', () => {
-  const cliPath = path.resolve(__dirname, '../../cli.js');
-  const testProjectPath = path.resolve(__dirname, '../fixtures/test-project');
+  const cliPath = path.resolve(__dirname, '..', '..', 'src', 'cli', 'index.ts');
+  const testProjectPath = path.resolve(
+    __dirname,
+    '..',
+    'fixtures',
+    'test-project',
+  );
   const outputPath = path.join(testProjectPath, 'output.md');
   const tempGitignorePath = path.join(testProjectPath, '.gitignore');
   const tempTodosPath = path.join(testProjectPath, 'todos.md');
