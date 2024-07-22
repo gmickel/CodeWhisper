@@ -8,6 +8,7 @@ import micromatch from 'micromatch';
 import Piscina from 'piscina';
 import { FileCache } from '../utils/file-cache';
 import { normalizePath } from '../utils/normalize-path';
+import { getWorkerPath } from '../utils/worker-path';
 
 export interface FileInfo {
   path: string;
@@ -32,7 +33,7 @@ interface ProcessOptions {
   matchBase?: boolean;
 }
 
-const workerFilePath = new URL('../core/file-worker.js', import.meta.url).href;
+const workerFilePath = getWorkerPath();
 
 const pool = new Piscina({
   filename: workerFilePath,

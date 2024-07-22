@@ -5,6 +5,7 @@ export default defineConfig({
     index: 'src/index.ts',
     'cli/index': 'src/cli/index.ts',
     'core/file-worker': 'src/core/file-worker.js',
+    'utils/worker-path': 'src/utils/worker-path.ts',
     cli: 'cli.js',
   },
   format: ['esm'],

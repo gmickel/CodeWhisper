@@ -26,6 +26,10 @@
     "./core": {
       "types": "./dist/core/file-worker.d.ts",
       "import": "./dist/core/file-worker.js"
+    },
+    "./utils/worker-path": {
+      "types": "./dist/utils/worker-path.d.ts",
+      "import": "./dist/utils/worker-path.js"
     }
   },
   "main": "./dist/index.js",
@@ -51,6 +55,7 @@
     "fixPermissions": "chmod +x ./dist/cli.js",
     "dev": "esno src/cli/index.ts",
     "start": "node dist/cli/index.js",
+    "startFromCli": "node dist/cli.js",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "typecheck": "tsc --noEmit",
