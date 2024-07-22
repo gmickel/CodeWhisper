@@ -1,3 +1,10 @@
+## [1.0.11](https://github.com/gmickel/CodeWhisper/compare/v1.0.10...v1.0.11) (2024-07-22)
+
+
+### Bug Fixes
+
+* programmatic usage of getAvailableTemplates ([b385bcf](https://github.com/gmickel/CodeWhisper/commit/b385bcf1b8f31ff6095fd3b4d04f068abc9beefd))
+
 ## [1.0.10](https://github.com/gmickel/CodeWhisper/compare/v1.0.9...v1.0.10) (2024-07-22)
 
 
