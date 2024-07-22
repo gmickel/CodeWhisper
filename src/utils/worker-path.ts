@@ -6,8 +6,8 @@ export function getWorkerPath(): string {
   const __dirname = path.dirname(__filename);
 
   if (__dirname.includes('node_modules')) {
-    // We're running from an installed package
-    return path.resolve(__dirname, '..', '..', 'core', 'file-worker.js');
+    // We're running from an installed package (including npx)
+    return path.resolve(__dirname, '..', 'dist', 'core', 'file-worker.js');
   }
   if (__dirname.includes(`${path.sep}dist`)) {
     // We're running in production mode
