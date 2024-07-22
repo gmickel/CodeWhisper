@@ -1,3 +1,10 @@
+## [1.0.6](https://github.com/gmickel/CodeWhisper/compare/v1.0.5...v1.0.6) (2024-07-22)
+
+
+### Bug Fixes
+
+* Update interactive-filtering.ts to disable going to the upper directory ([d2faa93](https://github.com/gmickel/CodeWhisper/commit/d2faa93df9cc547869fd46eba17bb6a7887baacc))
+
 ## [1.0.5](https://github.com/gmickel/CodeWhisper/compare/v1.0.4...v1.0.5) (2024-07-22)
 
 
