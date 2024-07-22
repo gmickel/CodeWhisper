@@ -1,3 +1,10 @@
+## [1.0.9](https://github.com/gmickel/CodeWhisper/compare/v1.0.8...v1.0.9) (2024-07-22)
+
+
+### Bug Fixes
+
+* worker-paths in different environments ([ed1336c](https://github.com/gmickel/CodeWhisper/commit/ed1336c2d2f2ce1427acf6ac6e572d775f819fd0))
+
 ## [1.0.8](https://github.com/gmickel/CodeWhisper/compare/v1.0.7...v1.0.8) (2024-07-22)
 
 
