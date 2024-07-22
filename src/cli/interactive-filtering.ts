@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { input, select } from '@inquirer/prompts';
+import { editor, input, select } from '@inquirer/prompts';
 import chalk from 'chalk';
 import fs from 'fs-extra';
 import inquirer from 'inquirer';
@@ -10,7 +10,9 @@ import {
   type MarkdownOptions,
   generateMarkdown,
 } from '../core/markdown-generator';
+import { getCachedValue, setCachedValue } from '../utils/cache-utils';
 import {
+  extractTemplateVariables,
   getAvailableTemplates,
   getTemplatePath,
 } from '../utils/template-utils';
@@ -64,6 +66,47 @@ export async function interactiveMode(options: InteractiveModeOptions) {
       templatePath = await selectTemplate();
     }
 
+    const templateContent = await fs.readFile(templatePath, 'utf-8');
+    const variables = extractTemplateVariables(templateContent);
+
+    let customData: { [key: string]: string } = {};
+    if (options.customData) {
+      try {
+        customData = JSON.parse(options.customData);
+      } catch (error) {
+        console.error(chalk.red('Error parsing custom data JSON:'), error);
+        process.exit(1);
+      }
+    } else if (variables.length > 0) {
+      for (const variable of variables) {
+        const cacheKey = `${path.basename(templatePath, '.hbs')}_${variable.name}`;
+        const cachedValue = await getCachedValue(cacheKey, options.cachePath);
+
+        if (variable.isMultiline) {
+          const answer = await editor({
+            message: `Enter value for ${variable.name} (multiline):`,
+            default: cachedValue ?? undefined,
+          });
+          customData[variable.name] = answer;
+        } else {
+          const answer = await inquirer.prompt([
+            {
+              type: 'input',
+              name: variable.name,
+              message: `Enter value for ${variable.name}:`,
+              default: cachedValue ?? undefined,
+            },
+          ]);
+          customData[variable.name] = answer[variable.name];
+        }
+
+        await setCachedValue(
+          cacheKey,
+          customData[variable.name],
+          options.cachePath,
+        );
+      }
+    }
     const outputPath = await getOutputPath(basePath);
 
     spinner.start('Processing files...');
@@ -76,13 +119,10 @@ export async function interactiveMode(options: InteractiveModeOptions) {
     spinner.succeed('Files processed successfully');
 
     spinner.start('Generating markdown...');
-    const templateContent = await fs.readFile(templatePath, 'utf-8');
     const markdownOptions: MarkdownOptions = {
       noCodeblock: options.noCodeblock,
       basePath,
-      customData: options.customData
-        ? JSON.parse(options.customData)
-        : undefined,
+      customData,
       lineNumbers: options.lineNumbers,
     };
 

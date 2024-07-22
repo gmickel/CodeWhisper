@@ -1,11 +1,12 @@
 import path from 'node:path';
 import Handlebars from 'handlebars';
+import { replaceTemplateVariables } from '../utils/template-utils';
 import type { FileInfo } from './file-processor';
 
 export interface MarkdownOptions {
   template?: string;
   noCodeblock?: boolean;
-  customData?: Record<string, unknown>;
+  customData?: Record<string, string>;
   basePath?: string;
   lineNumbers?: boolean;
 }
@@ -102,7 +103,13 @@ export async function generateMarkdown(
 
   registerHandlebarsHelpers(noCodeblock, options);
 
-  const compiledTemplate = Handlebars.compile(templateContent);
+  // Preprocess the template content to replace our custom variables
+  const preprocessedContent = replaceTemplateVariables(
+    templateContent,
+    customData,
+  );
+
+  const compiledTemplate = Handlebars.compile(preprocessedContent);
 
   const data = {
     files,

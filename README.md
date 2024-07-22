@@ -156,6 +156,23 @@ Interactive mode supports all the options available in generate mode. Additional
 
 * `--invert`: Selected files will be excluded instead of included
 
+### Template Variables
+
+CodeWhisper now supports interactive prompts for template variables. When using a template with variables, you'll be prompted to enter values if not provided via the `--custom-data` option.
+
+* Variables prefixed with `var_` in templates will prompt for single-line input.
+* Variables prefixed with `multiline_` will open your default text editor for multiline input.
+
+Example template usage:
+
+```handlebars
+Project Name: {{var_projectName}}
+
+Description:
+{{multiline_description}}
+
+Author: {{var_author}}
+
 ### Listing Available Templates
 
 CodeWhisper comes with several pre-defined templates:
@@ -263,6 +280,8 @@ Options:
 ```bash
    npx codewhisper generate --template optimize-llm-prompt --custom-data '{"prompt": "your prompt goes here"}'
    ```
+
+   > **Note:** CodeWhisper will automatically prompt the user for input if the values aren't provided via the `--custom-data` option.
 
 ### CI/CD Integration
 
@@ -417,6 +436,31 @@ You can create your own Handlebars templates for use with CodeWhisper. Here's ho
 ```bash
 codewhisper generate --custom-template path/to/your-template.hbs
 ```
+
+### Template Variables
+
+When creating custom templates, you can now use special variable prefixes to enable interactive prompting:
+
+* Use `{{var_variableName}}` for single-line input prompts.
+* Use `{{multiline_variableName}}` for multiline input prompts that open in the user's default text editor.
+
+Example:
+
+```handlebars
+# {{var_projectName}}
+
+## Description
+
+{{multiline_projectDescription}}
+
+## Author
+
+{{var_authorName}}
+```
+
+When using a template with these variables, CodeWhisper will automatically prompt the user for input if the values aren't provided via the `--custom-data` option. This feature makes it easier to create dynamic, interactive templates that can be reused across different projects.
+
+Note: Variable values are cached to speed up repeated use of templates. The cache can be cleared by using a different cache path with the `--cache-path` option.
 
 ### Handlebars Helpers
 

@@ -2,6 +2,48 @@ import path from 'node:path';
 import url from 'node:url';
 import fs from 'fs-extra';
 
+interface TemplateVariable {
+  name: string;
+  isMultiline: boolean;
+}
+
+export function extractTemplateVariables(
+  templateContent: string,
+): TemplateVariable[] {
+  const variableRegex = /{{(var_|multiline_)(\w+)}}/g;
+  const variables: TemplateVariable[] = [];
+  let match: RegExpExecArray | null;
+
+  while (true) {
+    match = variableRegex.exec(templateContent);
+    if (match === null) break;
+
+    const prefix = match[1];
+    const name = match[2];
+
+    variables.push({
+      name,
+      isMultiline: prefix === 'multiline_',
+    });
+  }
+
+  return [...new Set(variables.map((v) => JSON.stringify(v)))].map((v) =>
+    JSON.parse(v),
+  );
+}
+
+export function replaceTemplateVariables(
+  templateContent: string,
+  customData: Record<string, string>,
+): string {
+  return templateContent.replace(
+    /{{(var_|multiline_)(\w+)}}/g,
+    (match, prefix, name) => {
+      return customData[name] || match;
+    },
+  );
+}
+
 export function getTemplatesDir() {
   const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
   const isCLI = process.env.CODEWHISPER_CLI === 'true';
