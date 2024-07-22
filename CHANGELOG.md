@@ -1,3 +1,11 @@
+## [1.0.4](https://github.com/gmickel/CodeWhisper/compare/v1.0.3...v1.0.4) (2024-07-22)
+
+
+### Bug Fixes
+
+* programmatic usage ([34aae91](https://github.com/gmickel/CodeWhisper/commit/34aae91a8fc9bb6f6049381960dbb6b1fc79b766))
+* trigger release after fixing programatic usage ([1be5054](https://github.com/gmickel/CodeWhisper/commit/1be5054ab944eb0d2f16134f5ad5e2adbecbae6c))
+
 ## [1.0.3](https://github.com/gmickel/CodeWhisper/compare/v1.0.2...v1.0.3) (2024-07-22)
 
 
