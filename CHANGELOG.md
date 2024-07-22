@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/gmickel/CodeWhisper/compare/v1.0.2...v1.0.3) (2024-07-22)
+
+
+### Bug Fixes
+
+* Update package.json exports and built to allow programmatic usage ([89e759a](https://github.com/gmickel/CodeWhisper/commit/89e759a97a2a71d341336452bc9334923cfd5148))
+
 ## [1.0.2](https://github.com/gmickel/CodeWhisper/compare/v1.0.1...v1.0.2) (2024-07-21)
 
 
