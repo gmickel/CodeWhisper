@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/gmickel/CodeWhisper/compare/v1.1.0...v1.1.1) (2024-07-22)
+
+
+### Bug Fixes
+
+* add readme ([45f6fc1](https://github.com/gmickel/CodeWhisper/commit/45f6fc194c13039ee00d704c6b383035e5e2a75c))
+
 # [1.1.0](https://github.com/gmickel/CodeWhisper/compare/v1.0.12...v1.1.0) (2024-07-22)
 
 
