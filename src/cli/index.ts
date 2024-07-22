@@ -1,13 +1,20 @@
 import os from 'node:os';
 import path from 'node:path';
 import url from 'node:url';
+import { editor, input } from '@inquirer/prompts';
 import chalk from 'chalk';
 import { Command } from 'commander';
 import fs from 'fs-extra';
+import inquirer from 'inquirer';
 import ora from 'ora';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
-import { getTemplatesDir } from '../utils/template-utils';
+import { getCachedValue, setCachedValue } from '../utils/cache-utils';
+import {
+  extractTemplateVariables,
+  getTemplatePath,
+  getTemplatesDir,
+} from '../utils/template-utils';
 import { interactiveMode } from './interactive-filtering';
 
 const templatesDir = getTemplatesDir();
@@ -68,26 +75,67 @@ export function cli(args: string[]) {
       const spinner = ora('Processing files...').start();
 
       try {
-        const files = await processFiles(options);
+        let templatePath: string;
+        if (options.customTemplate) {
+          templatePath = path.resolve(options.customTemplate);
+        } else {
+          templatePath = getTemplatePath(options.template);
+        }
 
-        spinner.text = 'Generating markdown...';
+        if (!fs.existsSync(templatePath)) {
+          console.error(`Template file not found: ${templatePath}`);
+          process.exit(1);
+        }
 
-        let customData = {};
+        const templateContent = await fs.readFile(templatePath, 'utf-8');
+        const variables = extractTemplateVariables(templateContent);
+
+        let customData: { [key: string]: string } = {};
         if (options.customData) {
           try {
-            customData = JSON.parse(options.customData || '{}');
+            customData = JSON.parse(options.customData);
           } catch (error) {
             spinner.fail('Error parsing custom data JSON');
             console.error(chalk.red((error as Error).message));
             process.exit(1);
           }
+        } else if (variables.length > 0) {
+          spinner.stop();
+          for (const variable of variables) {
+            const cacheKey = `${options.template}_${variable.name}`;
+            const cachedValue = await getCachedValue(
+              cacheKey,
+              options.cachePath,
+            );
+
+            if (variable.isMultiline) {
+              const answer = await editor({
+                message: `Enter value for ${variable.name} (multiline):`,
+                default: cachedValue ?? undefined,
+              });
+              customData[variable.name] = answer;
+            } else {
+              const answer = await inquirer.prompt([
+                {
+                  type: 'input',
+                  name: variable.name,
+                  message: `Enter value for ${variable.name}:`,
+                  default: cachedValue ?? undefined,
+                },
+              ]);
+              customData[variable.name] = answer[variable.name];
+            }
+
+            await setCachedValue(
+              cacheKey,
+              customData[variable.name],
+              options.cachePath,
+            );
+          }
         }
+        const files = await processFiles(options);
 
-        const templatePath =
-          options.customTemplate ||
-          path.join(templatesDir, `${options.template}.hbs`);
-
-        const templateContent = await fs.readFile(templatePath, 'utf-8');
+        spinner.text = 'Generating markdown...';
 
         let markdown = await generateMarkdown(files, templateContent, {
           noCodeblock: !options.codeblock,

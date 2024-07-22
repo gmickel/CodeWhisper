@@ -1,29 +1,15 @@
 {{#if projectLogo}}
 <p align="center">
-  <img src="{{projectLogo}}"
-    alt="{{projectName}} logo"
+  <img src="{{var_projectLogo}}"
+    alt="{{var_projectName}} logo"
     width="200" />
 </p>
 {{/if}}
 
-<h1 align="center">{{projectName}}</h1>
+<h1 align="center">{{var_projectName}}</h1>
 
 <p align="center">
-  {{projectTagline}}
-</p>
-
-<p align="center">
-  {{#if projectBadges}}
-  {{{projectBadges}}}
-  {{else}}
-  <!-- Add your badges here -->
-  <img alt="GitHub release (latest by date)"
-    src="https://img.shields.io/github/v/release/{{githubUsername}}/{{projectName}}">
-  <img alt="GitHub Workflow Status"
-    src="https://img.shields.io/github/actions/workflow/status/{{githubUsername}}/{{projectName}}/main.yml">
-  <img alt="GitHub"
-    src="https://img.shields.io/github/license/{{githubUsername}}/{{projectName}}">
-  {{/if}}
+  {{var_projectTagline}}
 </p>
 
 <p align="center">
@@ -37,23 +23,17 @@
   <a href="#license">License</a>
 </p>
 
-{{#if projectDemo}}
 <p align="center">
-  <img src="{{projectDemo}}"
-    alt="{{projectName}} Demo"
+  <img src="{{var_projectDemo}}"
+    alt="{{var_projectName}} Demo"
     width="600">
 </p>
-{{/if}}
 
 ## 📖 About
 
-{{projectDescription}}
+{{multiline_projectDescription}}
 
 ## ✨ Key Features
-
-{{#each keyFeatures}}
-- {{this}}
-{{/each}}
 
 ## 🚀 Quick Start
 
