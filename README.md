@@ -1,6 +1,6 @@
 # CodeWhisper
 
-add blazing fast AI-friendly prompts to your codebase
+Blazingly fast codebase-to-LLM context bridge
 
 [![CI](https://github.com/gmickel/CodeWhisper/actions/workflows/ci.yml/badge.svg)](https://github.com/gmickel/CodeWhisper/actions/workflows/ci.yml)
 [![Known Vulnerabilities](https://snyk.io/test/github/gmickel/CodeWhisper/badge.svg)](https://snyk.io/test/github/gmickel/CodeWhisper)
@@ -19,7 +19,17 @@ add blazing fast AI-friendly prompts to your codebase
 
 ## 📖 About
 
-CodeWhisper is a powerful tool designed to convert your repository code into AI-friendly prompts. It streamlines the process of generating comprehensive code summaries, making it easier to integrate your codebase with AI-powered tools and workflows.
+CodeWhisper enhances how developers work with LLMs for complex coding tasks. Addressing the limitations of context-restricted AI coding assistants, it serves as a bridge between your entire codebase and large language models.
+
+Why CodeWhisper?
+
+* Comprehensive Context: When line-by-line suggestions aren't enough, CodeWhisper provides the big picture your AI needs.
+* Time-Saving Automation: Eliminate tedious copy-pasting and manual context-setting for AI tools.
+* Deep Understanding: Enable AI to grasp your project's architecture, patterns, and interdependencies.
+* Versatile Applications: From code reviews and documentation to architectural insights and refactoring strategies, empower your AI to contribute at a higher level.
+* Seamless AI Integration: Designed to work with your favorite LLMs and AI coding tools, enhancing their capabilities with rich, project-wide context.
+
+Whether you're tackling complex refactoring, conducting thorough code reviews, or seeking AI-driven architectural insights, CodeWhisper equips your AI tools with the comprehensive understanding they need. It's not just about coding assistance – it's about enabling AI to be a true collaborator in your software development process.
 
 ![CodeWhisper](https://raw.githubusercontent.com/gmickel/CodeWhisper/main/assets/worker_sm.jpg)
 
