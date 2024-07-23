@@ -38,11 +38,13 @@ Whether you're tackling complex refactoring, conducting thorough code reviews, o
 * 🚀 Blazingly fast code processing with concurrent workers
 * 🎯 Customizable file filtering and exclusion
 * 📊 Intelligent caching for improved performance
-* 🔧 Extensible template system
+* 🔧 Extensible template system with interactive variable prompts
+* 🖊️ Support for single-line and multi-line custom variables in templates
+* 💾 Value caching for quick template reuse
 * 🖥️ CLI and programmatic API
-* 🔒 Respects .gitignore rules
+* 🔒 Respects .gitignore and/or custom include and exclude globs
 * 🌈 Full language support for all text-based file types
-* 🤖 Interactive mode for granular file selection
+* 🤖 Interactive mode for granular file selection and template customization
 * ⚡ Optimized for large repositories
 
 ## 📺 Video
