@@ -30,7 +30,7 @@ export async function handleEditorAndOutput(
   } else {
     if (openEditor) {
       const tempFile = path.join(os.tmpdir(), 'codewhisper-output.md');
-      await fs.writeFile(tempFile, content);
+      await fs.writeFile(tempFile, content, 'utf8');
       console.log(chalk.cyan(`Temporary file created: ${tempFile}`));
       console.log(
         chalk.yellow(
