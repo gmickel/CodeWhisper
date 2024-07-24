@@ -11,6 +11,7 @@ import {
   generateMarkdown,
 } from '../core/markdown-generator';
 import { getCachedValue, setCachedValue } from '../utils/cache-utils';
+import { handleEditorAndOutput } from '../utils/editor-utils';
 import {
   extractTemplateVariables,
   getAvailableTemplates,
@@ -36,6 +37,7 @@ interface InteractiveModeOptions {
   respectGitignore?: boolean;
   invert?: boolean;
   lineNumbers?: boolean;
+  openEditor?: boolean;
 }
 
 export async function interactiveMode(options: InteractiveModeOptions) {
@@ -138,14 +140,12 @@ export async function interactiveMode(options: InteractiveModeOptions) {
 
     spinner.succeed('Markdown generated successfully');
 
-    if (outputPath === 'stdout') {
-      console.log(chalk.cyan('\nGenerated Markdown:'));
-      console.log(markdown);
-    } else {
-      await fs.writeFile(outputPath, markdown, 'utf8');
-      console.log(chalk.cyan(`\nMarkdown saved to: ${outputPath}`));
-    }
-
+    await handleEditorAndOutput({
+      content: markdown,
+      outputPath: outputPath,
+      openEditor: options.openEditor ?? false,
+      spinner,
+    });
     console.log(chalk.green('\nInteractive mode completed!'));
   } catch (error) {
     spinner.fail('Error in interactive mode');

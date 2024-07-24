@@ -140,6 +140,7 @@ CodeWhisper ignores all binary files by default.
 
 * `-p, --path <path>`: Path to the codebase (default: current directory)
 * `-o, --output <output>`: Output file name
+* `-E, --open-editor`: Open the generated output in your default text editor (uses $VISUAL or $EDITOR environment variable)
 * `-t, --template <template>`: Template to use (default: "default")
 * `-g, --gitignore <path>`: Path to .gitignore file
 * `-f, --filter <patterns...>`: File patterns to include (use glob patterns)
@@ -290,7 +291,7 @@ Options:
 14. Generate an optimized LLM prompt for code explanation:
 
 ```bash
-   npx codewhisper generate --template optimize-llm-prompt --custom-data '{"prompt": "your prompt goes here"}'
+   npx codewhisper generate --template optimize-llm-prompt --editor --custom-data '{"prompt": "your prompt goes here"}'
    ```
 
    > **Note:** CodeWhisper will automatically prompt the user for input if the values aren't provided via the `--custom-data` option.
