@@ -1,5 +1,3 @@
-// tests/unit/file-cache.test.ts
-
 import os from 'node:os';
 import path from 'node:path';
 import fs from 'fs-extra';

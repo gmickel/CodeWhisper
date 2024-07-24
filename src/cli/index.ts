@@ -1,6 +1,9 @@
+import { exec } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import url from 'node:url';
+import { promisify } from 'node:util';
+
 import { editor, input } from '@inquirer/prompts';
 import chalk from 'chalk';
 import { Command } from 'commander';
@@ -10,6 +13,7 @@ import ora from 'ora';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
 import { getCachedValue, setCachedValue } from '../utils/cache-utils';
+import { handleEditorAndOutput } from '../utils/editor-utils';
 import {
   extractTemplateVariables,
   getTemplatePath,
@@ -18,6 +22,8 @@ import {
 import { interactiveMode } from './interactive-filtering';
 
 const templatesDir = getTemplatesDir();
+
+const execAsync = promisify(exec);
 
 const program = new Command();
 
@@ -37,6 +43,11 @@ export function cli(args: string[]) {
       (value) => value,
     )
     .option('-o, --output <output>', 'Output file name')
+    .option(
+      '-E, --open-editor',
+      'Open the result in your default editor',
+      false,
+    )
     .option('-t, --template <template>', 'Template to use', 'default')
     .option('-g, --gitignore <path>', 'Path to .gitignore file')
     .option(
@@ -148,13 +159,14 @@ export function cli(args: string[]) {
           markdown += `\n\n## Your Task\n\n${options.prompt}`;
         }
 
-        if (options.output) {
-          await fs.writeFile(options.output, markdown);
-          spinner.succeed(`Output written to ${options.output}`);
-        } else {
-          spinner.stop();
-          console.log(markdown);
-        }
+        spinner.succeed('Markdown generated successfully');
+
+        await handleEditorAndOutput({
+          content: markdown,
+          outputPath: options.output || 'stdout',
+          openEditor: options.openEditor,
+          spinner,
+        });
       } catch (error) {
         spinner.fail('Error generating output');
         console.error(chalk.red((error as Error).message));
@@ -180,6 +192,11 @@ export function cli(args: string[]) {
     .option(
       '-e, --exclude <patterns...>',
       'File patterns to exclude (use glob patterns, e.g., "**/*.test.js")',
+    )
+    .option(
+      '-E, --open-editor',
+      'Open the result in your default editor',
+      false,
     )
     .option('-s, --suppress-comments', 'Strip comments from the code')
     .option('-l, --line-numbers', 'Add line numbers to code blocks')
