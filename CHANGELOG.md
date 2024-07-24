@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/gmickel/CodeWhisper/compare/v1.1.1...v1.2.0) (2024-07-24)
+
+
+### Features
+
+* Add open in Editor ([#23](https://github.com/gmickel/CodeWhisper/issues/23)) ([7a928b1](https://github.com/gmickel/CodeWhisper/commit/7a928b14bf79b79a8db5a50cbc3c1cb78388b5a7))
+
 ## [1.1.1](https://github.com/gmickel/CodeWhisper/compare/v1.1.0...v1.1.1) (2024-07-22)
 
 
