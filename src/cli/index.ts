@@ -12,14 +12,15 @@ import inquirer from 'inquirer';
 import ora from 'ora';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
+import { runInteractiveMode } from '../interactive/interactive-workflow';
 import { getCachedValue, setCachedValue } from '../utils/cache-utils';
 import { handleEditorAndOutput } from '../utils/editor-utils';
 import {
+  collectVariables,
   extractTemplateVariables,
   getTemplatePath,
   getTemplatesDir,
 } from '../utils/template-utils';
-import { interactiveMode } from './interactive-filtering';
 
 const templatesDir = getTemplatesDir();
 
@@ -101,49 +102,12 @@ export function cli(args: string[]) {
         const templateContent = await fs.readFile(templatePath, 'utf-8');
         const variables = extractTemplateVariables(templateContent);
 
-        let customData: { [key: string]: string } = {};
-        if (options.customData) {
-          try {
-            customData = JSON.parse(options.customData);
-          } catch (error) {
-            spinner.fail('Error parsing custom data JSON');
-            console.error(chalk.red((error as Error).message));
-            process.exit(1);
-          }
-        } else if (variables.length > 0) {
-          spinner.stop();
-          for (const variable of variables) {
-            const cacheKey = `${options.template}_${variable.name}`;
-            const cachedValue = await getCachedValue(
-              cacheKey,
-              options.cachePath,
-            );
+        const customData = await collectVariables(
+          options,
+          variables,
+          templatePath,
+        );
 
-            if (variable.isMultiline) {
-              const answer = await editor({
-                message: `Enter value for ${variable.name} (multiline):`,
-                default: cachedValue ?? undefined,
-              });
-              customData[variable.name] = answer;
-            } else {
-              const answer = await inquirer.prompt([
-                {
-                  type: 'input',
-                  name: variable.name,
-                  message: `Enter value for ${variable.name}:`,
-                  default: cachedValue ?? undefined,
-                },
-              ]);
-              customData[variable.name] = answer[variable.name];
-            }
-
-            await setCachedValue(
-              cacheKey,
-              customData[variable.name],
-              options.cachePath,
-            );
-          }
-        }
         const files = await processFiles(options);
 
         spinner.text = 'Generating markdown...';
@@ -221,7 +185,7 @@ export function cli(args: string[]) {
     .option('--invert', 'Selected files will be excluded', false)
     .action(async (options) => {
       try {
-        await interactiveMode(options);
+        await runInteractiveMode(options);
       } catch (error) {
         console.error(chalk.red('Error in interactive mode:'), error);
         process.exit(1);

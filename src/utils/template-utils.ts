@@ -1,10 +1,61 @@
 import path from 'node:path';
 import url from 'node:url';
+import { editor } from '@inquirer/prompts';
+import chalk from 'chalk';
 import fs from 'fs-extra';
+import inquirer from 'inquirer';
+import type { InteractiveModeOptions } from '../types';
+import { getCachedValue, setCachedValue } from './cache-utils';
 
 interface TemplateVariable {
   name: string;
   isMultiline: boolean;
+}
+
+export async function collectVariables(
+  options: InteractiveModeOptions,
+  variables: TemplateVariable[],
+  templatePath: string,
+): Promise<Record<string, string>> {
+  let customData: { [key: string]: string } = {};
+  if (options.customData) {
+    try {
+      customData = JSON.parse(options.customData);
+    } catch (error) {
+      console.error(chalk.red('Error parsing custom data JSON:'), error);
+      process.exit(1);
+    }
+  } else if (variables.length > 0) {
+    for (const variable of variables) {
+      const cacheKey = `${path.basename(templatePath, '.hbs')}_${variable.name}`;
+      const cachedValue = await getCachedValue(cacheKey, options.cachePath);
+
+      if (variable.isMultiline) {
+        const answer = await editor({
+          message: `Enter value for ${variable.name} (multiline):`,
+          default: cachedValue ?? undefined,
+        });
+        customData[variable.name] = answer;
+      } else {
+        const answer = await inquirer.prompt([
+          {
+            type: 'input',
+            name: variable.name,
+            message: `Enter value for ${variable.name}:`,
+            default: cachedValue ?? undefined,
+          },
+        ]);
+        customData[variable.name] = answer[variable.name];
+      }
+
+      await setCachedValue(
+        cacheKey,
+        customData[variable.name],
+        options.cachePath,
+      );
+    }
+  }
+  return customData;
 }
 
 export function extractTemplateVariables(
