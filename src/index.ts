@@ -3,7 +3,7 @@ export { processFiles } from './core/file-processor';
 export { generateMarkdown } from './core/markdown-generator';
 
 // Types
-export type { FileInfo } from './core/file-processor';
+export type { FileInfo } from './types';
 export type { MarkdownOptions } from './core/markdown-generator';
 
 // Utilities

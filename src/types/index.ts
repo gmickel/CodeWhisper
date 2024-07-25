@@ -2,24 +2,59 @@ export interface InteractiveModeOptions {
   path?: string;
   template?: string;
   prompt?: string;
-  gitignore?: string;
+  gitignore: string;
   filter?: string[];
   exclude?: string[];
   suppressComments?: boolean;
-  caseSensitive?: boolean;
-  noCodeblock?: boolean;
+  caseSensitive: boolean;
+  noCodeblock: boolean;
   customData?: string;
   customTemplate?: string;
   customIgnores?: string[];
-  cachePath?: string;
+  cachePath: string;
   respectGitignore?: boolean;
-  invert?: boolean;
+  invert: boolean;
   lineNumbers?: boolean;
   openEditor?: boolean;
-  plan?: boolean;
 }
 
-export type InteractiveModeOptionsWithoutPlan = Omit<
+export type AiAssistedTaskOptions = Pick<
   InteractiveModeOptions,
-  'plan'
+  | 'path'
+  | 'filter'
+  | 'exclude'
+  | 'suppressComments'
+  | 'lineNumbers'
+  | 'caseSensitive'
+  | 'customIgnores'
+  | 'cachePath'
+  | 'respectGitignore'
+  | 'invert'
+  | 'gitignore'
+  | 'noCodeblock'
 >;
+
+export type ProcessOptions = Pick<
+  InteractiveModeOptions,
+  | 'path'
+  | 'gitignore'
+  | 'filter'
+  | 'exclude'
+  | 'suppressComments'
+  | 'caseSensitive'
+  | 'customIgnores'
+  | 'cachePath'
+  | 'respectGitignore'
+> & {
+  matchBase?: boolean;
+};
+
+export interface FileInfo {
+  path: string;
+  extension: string;
+  language: string;
+  size: number;
+  created: Date;
+  modified: Date;
+  content: string;
+}

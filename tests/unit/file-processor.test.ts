@@ -5,7 +5,8 @@ import fastGlob from 'fast-glob';
 import fs from 'fs-extra'; // Import fs-extra module
 import Piscina from 'piscina';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { type FileInfo, processFiles } from '../../src/core/file-processor';
+import { processFiles } from '../../src/core/file-processor';
+import type { FileInfo } from '../../src/types';
 import { FileCache } from '../../src/utils/file-cache';
 
 vi.mock('fast-glob');
@@ -63,7 +64,9 @@ describe('processFiles', () => {
 
     const result = await processFiles({
       path: normalizedFixturesPath,
-      gitignorePath: tempGitignorePath,
+      gitignore: tempGitignorePath,
+      caseSensitive: false,
+      cachePath: '',
     });
 
     expect(result).toHaveLength(3);
@@ -86,8 +89,10 @@ describe('processFiles', () => {
 
     const result = await processFiles({
       path: normalizedFixturesPath,
-      gitignorePath: tempGitignorePath,
+      gitignore: tempGitignorePath,
       filter: ['src/**/*.{js,jsx}', 'package.json'],
+      caseSensitive: false,
+      cachePath: '',
     });
 
     expect(result).toHaveLength(3);
@@ -111,8 +116,10 @@ describe('processFiles', () => {
 
     const result = await processFiles({
       path: normalizedFixturesPath,
-      gitignorePath: tempGitignorePath,
+      gitignore: tempGitignorePath,
       customIgnores: ['**/*.js'],
+      caseSensitive: false,
+      cachePath: '',
     });
 
     const jsFiles = result.filter((file) => file.extension === 'js');
@@ -131,8 +138,10 @@ describe('processFiles', () => {
 
     const result = await processFiles({
       path: normalizedFixturesPath,
-      gitignorePath: tempGitignorePath,
+      gitignore: tempGitignorePath,
       filter: ['**/*.js', '**/*.ts'],
+      caseSensitive: false,
+      cachePath: '',
     });
 
     expect(result).toHaveLength(2);
@@ -154,8 +163,10 @@ describe('processFiles', () => {
 
     const result = await processFiles({
       path: normalizedFixturesPath,
-      gitignorePath: tempGitignorePath,
+      gitignore: tempGitignorePath,
       filter: ['**/*.js*', '**/package.json'],
+      caseSensitive: false,
+      cachePath: '',
     });
 
     expect(result).toHaveLength(3);
@@ -177,9 +188,11 @@ describe('processFiles', () => {
 
     const result = await processFiles({
       path: normalizedFixturesPath,
-      gitignorePath: tempGitignorePath,
+      gitignore: tempGitignorePath,
       filter: ['**/*'],
       exclude: ['**/*.ts'],
+      caseSensitive: false,
+      cachePath: '',
     });
 
     expect(result).toHaveLength(3);
@@ -201,11 +214,13 @@ describe('processFiles', () => {
 
     const result = await processFiles({
       path: normalizedFixturesPath,
-      gitignorePath: tempGitignorePath,
+      gitignore: tempGitignorePath,
       filter: [
         path.join(normalizedFixturesPath, 'src', 'main.js'),
         '**/package.json',
       ],
+      caseSensitive: false,
+      cachePath: '',
     });
 
     expect(result).toHaveLength(2);
@@ -227,8 +242,10 @@ describe('processFiles', () => {
 
     const result = await processFiles({
       path: normalizedFixturesPath,
-      gitignorePath: tempGitignorePath,
+      gitignore: tempGitignorePath,
       filter: [],
+      caseSensitive: false,
+      cachePath: '',
     });
 
     expect(result).toHaveLength(4);
@@ -255,10 +272,12 @@ describe('processFiles', () => {
 
     const result = await processFiles({
       path: normalizedFixturesPath,
-      gitignorePath: tempGitignorePath,
+      gitignore: tempGitignorePath,
       filter: ['src/**/*.{js,jsx}', 'tests', '**/README.md'],
       exclude: ['**/*.test.js'],
       customIgnores: ['**/Input.tsx'],
+      caseSensitive: false,
+      cachePath: '',
     });
 
     expect(result).toHaveLength(3);
@@ -287,9 +306,11 @@ describe('processFiles', () => {
 
     const result = await processFiles({
       path: normalizedFixturesPath,
-      gitignorePath: tempGitignorePath,
+      gitignore: tempGitignorePath,
       filter: ['main.js', 'README.md', 'Input.tsx'],
       matchBase: true,
+      caseSensitive: false,
+      cachePath: '',
     });
 
     expect(result).toHaveLength(3);
@@ -353,7 +374,9 @@ describe('processFiles', () => {
     );
     const firstResults = await processFiles({
       path: TEST_DIR,
+      gitignore: tempGitignorePath,
       cachePath: CACHE_FILE,
+      caseSensitive: false,
     });
 
     expect(firstResults).toHaveLength(1);
@@ -373,6 +396,8 @@ describe('processFiles', () => {
     const secondResults = await processFiles({
       path: TEST_DIR,
       cachePath: CACHE_FILE,
+      gitignore: tempGitignorePath,
+      caseSensitive: false,
     });
 
     expect(secondResults).toHaveLength(1);

@@ -1,6 +1,6 @@
 import simpleGit, { type SimpleGit } from 'simple-git';
-import type { FileInfo } from '../core/file-processor';
 import { detectLanguage } from '../core/file-worker';
+import type { FileInfo } from '../types';
 
 const git: SimpleGit = simpleGit();
 

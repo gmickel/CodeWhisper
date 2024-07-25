@@ -2,12 +2,12 @@ import path from 'node:path';
 import chalk from 'chalk';
 import fs from 'fs-extra';
 import ora from 'ora';
-import { type FileInfo, processFiles } from '../core/file-processor';
+import { processFiles } from '../core/file-processor';
 import {
   type MarkdownOptions,
   generateMarkdown,
 } from '../core/markdown-generator';
-import type { InteractiveModeOptionsWithoutPlan } from '../types';
+import type { InteractiveModeOptions } from '../types';
 import { handleEditorAndOutput } from '../utils/editor-utils';
 import {
   collectVariables,
@@ -19,11 +19,8 @@ import { outputPathPrompt } from './output-path-prompt';
 import { selectFilesPrompt } from './select-files-prompt';
 import { selectTemplatePrompt } from './select-template-prompt';
 
-export async function runInteractiveMode(
-  options: InteractiveModeOptionsWithoutPlan,
-) {
+export async function runInteractiveMode(options: InteractiveModeOptions) {
   const spinner = ora();
-  spinner.start('Interactive mode started');
   try {
     const basePath = path.resolve(options.path ?? '.');
 
@@ -57,7 +54,12 @@ export async function runInteractiveMode(
     const templateContent = await fs.readFile(templatePath, 'utf-8');
     const variables = extractTemplateVariables(templateContent);
 
-    const customData = await collectVariables(options, variables, templatePath);
+    const customData = await collectVariables(
+      options.customData ?? '',
+      options.cachePath,
+      variables,
+      templatePath,
+    );
 
     const outputPath = await outputPathPrompt(basePath);
 
@@ -96,7 +98,11 @@ export async function runInteractiveMode(
       openEditor: options.openEditor ?? false,
       spinner,
     });
-    spinner.succeed('Interactive mode completed!');
+    console.log(
+      chalk.green(
+        `\nInteractive mode completed! 🎉\nMarkdown output written to ${outputPath}`,
+      ),
+    );
   } catch (error) {
     spinner.fail('Error in interactive mode');
     console.error(

@@ -13,14 +13,15 @@ interface TemplateVariable {
 }
 
 export async function collectVariables(
-  options: InteractiveModeOptions,
+  data: string,
+  cachePath: string,
   variables: TemplateVariable[],
   templatePath: string,
 ): Promise<Record<string, string>> {
   let customData: { [key: string]: string } = {};
-  if (options.customData) {
+  if (data) {
     try {
-      customData = JSON.parse(options.customData);
+      customData = JSON.parse(data);
     } catch (error) {
       console.error(chalk.red('Error parsing custom data JSON:'), error);
       process.exit(1);
@@ -28,7 +29,7 @@ export async function collectVariables(
   } else if (variables.length > 0) {
     for (const variable of variables) {
       const cacheKey = `${path.basename(templatePath, '.hbs')}_${variable.name}`;
-      const cachedValue = await getCachedValue(cacheKey, options.cachePath);
+      const cachedValue = await getCachedValue(cacheKey, cachePath);
 
       if (variable.isMultiline) {
         const answer = await editor({
@@ -48,11 +49,7 @@ export async function collectVariables(
         customData[variable.name] = answer[variable.name];
       }
 
-      await setCachedValue(
-        cacheKey,
-        customData[variable.name],
-        options.cachePath,
-      );
+      await setCachedValue(cacheKey, customData[variable.name], cachePath);
     }
   }
   return customData;

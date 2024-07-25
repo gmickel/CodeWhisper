@@ -1,19 +1,15 @@
-import { exec } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import url from 'node:url';
-import { promisify } from 'node:util';
 
-import { editor, input } from '@inquirer/prompts';
 import chalk from 'chalk';
 import { Command } from 'commander';
 import fs from 'fs-extra';
-import inquirer from 'inquirer';
 import ora from 'ora';
+import { runAIAssistedTask } from '../ai/task-workflow';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
 import { runInteractiveMode } from '../interactive/interactive-workflow';
-import { getCachedValue, setCachedValue } from '../utils/cache-utils';
 import { handleEditorAndOutput } from '../utils/editor-utils';
 import {
   collectVariables,
@@ -24,8 +20,6 @@ import {
 
 const templatesDir = getTemplatesDir();
 
-const execAsync = promisify(exec);
-
 const program = new Command();
 
 export function cli(args: string[]) {
@@ -33,6 +27,44 @@ export function cli(args: string[]) {
     .name('codewhisper')
     .description('A powerful tool for converting code to AI-friendly prompts')
     .version('1.0.0');
+
+  program
+    .command('task')
+    .description('Start an AI-assisted coding task')
+    .option('-p, --path <path>', 'Path to the codebase', '.')
+    .option('-g, --gitignore <path>', 'Path to .gitignore file', '.gitignore')
+    .option(
+      '-f, --filter <patterns...>',
+      'File patterns to include (use glob patterns, e.g., "src/**/*.js")',
+    )
+    .option(
+      '-e, --exclude <patterns...>',
+      'File patterns to exclude (use glob patterns, e.g., "**/*.test.js")',
+    )
+    .option('-s, --suppress-comments', 'Strip comments from the code', false)
+    .option('-l, --line-numbers', 'Add line numbers to code blocks', false)
+    .option('--case-sensitive', 'Use case-sensitive pattern matching', false)
+    .option('--custom-ignores <patterns...>', 'Additional patterns to ignore')
+    .option(
+      '--cache-path <path>',
+      'Custom path for the cache file',
+      path.join(os.tmpdir(), 'codewhisper-cache.json'),
+    )
+    .option('--respect-gitignore', 'Respect entries in .gitignore', true)
+    .option(
+      '--no-respect-gitignore',
+      'Do not respect entries in .gitignore',
+      false,
+    )
+    .option('--invert', 'Selected files will be excluded', false)
+    .action(async (options) => {
+      try {
+        await runAIAssistedTask(options);
+      } catch (error) {
+        console.error(chalk.red('Error in AI-assisted task:'), error);
+        process.exit(1);
+      }
+    });
 
   program
     .command('generate')
@@ -50,7 +82,7 @@ export function cli(args: string[]) {
       false,
     )
     .option('-t, --template <template>', 'Template to use', 'default')
-    .option('-g, --gitignore <path>', 'Path to .gitignore file')
+    .option('-g, --gitignore <path>', 'Path to .gitignore file', '.gitignore')
     .option(
       '-f, --filter <patterns...>',
       'File patterns to include (use glob patterns, e.g., "src/**/*.js")',
@@ -59,12 +91,13 @@ export function cli(args: string[]) {
       '-e, --exclude <patterns...>',
       'File patterns to exclude (use glob patterns, e.g., "**/*.test.js")',
     )
-    .option('-s, --suppress-comments', 'Strip comments from the code')
-    .option('-l, --line-numbers', 'Add line numbers to code blocks')
-    .option('--case-sensitive', 'Use case-sensitive pattern matching')
+    .option('-s, --suppress-comments', 'Strip comments from the code', false)
+    .option('-l, --line-numbers', 'Add line numbers to code blocks', false)
+    .option('--case-sensitive', 'Use case-sensitive pattern matching', false)
     .option(
       '--no-codeblock',
       'Disable wrapping code inside markdown code blocks',
+      false,
     )
     .option(
       '--custom-data <json>',
@@ -103,7 +136,8 @@ export function cli(args: string[]) {
         const variables = extractTemplateVariables(templateContent);
 
         const customData = await collectVariables(
-          options,
+          options.customData,
+          options.cachePath,
           variables,
           templatePath,
         );
@@ -148,7 +182,7 @@ export function cli(args: string[]) {
       (value) => value,
     )
     .option('-t, --template <template>', 'Template to use')
-    .option('-g, --gitignore <path>', 'Path to .gitignore file')
+    .option('-g, --gitignore <path>', 'Path to .gitignore file', '.gitignore')
     .option(
       '-f, --filter <patterns...>',
       'File patterns to include (use glob patterns, e.g., "src/**/*.js")',
@@ -162,12 +196,13 @@ export function cli(args: string[]) {
       'Open the result in your default editor',
       false,
     )
-    .option('-s, --suppress-comments', 'Strip comments from the code')
-    .option('-l, --line-numbers', 'Add line numbers to code blocks')
-    .option('--case-sensitive', 'Use case-sensitive pattern matching')
+    .option('-s, --suppress-comments', 'Strip comments from the code', false)
+    .option('-l, --line-numbers', 'Add line numbers to code blocks', false)
+    .option('--case-sensitive', 'Use case-sensitive pattern matching', false)
     .option(
       '--no-codeblock',
       'Disable wrapping code inside markdown code blocks',
+      false,
     )
     .option(
       '--custom-data <json>',
@@ -175,7 +210,11 @@ export function cli(args: string[]) {
     )
     .option('--custom-template <path>', 'Path to a custom Handlebars template')
     .option('--custom-ignores <patterns...>', 'Additional patterns to ignore')
-    .option('--cache-path <path>', 'Custom path for the cache file')
+    .option(
+      '--cache-path <path>',
+      'Custom path for the cache file',
+      path.join(os.tmpdir(), 'codewhisper-cache.json'),
+    )
     .option('--respect-gitignore', 'Respect entries in .gitignore', true)
     .option(
       '--no-respect-gitignore',

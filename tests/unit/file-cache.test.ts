@@ -2,7 +2,7 @@ import os from 'node:os';
 import path from 'node:path';
 import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import type { FileInfo } from '../../src/core/file-processor';
+import type { FileInfo } from '../../src/types';
 import { FileCache } from '../../src/utils/file-cache';
 import { normalizePath } from '../../src/utils/normalize-path';
 

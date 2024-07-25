@@ -4,8 +4,8 @@ import { performance } from 'node:perf_hooks';
 import fs from 'fs-extra';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { processFiles } from '../../src/core/file-processor';
-import type { FileInfo } from '../../src/core/file-processor';
 import { generateMarkdown } from '../../src/core/markdown-generator';
+import type { FileInfo } from '../../src/types';
 
 const isCI = process.env.CI === 'true';
 
@@ -36,7 +36,12 @@ describe('Performance Tests', () => {
 
   async function runProcessFiles(): Promise<[FileInfo[], number]> {
     const start = performance.now();
-    const result = await processFiles({ path: TEST_DIR });
+    const result = await processFiles({
+      path: TEST_DIR,
+      gitignore: '.gitignore',
+      caseSensitive: false,
+      cachePath: DEFAULT_CACHE_PATH,
+    });
     const end = performance.now();
     const duration = end - start;
     console.log(`Processing took ${duration} ms`);
@@ -93,6 +98,8 @@ describe('Performance Tests', () => {
       const startFirstRun = performance.now();
       const firstRunFiles = await processFiles({
         path: TEST_DIR,
+        gitignore: '.gitignore',
+        caseSensitive: false,
         cachePath: DEFAULT_CACHE_PATH,
       });
       const endFirstRun = performance.now();
@@ -104,6 +111,8 @@ describe('Performance Tests', () => {
       const startSecondRun = performance.now();
       const secondRunFiles = await processFiles({
         path: TEST_DIR,
+        gitignore: '.gitignore',
+        caseSensitive: false,
         cachePath: DEFAULT_CACHE_PATH,
       });
       const endSecondRun = performance.now();
