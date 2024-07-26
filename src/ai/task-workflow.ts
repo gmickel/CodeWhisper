@@ -2,12 +2,13 @@ import path from 'node:path';
 import chalk from 'chalk';
 import fs from 'fs-extra';
 import ora from 'ora';
+import simpleGit from 'simple-git';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
 import { applyChanges } from '../git/apply-changes';
 import { selectFilesPrompt } from '../interactive/select-files-prompt';
 import type { AiAssistedTaskOptions, MarkdownOptions } from '../types';
-import { createBranchAndCommit } from '../utils/git-tools';
+import { createBranchAndCommit, ensureBranch } from '../utils/git-tools';
 import {
   collectVariables,
   extractTemplateVariables,
@@ -182,12 +183,14 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
       );
     } else {
       spinner.start('Applying AI Code Modifications...');
+
+      await ensureBranch(basePath, parsedResponse.gitBranchName);
       await applyChanges({ basePath, parsedResponse, dryRun: false });
-      await createBranchAndCommit(
-        basePath,
-        parsedResponse.gitBranchName,
-        parsedResponse.gitCommitMessage,
-      );
+
+      const git = simpleGit(basePath);
+      await git.add('.');
+      await git.commit(parsedResponse.gitCommitMessage);
+
       spinner.succeed(
         `AI Code Modifications applied and committed to branch: ${parsedResponse.gitBranchName}`,
       );

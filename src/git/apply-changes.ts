@@ -16,34 +16,9 @@ export async function applyChanges({
   const git: SimpleGit = simpleGit(basePath);
 
   try {
-    const { gitBranchName, gitCommitMessage, files } = parsedResponse;
-
-    if (dryRun) {
-      console.log(
-        chalk.yellow(`[DRY RUN] Would create new branch: ${gitBranchName}`),
-      );
-    } else {
-      await git.checkoutLocalBranch(gitBranchName);
-      console.log(chalk.green(`Created new branch: ${gitBranchName}`));
-    }
-
-    for (const file of files) {
+    for (const file of parsedResponse.files) {
       await applyFileChange(basePath, file, dryRun);
     }
-
-    if (dryRun) {
-      console.log(chalk.yellow('[DRY RUN] Would stage all changes'));
-      console.log(
-        chalk.yellow(
-          `[DRY RUN] Would commit changes with message: ${gitCommitMessage}`,
-        ),
-      );
-    } else {
-      await git.add('.');
-      await git.commit(gitCommitMessage);
-      console.log(chalk.green(`Committed changes: ${gitCommitMessage}`));
-    }
-
     console.log(
       chalk.green(
         dryRun

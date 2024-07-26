@@ -3,23 +3,17 @@ import simpleGit from 'simple-git';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { applyChanges } from '../../src/git/apply-changes';
 import type { AIParsedResponse } from '../../src/types';
+import * as gitTools from '../../src/utils/git-tools';
 
 vi.mock('fs-extra');
 vi.mock('simple-git');
+vi.mock('../../src/utils/git-tools');
 
 describe('applyChanges', () => {
   const mockBasePath = '/mock/base/path';
-  const mockGit = {
-    checkoutLocalBranch: vi.fn(),
-    add: vi.fn(),
-    commit: vi.fn(),
-  };
 
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.mocked(simpleGit).mockReturnValue(
-      mockGit as unknown as ReturnType<typeof simpleGit>,
-    );
   });
 
   afterEach(() => {
@@ -55,13 +49,8 @@ describe('applyChanges', () => {
       dryRun: false,
     });
 
-    expect(mockGit.checkoutLocalBranch).toHaveBeenCalledWith(
-      'feature/new-branch',
-    );
     expect(fs.ensureDir).toHaveBeenCalledTimes(2);
     expect(fs.writeFile).toHaveBeenCalledTimes(2);
-    expect(mockGit.add).toHaveBeenCalledWith('.');
-    expect(mockGit.commit).toHaveBeenCalledWith('Add and modify files');
   });
 
   it('should not apply changes in dry run mode', async () => {
@@ -87,12 +76,10 @@ describe('applyChanges', () => {
       dryRun: true,
     });
 
-    expect(mockGit.checkoutLocalBranch).not.toHaveBeenCalled();
     expect(fs.ensureDir).not.toHaveBeenCalled();
     expect(fs.writeFile).not.toHaveBeenCalled();
-    expect(mockGit.add).not.toHaveBeenCalled();
-    expect(mockGit.commit).not.toHaveBeenCalled();
   });
+
   it('should handle errors during file operations', async () => {
     const mockParsedResponse: AIParsedResponse = {
       fileList: ['error-file.js'],
@@ -118,6 +105,7 @@ describe('applyChanges', () => {
       applyChanges({
         basePath: mockBasePath,
         parsedResponse: mockParsedResponse,
+        dryRun: false,
       }),
     ).rejects.toThrow('Failed to create directory');
   });
@@ -154,13 +142,12 @@ describe('applyChanges', () => {
     await applyChanges({
       basePath: mockBasePath,
       parsedResponse: mockParsedResponse,
+      dryRun: false,
     });
 
     expect(fs.ensureDir).toHaveBeenCalledTimes(2);
     expect(fs.writeFile).toHaveBeenCalledTimes(2);
     expect(fs.remove).toHaveBeenCalledTimes(1);
-    expect(mockGit.add).toHaveBeenCalledWith('.');
-    expect(mockGit.commit).toHaveBeenCalledWith('Mixed file operations');
   });
 
   it('should handle empty file list', async () => {
@@ -176,13 +163,12 @@ describe('applyChanges', () => {
     await applyChanges({
       basePath: mockBasePath,
       parsedResponse: mockParsedResponse,
+      dryRun: false,
     });
 
     expect(fs.ensureDir).not.toHaveBeenCalled();
     expect(fs.writeFile).not.toHaveBeenCalled();
     expect(fs.remove).not.toHaveBeenCalled();
-    expect(mockGit.add).toHaveBeenCalledWith('.');
-    expect(mockGit.commit).toHaveBeenCalledWith('No changes');
   });
 
   it('should handle file path with subdirectories', async () => {
@@ -205,6 +191,7 @@ describe('applyChanges', () => {
     await applyChanges({
       basePath: mockBasePath,
       parsedResponse: mockParsedResponse,
+      dryRun: false,
     });
 
     expect(fs.ensureDir).toHaveBeenCalledWith(
@@ -214,61 +201,5 @@ describe('applyChanges', () => {
       expect.stringContaining('deep/nested/file.js'),
       'console.log("Nested file");',
     );
-  });
-
-  it('should handle errors during git operations', async () => {
-    const mockParsedResponse: AIParsedResponse = {
-      fileList: ['file.js'],
-      files: [
-        {
-          path: 'file.js',
-          language: 'javascript',
-          content: 'console.log("Test");',
-          status: 'new',
-        },
-      ],
-      gitBranchName: 'feature/git-error',
-      gitCommitMessage: 'This should fail',
-      summary: 'This operation should fail during git commit',
-      potentialIssues: 'None',
-    };
-
-    mockGit.commit.mockRejectedValueOnce(new Error('Git commit failed'));
-
-    await expect(
-      applyChanges({
-        basePath: mockBasePath,
-        parsedResponse: mockParsedResponse,
-      }),
-    ).rejects.toThrow('Git commit failed');
-  });
-
-  it('should use the gitBranchName and gitCommitMessage from parsedResponse', async () => {
-    const mockParsedResponse: AIParsedResponse = {
-      fileList: ['test-file.js'],
-      files: [
-        {
-          path: 'test-file.js',
-          language: 'javascript',
-          content: 'console.log("Test");',
-          status: 'new',
-        },
-      ],
-      gitBranchName: 'feature/custom-branch',
-      gitCommitMessage: 'Custom commit message',
-      summary: 'Added a test file',
-      potentialIssues: 'None',
-    };
-
-    await applyChanges({
-      basePath: mockBasePath,
-      parsedResponse: mockParsedResponse,
-      dryRun: false,
-    });
-
-    expect(mockGit.checkoutLocalBranch).toHaveBeenCalledWith(
-      'feature/custom-branch',
-    );
-    expect(mockGit.commit).toHaveBeenCalledWith('Custom commit message');
   });
 });
