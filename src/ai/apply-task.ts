@@ -2,7 +2,6 @@ import path from 'node:path';
 import chalk from 'chalk';
 import fs from 'fs-extra';
 import { applyChanges } from '../git/apply-changes';
-import type { AIParsedResponse } from '../types';
 import { createBranchAndCommit } from '../utils/git-tools';
 
 export async function applyTask(filePath: string): Promise<void> {
