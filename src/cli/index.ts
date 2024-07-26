@@ -62,6 +62,11 @@ export function cli(args: string[]) {
       'Perform a dry run without making actual changes',
       false,
     )
+    .option(
+      '-max --max-cost-threshold <number>',
+      'Set a maximum cost threshold for AI operations in USD (e.g., 0.5 for $0.50)',
+      Number.parseFloat,
+    )
     .action(async (options) => {
       try {
         await runAIAssistedTask(options);

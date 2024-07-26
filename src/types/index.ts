@@ -34,6 +34,7 @@ export type AiAssistedTaskOptions = Pick<
   | 'noCodeblock'
 > & {
   dryRun: boolean;
+  maxCostThreshold?: number;
 };
 
 export type ProcessOptions = Pick<
@@ -76,4 +77,8 @@ export interface AIParsedResponse {
   gitCommitMessage: string;
   summary: string;
   potentialIssues: string;
+}
+
+export interface GenerateAIResponseOptions {
+  maxCostThreshold?: number;
 }
