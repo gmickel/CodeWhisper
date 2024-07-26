@@ -52,6 +52,7 @@ describe('applyChanges', () => {
     await applyChanges({
       basePath: mockBasePath,
       parsedResponse: mockParsedResponse,
+      dryRun: false,
     });
 
     expect(mockGit.checkoutLocalBranch).toHaveBeenCalledWith(
@@ -63,33 +64,35 @@ describe('applyChanges', () => {
     expect(mockGit.commit).toHaveBeenCalledWith('Add and modify files');
   });
 
-  it('should delete files when status is "deleted"', async () => {
+  it('should not apply changes in dry run mode', async () => {
     const mockParsedResponse: AIParsedResponse = {
-      fileList: ['file-to-delete.js'],
+      fileList: ['new-file.js'],
       files: [
         {
-          path: 'file-to-delete.js',
-          language: '',
-          content: '',
-          status: 'deleted',
+          path: 'new-file.js',
+          language: 'javascript',
+          content: 'console.log("New file");',
+          status: 'new',
         },
       ],
-      gitBranchName: 'feature/delete-file',
-      gitCommitMessage: 'Delete unnecessary file',
-      summary: 'Removed an unnecessary file',
+      gitBranchName: 'feature/dry-run',
+      gitCommitMessage: 'This should not be committed',
+      summary: 'This is a dry run',
       potentialIssues: 'None',
     };
 
     await applyChanges({
       basePath: mockBasePath,
       parsedResponse: mockParsedResponse,
+      dryRun: true,
     });
 
-    expect(fs.remove).toHaveBeenCalledWith('/mock/base/path/file-to-delete.js');
-    expect(mockGit.add).toHaveBeenCalledWith('.');
-    expect(mockGit.commit).toHaveBeenCalledWith('Delete unnecessary file');
+    expect(mockGit.checkoutLocalBranch).not.toHaveBeenCalled();
+    expect(fs.ensureDir).not.toHaveBeenCalled();
+    expect(fs.writeFile).not.toHaveBeenCalled();
+    expect(mockGit.add).not.toHaveBeenCalled();
+    expect(mockGit.commit).not.toHaveBeenCalled();
   });
-
   it('should handle errors during file operations', async () => {
     const mockParsedResponse: AIParsedResponse = {
       fileList: ['error-file.js'],
@@ -238,5 +241,34 @@ describe('applyChanges', () => {
         parsedResponse: mockParsedResponse,
       }),
     ).rejects.toThrow('Git commit failed');
+  });
+
+  it('should use the gitBranchName and gitCommitMessage from parsedResponse', async () => {
+    const mockParsedResponse: AIParsedResponse = {
+      fileList: ['test-file.js'],
+      files: [
+        {
+          path: 'test-file.js',
+          language: 'javascript',
+          content: 'console.log("Test");',
+          status: 'new',
+        },
+      ],
+      gitBranchName: 'feature/custom-branch',
+      gitCommitMessage: 'Custom commit message',
+      summary: 'Added a test file',
+      potentialIssues: 'None',
+    };
+
+    await applyChanges({
+      basePath: mockBasePath,
+      parsedResponse: mockParsedResponse,
+      dryRun: false,
+    });
+
+    expect(mockGit.checkoutLocalBranch).toHaveBeenCalledWith(
+      'feature/custom-branch',
+    );
+    expect(mockGit.commit).toHaveBeenCalledWith('Custom commit message');
   });
 });

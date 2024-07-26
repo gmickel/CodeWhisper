@@ -39,27 +39,51 @@ describe('Template Utils', () => {
 
   describe('collectVariables', () => {
     it('should parse and return custom data when provided', async () => {
-      const data = '{"var_name": "John", "var_age": "30"}';
+      const data =
+        '{"var_taskDescription": "# Task Title\\n\\nTask description", "var_instructions": "Task instructions"}';
       const result = await collectVariables(
         data,
         '/tmp/cache',
         [],
         '/path/to/template.hbs',
       );
-      expect(result).toEqual({ var_name: 'John', var_age: '30' });
+      expect(result).toEqual({
+        var_taskDescription: '# Task Title\n\nTask description',
+        var_instructions: 'Task instructions',
+      });
     });
 
-    it('should prompt for variables when no data is provided', async () => {
+    it('should use CLI arguments when provided', async () => {
+      const data = JSON.stringify({
+        var_taskDescription: '# CLI Task\n\nCLI task description',
+        var_instructions: 'CLI instructions',
+      });
+
+      const result = await collectVariables(
+        data,
+        '/tmp/cache',
+        [],
+        '/path/to/template.hbs',
+      );
+
+      expect(result).toEqual({
+        var_taskDescription: '# CLI Task\n\nCLI task description',
+        var_instructions: 'CLI instructions',
+      });
+    });
+
+    it('should prompt for variables when no data is provided and no CLI args', async () => {
       const variables = [
-        { name: 'name', isMultiline: false },
-        { name: 'description', isMultiline: true },
+        { name: 'var_taskDescription', isMultiline: true },
+        { name: 'var_instructions', isMultiline: true },
       ];
 
       vi.mocked(getCachedValue)
         .mockResolvedValueOnce(null)
         .mockResolvedValueOnce(null);
-      vi.mocked(inquirer.prompt).mockResolvedValueOnce({ name: 'John' });
-      vi.mocked(editor).mockResolvedValueOnce('A long description');
+      vi.mocked(editor)
+        .mockResolvedValueOnce('# Prompted Task\n\nPrompted task description')
+        .mockResolvedValueOnce('Prompted instructions');
 
       const result = await collectVariables(
         '',
@@ -69,38 +93,35 @@ describe('Template Utils', () => {
       );
 
       expect(result).toEqual({
-        name: 'John',
-        description: 'A long description',
+        var_taskDescription: '# Prompted Task\n\nPrompted task description',
+        var_instructions: 'Prompted instructions',
       });
 
-      expect(inquirer.prompt).toHaveBeenCalledWith([
-        {
-          type: 'input',
-          name: 'name',
-          message: 'Enter value for name:',
-          default: undefined,
-        },
-      ]);
-
+      expect(editor).toHaveBeenCalledTimes(2);
       expect(editor).toHaveBeenCalledWith({
-        message: 'Enter value for description (multiline):',
+        message: 'Enter value for var_taskDescription (multiline):',
+        default: undefined,
+      });
+      expect(editor).toHaveBeenCalledWith({
+        message: 'Enter value for var_instructions (multiline):',
         default: undefined,
       });
 
       expect(setCachedValue).toHaveBeenCalledTimes(2);
     });
 
-    it('should use cached values when available', async () => {
+    it('should use cached values when available and no CLI args', async () => {
       const variables = [
-        { name: 'name', isMultiline: false },
-        { name: 'description', isMultiline: true },
+        { name: 'var_taskDescription', isMultiline: true },
+        { name: 'var_instructions', isMultiline: true },
       ];
 
       vi.mocked(getCachedValue)
-        .mockResolvedValueOnce('Cached John')
-        .mockResolvedValueOnce('Cached description');
-      vi.mocked(inquirer.prompt).mockResolvedValueOnce({ name: 'Cached John' });
-      vi.mocked(editor).mockResolvedValueOnce('Cached description');
+        .mockResolvedValueOnce('# Cached Task\n\nCached task description')
+        .mockResolvedValueOnce('Cached instructions');
+      vi.mocked(editor)
+        .mockResolvedValueOnce('# Cached Task\n\nCached task description')
+        .mockResolvedValueOnce('Cached instructions');
 
       const result = await collectVariables(
         '',
@@ -110,22 +131,18 @@ describe('Template Utils', () => {
       );
 
       expect(result).toEqual({
-        name: 'Cached John',
-        description: 'Cached description',
+        var_taskDescription: '# Cached Task\n\nCached task description',
+        var_instructions: 'Cached instructions',
       });
 
-      expect(inquirer.prompt).toHaveBeenCalledWith([
-        {
-          type: 'input',
-          name: 'name',
-          message: 'Enter value for name:',
-          default: 'Cached John',
-        },
-      ]);
-
+      expect(editor).toHaveBeenCalledTimes(2);
       expect(editor).toHaveBeenCalledWith({
-        message: 'Enter value for description (multiline):',
-        default: 'Cached description',
+        message: 'Enter value for var_taskDescription (multiline):',
+        default: '# Cached Task\n\nCached task description',
+      });
+      expect(editor).toHaveBeenCalledWith({
+        message: 'Enter value for var_instructions (multiline):',
+        default: 'Cached instructions',
       });
     });
 
