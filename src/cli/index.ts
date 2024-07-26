@@ -80,6 +80,12 @@ export function cli(args: string[]) {
       'Set a maximum cost threshold for AI operations in USD (e.g., 0.5 for $0.50)',
       Number.parseFloat,
     )
+    .option('-t, --task <task>', 'Short task title')
+    .option('-d, --description <description>', 'Detailed task description')
+    .option(
+      '-i, --instructions <instructions>',
+      'Additional instructions for the task',
+    )
     .action(async (options) => {
       try {
         await runAIAssistedTask(options);

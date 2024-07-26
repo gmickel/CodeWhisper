@@ -3,18 +3,14 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 import ora from 'ora';
 import { processFiles } from '../core/file-processor';
-import {
-  type MarkdownOptions,
-  generateMarkdown,
-} from '../core/markdown-generator';
+import { generateMarkdown } from '../core/markdown-generator';
 import { applyChanges } from '../git/apply-changes';
 import { selectFilesPrompt } from '../interactive/select-files-prompt';
-import type { AiAssistedTaskOptions } from '../types';
+import type { AiAssistedTaskOptions, MarkdownOptions } from '../types';
 import { createBranchAndCommit } from '../utils/git-tools';
 import {
   collectVariables,
   extractTemplateVariables,
-  getAvailableTemplates,
   getTemplatePath,
 } from '../utils/template-utils';
 import { generateAIResponse } from './generate-ai-response';
@@ -28,12 +24,21 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
   try {
     const basePath = path.resolve(options.path ?? '.');
 
-    const taskDescription =
-      (await getTaskDescription()) ?? 'No task description provided.';
+    let taskDescription = '';
+    if (options.task || options.description) {
+      taskDescription =
+        `# ${options.task || 'Task'}\n\n${options.description || ''}`.trim();
+    } else {
+      taskDescription =
+        (await getTaskDescription()) ?? 'No task description provided.';
+    }
 
-    const instructions =
-      (await getInstructions()) ?? 'No instructions provided.';
-
+    let instructions = '';
+    if (options.instructions) {
+      instructions = options.instructions;
+    } else {
+      instructions = (await getInstructions()) ?? 'No instructions provided.';
+    }
     const userFilters = options.filter || [];
 
     const selectedFiles = await selectFilesPrompt(

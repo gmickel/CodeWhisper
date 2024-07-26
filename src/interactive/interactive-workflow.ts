@@ -3,11 +3,8 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 import ora from 'ora';
 import { processFiles } from '../core/file-processor';
-import {
-  type MarkdownOptions,
-  generateMarkdown,
-} from '../core/markdown-generator';
-import type { InteractiveModeOptions } from '../types';
+import { generateMarkdown } from '../core/markdown-generator';
+import type { InteractiveModeOptions, MarkdownOptions } from '../types';
 import { handleEditorAndOutput } from '../utils/editor-utils';
 import {
   collectVariables,

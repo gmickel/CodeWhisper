@@ -1,3 +1,11 @@
+export interface MarkdownOptions {
+  template?: string;
+  noCodeblock?: boolean;
+  customData?: Record<string, string>;
+  basePath?: string;
+  lineNumbers?: boolean;
+}
+
 export interface InteractiveModeOptions {
   path?: string;
   template?: string;
@@ -35,6 +43,9 @@ export type AiAssistedTaskOptions = Pick<
 > & {
   dryRun: boolean;
   maxCostThreshold?: number;
+  task?: string;
+  description?: string;
+  instructions?: string;
 };
 
 export type ProcessOptions = Pick<
