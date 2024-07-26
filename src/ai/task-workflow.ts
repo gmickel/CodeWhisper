@@ -10,6 +10,7 @@ import {
 import { applyChanges } from '../git/apply-changes';
 import { selectFilesPrompt } from '../interactive/select-files-prompt';
 import type { AiAssistedTaskOptions } from '../types';
+import { createBranchAndCommit } from '../utils/git-tools';
 import {
   collectVariables,
   extractTemplateVariables,
@@ -134,11 +135,58 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     });
     spinner.succeed('AI Code Modifications generated successfully');
 
-    spinner.start('Applying AI Code Modifications...');
     const parsedResponse = parseAICodegenResponse(generatedCode);
-    await applyChanges(basePath, parsedResponse, options.dryRun);
-    spinner.succeed('AI Code Modifications applied successfully');
 
+    if (options.dryRun) {
+      spinner.info(
+        chalk.yellow(
+          'Dry Run Mode: Generating output without applying changes',
+        ),
+      );
+
+      // Save only the generated code modifications
+      const outputPath = path.join(basePath, 'codewhisper-task-output.json');
+      await fs.writeJSON(
+        outputPath,
+        {
+          taskDescription,
+          parsedResponse,
+        },
+        { spaces: 2 },
+      );
+      console.log(chalk.green(`AI-generated output saved to: ${outputPath}`));
+      console.log(chalk.cyan('To apply these changes, run:'));
+      console.log(chalk.cyan(`npx codewhisper apply-task ${outputPath}`));
+
+      // Detailed console output
+      console.log('\nTask Summary:');
+      console.log(chalk.blue('Task Description:'), taskDescription);
+      console.log(chalk.blue('Branch Name:'), parsedResponse.gitBranchName);
+      console.log(
+        chalk.blue('Commit Message:'),
+        parsedResponse.gitCommitMessage,
+      );
+      console.log(chalk.blue('Files to be changed:'));
+      for (const file of parsedResponse.files) {
+        console.log(`  ${file.status}: ${file.path}`);
+      }
+      console.log(chalk.blue('Summary:'), parsedResponse.summary);
+      console.log(
+        chalk.blue('Potential Issues:'),
+        parsedResponse.potentialIssues,
+      );
+    } else {
+      spinner.start('Applying AI Code Modifications...');
+      await applyChanges({ basePath, parsedResponse, dryRun: false });
+      await createBranchAndCommit(
+        basePath,
+        parsedResponse.gitBranchName,
+        parsedResponse.gitCommitMessage,
+      );
+      spinner.succeed(
+        `AI Code Modifications applied and committed to branch: ${parsedResponse.gitBranchName}`,
+      );
+    }
     console.log(chalk.green('AI-assisted task completed! 🎉'));
   } catch (error) {
     spinner.fail('Error in AI-assisted task');

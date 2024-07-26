@@ -82,3 +82,9 @@ export interface AIParsedResponse {
 export interface GenerateAIResponseOptions {
   maxCostThreshold?: number;
 }
+
+export interface ApplyChangesOptions {
+  basePath: string;
+  parsedResponse: AIParsedResponse;
+  dryRun?: boolean;
+}

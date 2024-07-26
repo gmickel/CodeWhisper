@@ -6,6 +6,7 @@ import chalk from 'chalk';
 import { Command } from 'commander';
 import fs from 'fs-extra';
 import ora from 'ora';
+import { applyTask } from '../ai/apply-task';
 import { runAIAssistedTask } from '../ai/task-workflow';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
@@ -27,6 +28,18 @@ export function cli(args: string[]) {
     .name('codewhisper')
     .description('A powerful tool for converting code to AI-friendly prompts')
     .version('1.0.0');
+
+  program
+    .command('apply-task <file>')
+    .description('Apply an AI-generated task from a file')
+    .action(async (file) => {
+      try {
+        await applyTask(file);
+      } catch (error) {
+        console.error(chalk.red('Error applying task:'), error);
+        process.exit(1);
+      }
+    });
 
   program
     .command('task')

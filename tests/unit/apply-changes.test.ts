@@ -49,7 +49,10 @@ describe('applyChanges', () => {
       potentialIssues: 'None',
     };
 
-    await applyChanges(mockBasePath, mockParsedResponse);
+    await applyChanges({
+      basePath: mockBasePath,
+      parsedResponse: mockParsedResponse,
+    });
 
     expect(mockGit.checkoutLocalBranch).toHaveBeenCalledWith(
       'feature/new-branch',
@@ -77,7 +80,10 @@ describe('applyChanges', () => {
       potentialIssues: 'None',
     };
 
-    await applyChanges(mockBasePath, mockParsedResponse);
+    await applyChanges({
+      basePath: mockBasePath,
+      parsedResponse: mockParsedResponse,
+    });
 
     expect(fs.remove).toHaveBeenCalledWith('/mock/base/path/file-to-delete.js');
     expect(mockGit.add).toHaveBeenCalledWith('.');
@@ -106,7 +112,10 @@ describe('applyChanges', () => {
     );
 
     await expect(
-      applyChanges(mockBasePath, mockParsedResponse),
+      applyChanges({
+        basePath: mockBasePath,
+        parsedResponse: mockParsedResponse,
+      }),
     ).rejects.toThrow('Failed to create directory');
   });
 
@@ -139,7 +148,10 @@ describe('applyChanges', () => {
       potentialIssues: 'None',
     };
 
-    await applyChanges(mockBasePath, mockParsedResponse);
+    await applyChanges({
+      basePath: mockBasePath,
+      parsedResponse: mockParsedResponse,
+    });
 
     expect(fs.ensureDir).toHaveBeenCalledTimes(2);
     expect(fs.writeFile).toHaveBeenCalledTimes(2);
@@ -158,7 +170,10 @@ describe('applyChanges', () => {
       potentialIssues: 'None',
     };
 
-    await applyChanges(mockBasePath, mockParsedResponse);
+    await applyChanges({
+      basePath: mockBasePath,
+      parsedResponse: mockParsedResponse,
+    });
 
     expect(fs.ensureDir).not.toHaveBeenCalled();
     expect(fs.writeFile).not.toHaveBeenCalled();
@@ -184,7 +199,10 @@ describe('applyChanges', () => {
       potentialIssues: 'None',
     };
 
-    await applyChanges(mockBasePath, mockParsedResponse);
+    await applyChanges({
+      basePath: mockBasePath,
+      parsedResponse: mockParsedResponse,
+    });
 
     expect(fs.ensureDir).toHaveBeenCalledWith(
       expect.stringContaining('deep/nested'),
@@ -215,7 +233,10 @@ describe('applyChanges', () => {
     mockGit.commit.mockRejectedValueOnce(new Error('Git commit failed'));
 
     await expect(
-      applyChanges(mockBasePath, mockParsedResponse),
+      applyChanges({
+        basePath: mockBasePath,
+        parsedResponse: mockParsedResponse,
+      }),
     ).rejects.toThrow('Git commit failed');
   });
 });
