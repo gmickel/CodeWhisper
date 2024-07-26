@@ -1,82 +1,89 @@
 import type { AIFileInfo, AIParsedResponse } from '../types';
 
 export function parseAICodegenResponse(response: string): AIParsedResponse {
-  const files: AIFileInfo[] = [];
-
-  // Parse file list
-  const fileListMatch = response.match(/<file_list>([\s\S]*?)<\/file_list>/);
-  const fileList = fileListMatch
-    ? fileListMatch[1]
-        .trim()
-        .split('\n')
-        .map((file) => file.trim())
-    : [];
-
-  // Parse individual files
-  const fileRegex =
-    /<file>[\s\S]*?<file_path>(.*?)<\/file_path>[\s\S]*?<file_content language="(.*?)">([\s\S]*?)<\/file_content>[\s\S]*?<file_status>(.*?)<\/file_status>(?:[\s\S]*?<explanation>([\s\S]*?)<\/explanation>)?[\s\S]*?<\/file>/g;
-  let match: RegExpExecArray | null;
-  while (true) {
-    match = fileRegex.exec(response);
-    if (match === null) break;
-    const [, path, language, content, status, explanation] = match;
-    files.push({
-      path: path.trim(),
-      language: language.trim(),
-      content: content.trim(),
-      status: status.trim() as 'new' | 'modified' | 'deleted',
-      explanation: explanation ? explanation.trim() : undefined,
-    });
-  }
-
-  // Handle deleted files (which don't have content)
-  const deletedFileRegex =
-    /<file>[\s\S]*?<file_path>(.*?)<\/file_path>[\s\S]*?<file_status>deleted<\/file_status>[\s\S]*?<\/file>/g;
-  let deletedMatch: RegExpExecArray | null;
-  while (true) {
-    deletedMatch = deletedFileRegex.exec(response);
-    if (deletedMatch === null) break;
-    const [, path] = deletedMatch;
-    files.push({
-      path: path.trim(),
-      language: '',
-      content: '',
-      status: 'deleted',
-    });
-  }
-
-  // Parse git branch name
-  const gitBranchNameMatch = response.match(
-    /<git_branch_name>([\s\S]*?)<\/git_branch_name>/,
-  );
-  const gitBranchName = gitBranchNameMatch ? gitBranchNameMatch[1].trim() : '';
-
-  // Parse git commit message
-  const gitCommitMessageMatch = response.match(
-    /<git_commit_message>([\s\S]*?)<\/git_commit_message>/,
-  );
-  const gitCommitMessage = gitCommitMessageMatch
-    ? gitCommitMessageMatch[1].trim()
-    : '';
-
-  // Parse summary
-  const summaryMatch = response.match(/<summary>([\s\S]*?)<\/summary>/);
-  const summary = summaryMatch ? summaryMatch[1].trim() : '';
-
-  // Parse potential issues
-  const potentialIssuesMatch = response.match(
-    /<potential_issues>([\s\S]*?)<\/potential_issues>/,
-  );
-  const potentialIssues = potentialIssuesMatch
-    ? potentialIssuesMatch[1].trim()
-    : '';
-
-  return {
-    fileList,
-    files,
-    gitBranchName,
-    gitCommitMessage,
-    summary,
-    potentialIssues,
+  const result: AIParsedResponse = {
+    fileList: [],
+    files: [],
+    gitBranchName: '',
+    gitCommitMessage: '',
+    summary: '',
+    potentialIssues: '',
   };
+
+  try {
+    // Parse file list
+    const fileListMatch = response.match(/<file_list>([\s\S]*?)<\/file_list>/);
+    result.fileList = fileListMatch
+      ? fileListMatch[1]
+          .trim()
+          .split('\n')
+          .map((file) => file.trim())
+          .filter((file) => file !== '')
+      : [];
+
+    // Parse individual files
+    const fileRegex =
+      /<file>[\s\S]*?<file_path>(.*?)<\/file_path>[\s\S]*?<file_content language="(.*?)">([\s\S]*?)<\/file_content>[\s\S]*?<file_status>(.*?)<\/file_status>(?:[\s\S]*?<explanation>([\s\S]*?)<\/explanation>)?[\s\S]*?<\/file>/g;
+    let match: RegExpExecArray | null;
+    while (true) {
+      match = fileRegex.exec(response);
+      if (match === null) break;
+      const [, path, language, content, status, explanation] = match;
+      result.files.push({
+        path: path.trim(),
+        language: language.trim(),
+        content: content.trim(),
+        status: status.trim() as 'new' | 'modified' | 'deleted',
+        explanation: explanation ? explanation.trim() : undefined,
+      });
+    }
+
+    // Handle deleted files (which don't have content)
+    const deletedFileRegex =
+      /<file>[\s\S]*?<file_path>(.*?)<\/file_path>[\s\S]*?<file_status>deleted<\/file_status>[\s\S]*?<\/file>/g;
+    let deletedMatch: RegExpExecArray | null;
+    while (true) {
+      deletedMatch = deletedFileRegex.exec(response);
+      if (deletedMatch === null) break;
+      const [, path] = deletedMatch;
+      result.files.push({
+        path: path.trim(),
+        language: '',
+        content: '',
+        status: 'deleted',
+      });
+    }
+
+    // Parse other fields
+    result.gitBranchName = parseField(response, 'git_branch_name');
+    result.gitCommitMessage = parseField(response, 'git_commit_message');
+    result.summary = parseField(response, 'summary');
+    result.potentialIssues = parseField(response, 'potential_issues');
+
+    // Check if the response is malformed
+    if (isResponseMalformed(result)) {
+      throw new Error('Malformed response');
+    }
+  } catch (error) {
+    console.error('Error parsing AI response:', error);
+    result.gitCommitMessage = 'Error: Malformed response';
+  }
+
+  return result;
+}
+
+function parseField(response: string, fieldName: string): string {
+  const regex = new RegExp(`<${fieldName}>([\\s\\S]*?)<\\/${fieldName}>`, 'g');
+  const match = regex.exec(response);
+  return match ? match[1].trim() : '';
+}
+
+function isResponseMalformed(result: AIParsedResponse): boolean {
+  // Consider the response malformed only if all main fields are empty
+  return (
+    result.fileList.length === 0 &&
+    result.files.length === 0 &&
+    result.gitBranchName === '' &&
+    result.gitCommitMessage === ''
+  );
 }
