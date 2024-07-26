@@ -31,3 +31,14 @@ export async function prReview(prNumber: string): Promise<FileInfo[]> {
   console.log(`Reviewing PR #${prNumber}`);
   return [];
 }
+
+export async function createBranchAndCommit(
+  basePath: string,
+  branchName: string,
+  commitMessage: string,
+): Promise<void> {
+  const git = simpleGit(basePath);
+  await git.checkoutLocalBranch(branchName);
+  await git.add('.');
+  await git.commit(commitMessage);
+}

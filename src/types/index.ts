@@ -32,7 +32,9 @@ export type AiAssistedTaskOptions = Pick<
   | 'invert'
   | 'gitignore'
   | 'noCodeblock'
->;
+> & {
+  dryRun: boolean;
+};
 
 export type ProcessOptions = Pick<
   InteractiveModeOptions,
@@ -57,4 +59,21 @@ export interface FileInfo {
   created: Date;
   modified: Date;
   content: string;
+}
+
+export interface AIFileInfo {
+  path: string;
+  language: string;
+  content: string;
+  status: 'new' | 'modified' | 'deleted';
+  explanation?: string;
+}
+
+export interface AIParsedResponse {
+  fileList: string[];
+  files: AIFileInfo[];
+  gitBranchName: string;
+  gitCommitMessage: string;
+  summary: string;
+  potentialIssues: string;
 }

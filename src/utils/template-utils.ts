@@ -12,6 +12,11 @@ interface TemplateVariable {
   isMultiline: boolean;
 }
 
+function escapeLineBreaks(str: string): string {
+  if (!str) return str;
+  return str.replace(/\r?\n/g, '\\n');
+}
+
 export async function collectVariables(
   data: string,
   cachePath: string,
@@ -19,9 +24,12 @@ export async function collectVariables(
   templatePath: string,
 ): Promise<Record<string, string>> {
   let customData: { [key: string]: string } = {};
+
+  const escapedData = escapeLineBreaks(data);
+
   if (data) {
     try {
-      customData = JSON.parse(data);
+      customData = JSON.parse(escapedData);
     } catch (error) {
       console.error(chalk.red('Error parsing custom data JSON:'), error);
       process.exit(1);

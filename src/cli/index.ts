@@ -57,6 +57,11 @@ export function cli(args: string[]) {
       false,
     )
     .option('--invert', 'Selected files will be excluded', false)
+    .option(
+      '--dry-run',
+      'Perform a dry run without making actual changes',
+      false,
+    )
     .action(async (options) => {
       try {
         await runAIAssistedTask(options);
