@@ -7,6 +7,7 @@ import { Command } from 'commander';
 import fs from 'fs-extra';
 import ora from 'ora';
 import { applyTask } from '../ai/apply-task';
+import { getModelConfig, getModelNames } from '../ai/model-config';
 import { runAIAssistedTask } from '../ai/task-workflow';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
@@ -30,6 +31,26 @@ export function cli(args: string[]) {
     .version('1.0.0');
 
   program
+    .command('list-models')
+    .description('List available AI models')
+    .action(() => {
+      const models = getModelNames();
+      console.log('Available AI models:');
+      for (const modelId of models) {
+        const config = getModelConfig(modelId);
+        if (config) {
+          console.log(`- ${config.modelName} (${chalk.cyan(modelId)})`);
+          console.log(
+            `  Context window: ${config.contextWindow}, Max output: ${config.maxOutput}`,
+          );
+          console.log(
+            `  Pricing: $${config.pricing.inputCost}/1M tokens (input), $${config.pricing.outputCost}/1M tokens (output)`,
+          );
+        }
+      }
+    });
+
+  program
     .command('apply-task <file>')
     .description('Apply an AI-generated task from a file')
     .option('--auto-commit', 'Automatically commit changes', false)
@@ -46,6 +67,11 @@ export function cli(args: string[]) {
     .command('task')
     .description('Start an AI-assisted coding task')
     .option('-p, --path <path>', 'Path to the codebase', '.')
+    .option(
+      '-m, --model <modelId>',
+      'Specify the AI model to use',
+      'claude-3-5-sonnet-20240620',
+    )
     .option('-g, --gitignore <path>', 'Path to .gitignore file', '.gitignore')
     .option(
       '-f, --filter <patterns...>',
@@ -90,6 +116,14 @@ export function cli(args: string[]) {
     )
     .action(async (options) => {
       try {
+        const modelConfig = getModelConfig(options.model);
+        if (!modelConfig) {
+          console.error(
+            `Invalid model ID: ${options.model}. Use 'list-models' command to see available models.`,
+          );
+          return;
+        }
+        console.log(`Using model: ${modelConfig.modelName}`);
         await runAIAssistedTask(options);
       } catch (error) {
         console.error(chalk.red('Error in AI-assisted task:'), error);
