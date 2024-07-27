@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import {
-  calculateCost,
-  estimateCost,
-  getAvailableModels,
-} from '../../src/ai/cost-calculation';
+import { calculateCost, estimateCost } from '../../src/ai/cost-calculation';
+import { getModelNames } from '../../src/ai/model-config';
 
 function roundTo(num: number, decimals: number): number {
   return Number(num.toFixed(decimals));
@@ -61,7 +58,7 @@ describe('Cost Calculation', () => {
 
   describe('getAvailableModels', () => {
     it('should return all available models', () => {
-      const availableModels = getAvailableModels();
+      const availableModels = getModelNames();
       expect(availableModels).toEqual([
         'claude-3-5-sonnet-20240620',
         'claude-3-opus-20240229',

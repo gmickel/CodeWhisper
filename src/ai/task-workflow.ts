@@ -98,6 +98,7 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     spinner.start('Generating AI plan...');
     const generatedPlan = await generateAIResponse(planPrompt, {
       maxCostThreshold: options.maxCostThreshold,
+      model: options.model,
     });
     spinner.succeed('AI plan generated successfully');
 
@@ -138,6 +139,7 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     spinner.start('Generating AI Code Modifications...');
     const generatedCode = await generateAIResponse(codeGenPrompt, {
       maxCostThreshold: options.maxCostThreshold,
+      model: options.model,
     });
     spinner.succeed('AI Code Modifications generated successfully');
 

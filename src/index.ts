@@ -12,6 +12,7 @@ export type {
   InteractiveModeOptions,
   MarkdownOptions,
   FileInfo,
+  ModelSpecs,
 } from './types';
 
 // Utilities

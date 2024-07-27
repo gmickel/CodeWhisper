@@ -4,10 +4,10 @@ import chalk from 'chalk';
 import dotenv from 'dotenv';
 import type { GenerateAIResponseOptions } from '../types';
 import { calculateCost, estimateCost } from './cost-calculation';
+import { getModelConfig } from './model-config';
 import {
   calculateTokenUsage,
   estimateTokenCount,
-  getModelSpecs,
   truncateToContextLimit,
 } from './token-management';
 
@@ -19,13 +19,17 @@ if (!process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY) {
   );
 }
 
-const MODEL = process.env.MODEL || 'claude-3-5-sonnet-20240620';
-const MAX_TOKENS = getModelSpecs(MODEL).maxOutput;
-
 export async function generateAIResponse(
   prompt: string,
   options: GenerateAIResponseOptions,
 ): Promise<string> {
+  const modelKey = options.model;
+  const modelConfig = getModelConfig(modelKey);
+
+  if (!modelConfig) {
+    throw new Error(`Unknown model: ${modelKey}`);
+  }
+
   const anthropic = createAnthropic({
     apiKey: process.env.ANTHROPIC_API_KEY,
     headers: {
@@ -33,10 +37,10 @@ export async function generateAIResponse(
     },
   });
 
-  const estimatedInputTokens = estimateTokenCount(prompt, MODEL);
-  const estimatedOutputTokens = MAX_TOKENS; // We assume the max output tokens for caluated the total token count
+  const estimatedInputTokens = estimateTokenCount(prompt, modelKey);
+  const estimatedOutputTokens = modelConfig.maxOutput;
   const estimatedCost = estimateCost(
-    MODEL,
+    modelKey,
     estimatedInputTokens,
     estimatedOutputTokens,
   );
@@ -57,26 +61,25 @@ export async function generateAIResponse(
   }
 
   let processedPrompt = prompt;
-  const modelSpecs = getModelSpecs(MODEL);
 
-  if (estimatedInputTokens > modelSpecs.contextWindow) {
+  if (estimatedInputTokens > modelConfig.contextWindow) {
     console.warn(
       chalk.yellow(
-        `Truncating prompt to ${modelSpecs.contextWindow} tokens...`,
+        `Truncating prompt to ${modelConfig.contextWindow} tokens...`,
       ),
     );
-    processedPrompt = truncateToContextLimit(prompt, MODEL);
+    processedPrompt = truncateToContextLimit(processedPrompt, modelKey);
   }
 
   try {
     const result = await generateText({
-      model: anthropic(MODEL),
-      maxTokens: MAX_TOKENS,
+      model: anthropic(modelKey),
+      maxTokens: modelConfig.maxOutput,
       prompt: processedPrompt,
     });
 
-    const usage = calculateTokenUsage(processedPrompt, result.text, MODEL);
-    const actualCost = calculateCost(MODEL, usage);
+    const usage = calculateTokenUsage(processedPrompt, result.text, modelKey);
+    const actualCost = calculateCost(modelKey, usage);
 
     console.log(chalk.green(`Actual cost: $${actualCost.toFixed(2)} USD`));
     console.log(
@@ -91,6 +94,8 @@ export async function generateAIResponse(
     throw error;
   }
 }
+
+// ... (rest of the file remains the same)
 
 async function confirmCostExceedsThreshold(
   estimatedCost: number,

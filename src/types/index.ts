@@ -47,6 +47,7 @@ export type AiAssistedTaskOptions = Pick<
   description?: string;
   instructions?: string;
   autoCommit?: boolean;
+  model: string;
 };
 
 export type ProcessOptions = Pick<
@@ -93,10 +94,27 @@ export interface AIParsedResponse {
 
 export interface GenerateAIResponseOptions {
   maxCostThreshold?: number;
+  model: string;
 }
 
 export interface ApplyChangesOptions {
   basePath: string;
   parsedResponse: AIParsedResponse;
   dryRun?: boolean;
+}
+
+interface LLMPricing {
+  inputCost: number;
+  outputCost: number;
+}
+
+export interface ModelSpec {
+  contextWindow: number;
+  maxOutput: number;
+  modelName: string;
+  pricing: LLMPricing;
+}
+
+export interface ModelSpecs {
+  [key: string]: ModelSpec;
 }

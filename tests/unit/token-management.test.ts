@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { getModelConfig } from '../../src/ai/model-config';
 import {
   calculateTokenUsage,
   countTokens,
   estimateTokenCount,
-  getModelSpecs,
   truncateToContextLimit,
 } from '../../src/ai/token-management';
 
@@ -25,7 +25,10 @@ describe('Token Management', () => {
       'gpt-4o',
       'gpt-4o-mini',
     ])('should truncate text to context limit for %s', (model) => {
-      const modelSpecs = getModelSpecs(model);
+      const modelSpecs = getModelConfig(model);
+      if (!modelSpecs) {
+        throw new Error(`Model specifications not found for ${model}`);
+      }
       const contextWindow = modelSpecs.contextWindow;
 
       // Create a string that's definitely longer than the context window in tokens
@@ -91,25 +94,27 @@ describe('Token Management', () => {
 
   describe('getModelSpecs', () => {
     it('should return correct specs for Claude models', () => {
-      const specs = getModelSpecs('claude-3-5-sonnet-20240620');
+      const specs = getModelConfig('claude-3-5-sonnet-20240620');
       expect(specs).toEqual({
         contextWindow: 200000,
         maxOutput: 8192,
         modelName: 'Claude 3.5 Sonnet',
+        pricing: { inputCost: 3, outputCost: 15 },
       });
     });
 
     it('should return correct specs for GPT models', () => {
-      const specs = getModelSpecs('gpt-4o');
+      const specs = getModelConfig('gpt-4o');
       expect(specs).toEqual({
         contextWindow: 128000,
         maxOutput: 4096,
         modelName: 'GPT 4 Omni',
+        pricing: { inputCost: 5, outputCost: 15 },
       });
     });
 
     it('should throw an error for unknown models', () => {
-      expect(() => getModelSpecs('unknown-model')).toThrow(
+      expect(() => getModelConfig('unknown-model')).toThrow(
         'Unknown model: unknown-model',
       );
     });
