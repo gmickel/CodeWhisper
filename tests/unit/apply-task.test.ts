@@ -60,7 +60,9 @@ describe('applyTask', () => {
     await applyTask(mockFilePath, false);
 
     expect(fs.readJSON).toHaveBeenCalledWith(
-      expect.stringContaining(normalizePath(mockFilePath)),
+      expect.stringContaining(
+        path.join('mock', 'path', 'codewhisper-task-output.json'),
+      ),
     );
     expect(gitTools.ensureBranch).toHaveBeenCalledWith(
       expect.any(String),
@@ -88,7 +90,9 @@ describe('applyTask', () => {
     await applyTask(mockFilePath, true);
 
     expect(fs.readJSON).toHaveBeenCalledWith(
-      expect.stringContaining(normalizePath(mockFilePath)),
+      expect.stringContaining(
+        path.join('mock', 'path', 'codewhisper-task-output.json'),
+      ),
     );
     expect(gitTools.ensureBranch).toHaveBeenCalledWith(
       expect.any(String),

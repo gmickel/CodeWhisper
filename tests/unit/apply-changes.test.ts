@@ -1,3 +1,4 @@
+import path from 'node:path';
 import fs from 'fs-extra';
 import simpleGit from 'simple-git';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -195,10 +196,10 @@ describe('applyChanges', () => {
     });
 
     expect(fs.ensureDir).toHaveBeenCalledWith(
-      expect.stringContaining('deep/nested'),
+      expect.stringContaining(path.join('deep', 'nested')),
     );
     expect(fs.writeFile).toHaveBeenCalledWith(
-      expect.stringContaining('deep/nested/file.js'),
+      expect.stringContaining(path.join('deep', 'nested', 'file.js')),
       'console.log("Nested file");',
     );
   });

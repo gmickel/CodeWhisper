@@ -4,6 +4,7 @@ import fs from 'fs-extra';
 import inquirer from 'inquirer';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getCachedValue, setCachedValue } from '../../src/utils/cache-utils';
+import { normalizePath } from '../../src/utils/normalize-path';
 import {
   collectVariables,
   extractTemplateVariables,
@@ -228,16 +229,18 @@ describe('Template Utils', () => {
     });
     it('should handle different environment scenarios', () => {
       process.env.CODEWHISPER_CLI = 'false';
-      expect(getTemplatesDir()).toContain('src/templates');
+      expect(normalizePath(getTemplatesDir())).toContain(
+        normalizePath(path.join('src', 'templates')),
+      );
     });
   });
 
   describe('getTemplatePath', () => {
     it('should return the correct template path', () => {
       const result = getTemplatePath('custom-template');
-      expect(result).toContain('custom-template.hbs');
+      expect(normalizePath(result)).toContain(
+        normalizePath(path.join('custom-template.hbs')),
+      );
     });
   });
-
-  // Add more test cases for collectVariables and other functions
 });
