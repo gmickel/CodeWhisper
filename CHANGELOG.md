@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/gmickel/CodeWhisper/compare/v1.3.2...v1.3.3) (2024-07-27)
+
+
+### Bug Fixes
+
+* update codegen template ([248bfea](https://github.com/gmickel/CodeWhisper/commit/248bfea8c78a479c598375b9123f302fec442849))
+
 ## [1.3.2](https://github.com/gmickel/CodeWhisper/compare/v1.3.1...v1.3.2) (2024-07-27)
 
 
