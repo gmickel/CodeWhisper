@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/gmickel/CodeWhisper/compare/v1.2.0...v1.3.0) (2024-07-27)
+
+
+### Features
+
+* **ai:** Implement AI-assisted code generation capabilities ([#24](https://github.com/gmickel/CodeWhisper/issues/24)) ([3d61722](https://github.com/gmickel/CodeWhisper/commit/3d61722dc92f107f2937acc7c9fab4f38f9cda75))
+
 # [1.2.0](https://github.com/gmickel/CodeWhisper/compare/v1.1.1...v1.2.0) (2024-07-24)
 
 
