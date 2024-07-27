@@ -32,6 +32,7 @@ export function cli(args: string[]) {
   program
     .command('apply-task <file>')
     .description('Apply an AI-generated task from a file')
+    .option('--auto-commit', 'Automatically commit changes', false)
     .action(async (file) => {
       try {
         await applyTask(file);
@@ -80,6 +81,7 @@ export function cli(args: string[]) {
       'Set a maximum cost threshold for AI operations in USD (e.g., 0.5 for $0.50)',
       Number.parseFloat,
     )
+    .option('--auto-commit', 'Automatically commit changes', false)
     .option('-t, --task <task>', 'Short task title')
     .option('-d, --description <description>', 'Detailed task description')
     .option(

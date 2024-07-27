@@ -5,7 +5,10 @@ import simpleGit from 'simple-git';
 import { applyChanges } from '../git/apply-changes';
 import { createBranchAndCommit, ensureBranch } from '../utils/git-tools';
 
-export async function applyTask(filePath: string): Promise<void> {
+export async function applyTask(
+  filePath: string,
+  autoCommit = false,
+): Promise<void> {
   try {
     const absolutePath = path.resolve(filePath);
     const taskOutput = await fs.readJSON(absolutePath);
@@ -14,7 +17,10 @@ export async function applyTask(filePath: string): Promise<void> {
 
     const basePath = process.cwd();
 
-    await ensureBranch(basePath, parsedResponse.gitBranchName);
+    const actualBranchName = await ensureBranch(
+      basePath,
+      parsedResponse.gitBranchName,
+    );
 
     await applyChanges({
       basePath: process.cwd(),
@@ -22,16 +28,32 @@ export async function applyTask(filePath: string): Promise<void> {
       dryRun: false,
     });
 
-    const git = simpleGit(basePath);
-    await git.add('.');
-    await git.commit(parsedResponse.gitCommitMessage);
+    if (autoCommit) {
+      const git = simpleGit(basePath);
+      await git.add('.');
+      await git.commit(parsedResponse.gitCommitMessage);
+      console.log(
+        chalk.green(
+          `Task applied and committed successfully to branch: ${actualBranchName}`,
+        ),
+      );
+    } else {
+      console.log(
+        chalk.green(`Task applied successfully to branch: ${actualBranchName}`),
+      );
+      console.log(chalk.yellow('Changes have been applied but not committed.'));
+      console.log(
+        chalk.cyan('Please review the changes in your IDE before committing.'),
+      );
+      console.log(
+        chalk.cyan('To commit the changes, use the following commands:'),
+      );
+      console.log(chalk.cyan('  git add .'));
+      console.log(
+        chalk.cyan(`  git commit -m "${parsedResponse.gitCommitMessage}"`),
+      );
+    }
 
-    console.log(
-      chalk.green(
-        `Task applied successfully. Changes committed to branch: ${parsedResponse.gitBranchName}`,
-      ),
-    );
-    console.log(chalk.blue('Commit Message:'), parsedResponse.gitCommitMessage);
     console.log(chalk.blue('Summary:'), parsedResponse.summary);
     if (parsedResponse.potentialIssues) {
       console.log(

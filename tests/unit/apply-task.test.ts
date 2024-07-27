@@ -41,7 +41,7 @@ describe('applyTask', () => {
     vi.clearAllMocks();
   });
 
-  it('should apply the task correctly', async () => {
+  it('should apply the task without committing when autoCommit is false', async () => {
     const mockGit = {
       add: vi.fn().mockResolvedValue(undefined),
       commit: vi.fn().mockResolvedValue(undefined),
@@ -49,8 +49,35 @@ describe('applyTask', () => {
     vi.mocked(simpleGit).mockReturnValue(
       mockGit as unknown as ReturnType<typeof simpleGit>,
     );
+    vi.mocked(gitTools.ensureBranch).mockResolvedValue('feature/test-branch');
 
-    await applyTask(mockFilePath);
+    await applyTask(mockFilePath, false);
+
+    expect(fs.readJSON).toHaveBeenCalledWith(mockFilePath);
+    expect(gitTools.ensureBranch).toHaveBeenCalledWith(
+      expect.any(String),
+      'feature/test-branch',
+    );
+    expect(applyChanges.applyChanges).toHaveBeenCalledWith({
+      basePath: expect.any(String),
+      parsedResponse: mockTaskOutput.parsedResponse,
+      dryRun: false,
+    });
+    expect(mockGit.add).not.toHaveBeenCalled();
+    expect(mockGit.commit).not.toHaveBeenCalled();
+  });
+
+  it('should apply the task and commit when autoCommit is true', async () => {
+    const mockGit = {
+      add: vi.fn().mockResolvedValue(undefined),
+      commit: vi.fn().mockResolvedValue(undefined),
+    };
+    vi.mocked(simpleGit).mockReturnValue(
+      mockGit as unknown as ReturnType<typeof simpleGit>,
+    );
+    vi.mocked(gitTools.ensureBranch).mockResolvedValue('feature/test-branch');
+
+    await applyTask(mockFilePath, true);
 
     expect(fs.readJSON).toHaveBeenCalledWith(mockFilePath);
     expect(gitTools.ensureBranch).toHaveBeenCalledWith(

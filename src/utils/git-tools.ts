@@ -34,21 +34,30 @@ export async function prReview(prNumber: string): Promise<FileInfo[]> {
 
 export async function ensureBranch(
   basePath: string,
-  branchName: string,
-): Promise<void> {
+  initialBranchName: string,
+  options: { suffix?: string; maxAttempts?: number } = {},
+): Promise<string> {
   const git: SimpleGit = simpleGit(basePath);
+  const suffix = options.suffix || '-ai-';
+  const maxAttempts = options.maxAttempts || 100;
 
-  // Check if the branch already exists
   const branches = await git.branchLocal();
-  const branchExists = branches.all.includes(branchName);
+  let branchName = initialBranchName;
+  let attempts = 0;
 
-  if (!branchExists) {
-    // Create the branch if it doesn't exist
-    await git.checkoutLocalBranch(branchName);
-  } else {
-    // If the branch exists, switch to it
-    await git.checkout(branchName);
+  while (attempts < maxAttempts) {
+    if (!branches.all.includes(branchName)) {
+      await git.checkoutLocalBranch(branchName);
+      return branchName;
+    }
+
+    attempts++;
+    branchName = `${initialBranchName}${suffix}${attempts}`;
   }
+
+  throw new Error(
+    `Failed to create a unique branch name after ${maxAttempts} attempts`,
+  );
 }
 
 export async function createBranchAndCommit(

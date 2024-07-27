@@ -184,16 +184,41 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     } else {
       spinner.start('Applying AI Code Modifications...');
 
-      await ensureBranch(basePath, parsedResponse.gitBranchName);
+      const actualBranchName = await ensureBranch(
+        basePath,
+        parsedResponse.gitBranchName,
+      );
+
+      // Apply changes
       await applyChanges({ basePath, parsedResponse, dryRun: false });
 
-      const git = simpleGit(basePath);
-      await git.add('.');
-      await git.commit(parsedResponse.gitCommitMessage);
-
-      spinner.succeed(
-        `AI Code Modifications applied and committed to branch: ${parsedResponse.gitBranchName}`,
-      );
+      if (options.autoCommit) {
+        const git = simpleGit(basePath);
+        await git.add('.');
+        await git.commit(parsedResponse.gitCommitMessage);
+        spinner.succeed(
+          `AI Code Modifications applied and committed to branch: ${actualBranchName}`,
+        );
+      } else {
+        spinner.succeed(
+          `AI Code Modifications applied to branch: ${actualBranchName}`,
+        );
+        console.log(
+          chalk.green('Changes have been applied but not committed.'),
+        );
+        console.log(
+          chalk.yellow(
+            'Please review the changes in your IDE before committing.',
+          ),
+        );
+        console.log(
+          chalk.cyan('To commit the changes, use the following commands:'),
+        );
+        console.log(chalk.cyan('  git add .'));
+        console.log(
+          chalk.cyan(`  git commit -m "${parsedResponse.gitCommitMessage}"`),
+        );
+      }
     }
     console.log(chalk.green('AI-assisted task completed! 🎉'));
   } catch (error) {

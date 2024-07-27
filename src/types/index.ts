@@ -46,6 +46,7 @@ export type AiAssistedTaskOptions = Pick<
   task?: string;
   description?: string;
   instructions?: string;
+  autoCommit?: boolean;
 };
 
 export type ProcessOptions = Pick<
