@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/gmickel/CodeWhisper/compare/v1.3.0...v1.3.1) (2024-07-27)
+
+
+### Bug Fixes
+
+* JSON Parsing error ([f3a99a5](https://github.com/gmickel/CodeWhisper/commit/f3a99a545c054fe703f40926e9ef1c6a6eb0c53a))
+
 # [1.3.0](https://github.com/gmickel/CodeWhisper/compare/v1.2.0...v1.3.0) (2024-07-27)
 
 
