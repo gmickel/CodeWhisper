@@ -1,3 +1,10 @@
+## [1.3.2](https://github.com/gmickel/CodeWhisper/compare/v1.3.1...v1.3.2) (2024-07-27)
+
+
+### Bug Fixes
+
+* **docs:** document new ai functionality ([70bddd8](https://github.com/gmickel/CodeWhisper/commit/70bddd8b07d60414a5008cb6b753861f8723dea0))
+
 ## [1.3.1](https://github.com/gmickel/CodeWhisper/compare/v1.3.0...v1.3.1) (2024-07-27)
 
 
