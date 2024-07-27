@@ -62,7 +62,21 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     const templateContent = await fs.readFile(templatePath, 'utf-8');
     const variables = extractTemplateVariables(templateContent);
 
-    const data = `{"var_taskDescription": "${taskDescription}", "var_instructions": "${instructions}"}`;
+    const dataObj = {
+      var_taskDescription: taskDescription,
+      var_instructions: instructions,
+    };
+
+    let data: string;
+    try {
+      data = JSON.stringify(dataObj);
+    } catch (error) {
+      console.error(
+        chalk.red('Error creating data for task plan prompt:'),
+        error instanceof Error ? error.message : String(error),
+      );
+      process.exit(1);
+    }
 
     const customData = await collectVariables(
       data,
@@ -112,7 +126,22 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
 
     const codegenVariables = extractTemplateVariables(codegenTemplateContent);
 
-    const codegenData = `{"var_taskDescription": "${taskDescription}","var_instructions": "${instructions}", "var_plan": "${reviewedPlan}"}`;
+    const codegenDataObj = {
+      var_taskDescription: taskDescription,
+      var_instructions: instructions,
+      var_plan: reviewedPlan,
+    };
+
+    let codegenData: string;
+    try {
+      codegenData = JSON.stringify(codegenDataObj);
+    } catch (error) {
+      console.error(
+        chalk.red('Error creating data for code generation prompt:'),
+        error instanceof Error ? error.message : String(error),
+      );
+      process.exit(1);
+    }
 
     const codegenCustomData = await collectVariables(
       codegenData,
