@@ -1,15 +1,7 @@
 import path from 'node:path';
 import Handlebars from 'handlebars';
+import type { FileInfo, MarkdownOptions } from '../types';
 import { replaceTemplateVariables } from '../utils/template-utils';
-import type { FileInfo } from './file-processor';
-
-export interface MarkdownOptions {
-  template?: string;
-  noCodeblock?: boolean;
-  customData?: Record<string, string>;
-  basePath?: string;
-  lineNumbers?: boolean;
-}
 
 function registerHandlebarsHelpers(
   noCodeblock: boolean,

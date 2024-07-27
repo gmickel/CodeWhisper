@@ -6,32 +6,10 @@ import ignore from 'ignore';
 import { isBinaryFile } from 'isbinaryfile';
 import micromatch from 'micromatch';
 import Piscina from 'piscina';
+import type { FileInfo, ProcessOptions } from '../types';
 import { FileCache } from '../utils/file-cache';
 import { normalizePath } from '../utils/normalize-path';
 import { getWorkerPath } from '../utils/worker-path';
-
-export interface FileInfo {
-  path: string;
-  extension: string;
-  language: string;
-  size: number;
-  created: Date;
-  modified: Date;
-  content: string;
-}
-
-interface ProcessOptions {
-  path: string;
-  gitignorePath?: string;
-  filter?: string[];
-  exclude?: string[];
-  suppressComments?: boolean;
-  caseSensitive?: boolean;
-  customIgnores?: string[];
-  cachePath?: string;
-  respectGitignore?: boolean;
-  matchBase?: boolean;
-}
 
 const workerFilePath = getWorkerPath();
 
@@ -109,25 +87,13 @@ export const DEFAULT_IGNORES = [
 export async function processFiles(
   options: ProcessOptions,
 ): Promise<FileInfo[]> {
-  const {
-    path: basePath,
-    gitignorePath = '.gitignore',
-    filter = [],
-    exclude = [],
-    suppressComments = false,
-    caseSensitive = false,
-    customIgnores = [],
-    cachePath = path.join(os.tmpdir(), 'codewhisper-cache.json'),
-    respectGitignore = true,
-    matchBase = false,
-  } = options;
-
-  const fileCache = new FileCache(cachePath);
+  const basePath = path.resolve(options.path ?? '.');
+  const fileCache = new FileCache(options.cachePath);
 
   const ig = ignore().add(DEFAULT_IGNORES);
 
-  if (await fs.pathExists(gitignorePath)) {
-    const gitignoreContent = await fs.readFile(gitignorePath, 'utf-8');
+  if (await fs.pathExists(options.gitignore)) {
+    const gitignoreContent = await fs.readFile(options.gitignore, 'utf-8');
     ig.add(gitignoreContent);
   }
 
@@ -137,15 +103,19 @@ export async function processFiles(
     absolute: true,
     onlyFiles: true,
     followSymbolicLinks: false,
-    caseSensitiveMatch: caseSensitive,
+    caseSensitiveMatch: options.caseSensitive,
   };
 
   const fileInfos: FileInfo[] = [];
   const cachePromises: Promise<void>[] = [];
 
+  const filters = options.filter || [];
+
   const normalizedFilters =
-    filter.length > 0
-      ? filter.map((f) => (path.isAbsolute(f) ? path.relative(basePath, f) : f))
+    filters.length > 0
+      ? filters.map((f) =>
+          path.isAbsolute(f) ? path.relative(basePath, f) : f,
+        )
       : ['**/*'];
 
   const globPattern =
@@ -158,12 +128,12 @@ export async function processFiles(
   const matchFile = (relativePath: string, patterns: string[]) => {
     const matchOptions = {
       dot: true,
-      nocase: !caseSensitive,
-      matchBase,
+      nocase: !options.caseSensitive,
+      matchBase: options.matchBase,
       bash: true,
     };
 
-    if (matchBase) {
+    if (options.matchBase) {
       const basename = path.basename(relativePath);
       return patterns.some(
         (pattern) =>
@@ -180,6 +150,8 @@ export async function processFiles(
       const filePathStr = path.resolve(filePath.toString());
       const relativePath = path.relative(basePath, filePathStr);
 
+      const customIgnores = options.customIgnores || [];
+
       // Check customIgnores first
       if (customIgnores.length > 0 && matchFile(relativePath, customIgnores)) {
         return;
@@ -194,7 +166,9 @@ export async function processFiles(
       }
 
       // Conditionally check .gitignore patterns
-      if (respectGitignore && ig.ignores(relativePath)) return;
+      if (options.respectGitignore && ig.ignores(relativePath)) return;
+
+      const exclude = options.exclude || [];
 
       // Check exclude patterns
       if (exclude.length > 0 && matchFile(relativePath, exclude)) {
@@ -218,7 +192,7 @@ export async function processFiles(
 
             const result = await pool.run({
               filePath: filePathStr,
-              suppressComments,
+              suppressComments: options.suppressComments,
             });
 
             if (result) {

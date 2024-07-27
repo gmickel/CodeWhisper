@@ -1,7 +1,5 @@
 # Test-related files
 tests/fixtures/**/.gitignore
-tests/**/temp*
-tests/**/tmp*
 tests/**/*.log
 
 # Temporary files
@@ -163,3 +161,4 @@ codewhisper.md
 testing
 ElPlan.md
 ElPlanFilter.md
+codewhisper-task-output.json

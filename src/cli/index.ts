@@ -1,29 +1,26 @@
-import { exec } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import url from 'node:url';
-import { promisify } from 'node:util';
 
-import { editor, input } from '@inquirer/prompts';
 import chalk from 'chalk';
 import { Command } from 'commander';
 import fs from 'fs-extra';
-import inquirer from 'inquirer';
 import ora from 'ora';
+import { applyTask } from '../ai/apply-task';
+import { getModelConfig, getModelNames } from '../ai/model-config';
+import { runAIAssistedTask } from '../ai/task-workflow';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
-import { getCachedValue, setCachedValue } from '../utils/cache-utils';
+import { runInteractiveMode } from '../interactive/interactive-workflow';
 import { handleEditorAndOutput } from '../utils/editor-utils';
 import {
+  collectVariables,
   extractTemplateVariables,
   getTemplatePath,
   getTemplatesDir,
 } from '../utils/template-utils';
-import { interactiveMode } from './interactive-filtering';
 
 const templatesDir = getTemplatesDir();
-
-const execAsync = promisify(exec);
 
 const program = new Command();
 
@@ -32,6 +29,107 @@ export function cli(args: string[]) {
     .name('codewhisper')
     .description('A powerful tool for converting code to AI-friendly prompts')
     .version('1.0.0');
+
+  program
+    .command('list-models')
+    .description('List available AI models')
+    .action(() => {
+      const models = getModelNames();
+      console.log('Available AI models:');
+      for (const modelId of models) {
+        const config = getModelConfig(modelId);
+        if (config) {
+          console.log(`- ${config.modelName} (${chalk.cyan(modelId)})`);
+          console.log(
+            `  Context window: ${config.contextWindow}, Max output: ${config.maxOutput}`,
+          );
+          console.log(
+            `  Pricing: $${config.pricing.inputCost}/1M tokens (input), $${config.pricing.outputCost}/1M tokens (output)`,
+          );
+        }
+      }
+    });
+
+  program
+    .command('apply-task <file>')
+    .description('Apply an AI-generated task from a file')
+    .option('--auto-commit', 'Automatically commit changes', false)
+    .action(async (file) => {
+      try {
+        await applyTask(file);
+      } catch (error) {
+        console.error(chalk.red('Error applying task:'), error);
+        process.exit(1);
+      }
+    });
+
+  program
+    .command('task')
+    .description('Start an AI-assisted coding task')
+    .option('-p, --path <path>', 'Path to the codebase', '.')
+    .option(
+      '-m, --model <modelId>',
+      'Specify the AI model to use',
+      'claude-3-5-sonnet-20240620',
+    )
+    .option('-g, --gitignore <path>', 'Path to .gitignore file', '.gitignore')
+    .option(
+      '-f, --filter <patterns...>',
+      'File patterns to include (use glob patterns, e.g., "src/**/*.js")',
+    )
+    .option(
+      '-e, --exclude <patterns...>',
+      'File patterns to exclude (use glob patterns, e.g., "**/*.test.js")',
+    )
+    .option('-s, --suppress-comments', 'Strip comments from the code', false)
+    .option('-l, --line-numbers', 'Add line numbers to code blocks', false)
+    .option('--case-sensitive', 'Use case-sensitive pattern matching', false)
+    .option('--custom-ignores <patterns...>', 'Additional patterns to ignore')
+    .option(
+      '--cache-path <path>',
+      'Custom path for the cache file',
+      path.join(os.tmpdir(), 'codewhisper-cache.json'),
+    )
+    .option('--respect-gitignore', 'Respect entries in .gitignore', true)
+    .option(
+      '--no-respect-gitignore',
+      'Do not respect entries in .gitignore',
+      false,
+    )
+    .option('--invert', 'Selected files will be excluded', false)
+    .option(
+      '--dry-run',
+      'Perform a dry run without making actual changes',
+      false,
+    )
+    .option(
+      '-max --max-cost-threshold <number>',
+      'Set a maximum cost threshold for AI operations in USD (e.g., 0.5 for $0.50)',
+      Number.parseFloat,
+    )
+    .option('--auto-commit', 'Automatically commit changes', false)
+    .option('-t, --task <task>', 'Short task title')
+    .option('-d, --description <description>', 'Detailed task description')
+    .option(
+      '-i, --instructions <instructions>',
+      'Additional instructions for the task',
+    )
+    .action(async (options) => {
+      try {
+        const modelConfig = getModelConfig(options.model);
+        if (!modelConfig) {
+          console.error(
+            `Invalid model ID: ${options.model}. Use 'list-models' command to see available models.`,
+          );
+          return;
+        }
+        console.log(`Using model: ${modelConfig.modelName}`);
+        await runAIAssistedTask(options);
+      } catch (error) {
+        console.error(chalk.red('Error in AI-assisted task:'), error);
+        process.exit(1);
+      }
+    });
 
   program
     .command('generate')
@@ -49,7 +147,7 @@ export function cli(args: string[]) {
       false,
     )
     .option('-t, --template <template>', 'Template to use', 'default')
-    .option('-g, --gitignore <path>', 'Path to .gitignore file')
+    .option('-g, --gitignore <path>', 'Path to .gitignore file', '.gitignore')
     .option(
       '-f, --filter <patterns...>',
       'File patterns to include (use glob patterns, e.g., "src/**/*.js")',
@@ -58,12 +156,13 @@ export function cli(args: string[]) {
       '-e, --exclude <patterns...>',
       'File patterns to exclude (use glob patterns, e.g., "**/*.test.js")',
     )
-    .option('-s, --suppress-comments', 'Strip comments from the code')
-    .option('-l, --line-numbers', 'Add line numbers to code blocks')
-    .option('--case-sensitive', 'Use case-sensitive pattern matching')
+    .option('-s, --suppress-comments', 'Strip comments from the code', false)
+    .option('-l, --line-numbers', 'Add line numbers to code blocks', false)
+    .option('--case-sensitive', 'Use case-sensitive pattern matching', false)
     .option(
       '--no-codeblock',
       'Disable wrapping code inside markdown code blocks',
+      false,
     )
     .option(
       '--custom-data <json>',
@@ -101,49 +200,13 @@ export function cli(args: string[]) {
         const templateContent = await fs.readFile(templatePath, 'utf-8');
         const variables = extractTemplateVariables(templateContent);
 
-        let customData: { [key: string]: string } = {};
-        if (options.customData) {
-          try {
-            customData = JSON.parse(options.customData);
-          } catch (error) {
-            spinner.fail('Error parsing custom data JSON');
-            console.error(chalk.red((error as Error).message));
-            process.exit(1);
-          }
-        } else if (variables.length > 0) {
-          spinner.stop();
-          for (const variable of variables) {
-            const cacheKey = `${options.template}_${variable.name}`;
-            const cachedValue = await getCachedValue(
-              cacheKey,
-              options.cachePath,
-            );
+        const customData = await collectVariables(
+          options.customData,
+          options.cachePath,
+          variables,
+          templatePath,
+        );
 
-            if (variable.isMultiline) {
-              const answer = await editor({
-                message: `Enter value for ${variable.name} (multiline):`,
-                default: cachedValue ?? undefined,
-              });
-              customData[variable.name] = answer;
-            } else {
-              const answer = await inquirer.prompt([
-                {
-                  type: 'input',
-                  name: variable.name,
-                  message: `Enter value for ${variable.name}:`,
-                  default: cachedValue ?? undefined,
-                },
-              ]);
-              customData[variable.name] = answer[variable.name];
-            }
-
-            await setCachedValue(
-              cacheKey,
-              customData[variable.name],
-              options.cachePath,
-            );
-          }
-        }
         const files = await processFiles(options);
 
         spinner.text = 'Generating markdown...';
@@ -184,7 +247,7 @@ export function cli(args: string[]) {
       (value) => value,
     )
     .option('-t, --template <template>', 'Template to use')
-    .option('-g, --gitignore <path>', 'Path to .gitignore file')
+    .option('-g, --gitignore <path>', 'Path to .gitignore file', '.gitignore')
     .option(
       '-f, --filter <patterns...>',
       'File patterns to include (use glob patterns, e.g., "src/**/*.js")',
@@ -198,12 +261,13 @@ export function cli(args: string[]) {
       'Open the result in your default editor',
       false,
     )
-    .option('-s, --suppress-comments', 'Strip comments from the code')
-    .option('-l, --line-numbers', 'Add line numbers to code blocks')
-    .option('--case-sensitive', 'Use case-sensitive pattern matching')
+    .option('-s, --suppress-comments', 'Strip comments from the code', false)
+    .option('-l, --line-numbers', 'Add line numbers to code blocks', false)
+    .option('--case-sensitive', 'Use case-sensitive pattern matching', false)
     .option(
       '--no-codeblock',
       'Disable wrapping code inside markdown code blocks',
+      false,
     )
     .option(
       '--custom-data <json>',
@@ -211,7 +275,11 @@ export function cli(args: string[]) {
     )
     .option('--custom-template <path>', 'Path to a custom Handlebars template')
     .option('--custom-ignores <patterns...>', 'Additional patterns to ignore')
-    .option('--cache-path <path>', 'Custom path for the cache file')
+    .option(
+      '--cache-path <path>',
+      'Custom path for the cache file',
+      path.join(os.tmpdir(), 'codewhisper-cache.json'),
+    )
     .option('--respect-gitignore', 'Respect entries in .gitignore', true)
     .option(
       '--no-respect-gitignore',
@@ -221,7 +289,7 @@ export function cli(args: string[]) {
     .option('--invert', 'Selected files will be excluded', false)
     .action(async (options) => {
       try {
-        await interactiveMode(options);
+        await runInteractiveMode(options);
       } catch (error) {
         console.error(chalk.red('Error in interactive mode:'), error);
         process.exit(1);

@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import path from 'node:path';
 import fs from 'fs-extra';
-import type { FileInfo } from '../core/file-processor';
+import type { FileInfo } from '../types';
 import { normalizePath } from './normalize-path';
 
 interface CacheEntry {

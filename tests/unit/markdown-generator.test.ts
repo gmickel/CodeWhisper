@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { FileInfo } from '../../src/core/file-processor';
 import { generateMarkdown } from '../../src/core/markdown-generator';
+import type { FileInfo } from '../../src/types';
 
 function decodeHTMLEntities(text: string): string {
   const entities: Record<string, string> = {

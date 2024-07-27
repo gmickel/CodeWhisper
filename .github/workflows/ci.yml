@@ -51,6 +51,10 @@ jobs:
   test:
     runs-on: ${{ matrix.os }}
 
+    env:
+      OPENAI_API_KEY: open-ai-api-key
+      ANTHROPIC_API_KEY: anthropic-api-key
+
     strategy:
       matrix:
         node: [lts/*]
