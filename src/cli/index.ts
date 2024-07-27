@@ -99,7 +99,7 @@ export function cli(args: string[]) {
     .option('--invert', 'Selected files will be excluded', false)
     .option(
       '--dry-run',
-      'Perform a dry run without making actual changes',
+      'Perform a dry run without making actual changes. Saves changes to a file so you can apply them after review using apply-task',
       false,
     )
     .option(
