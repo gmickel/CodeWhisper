@@ -7,12 +7,12 @@ import { isBinaryFile } from 'isbinaryfile';
 import micromatch from 'micromatch';
 import Piscina from 'piscina';
 import type { FileInfo, ProcessOptions } from '../types';
+import { DEFAULT_CACHE_PATH } from '../utils/cache-utils';
 import { FileCache } from '../utils/file-cache';
 import { normalizePath } from '../utils/normalize-path';
 import { getWorkerPath } from '../utils/worker-path';
 
 const workerFilePath = getWorkerPath();
-const DEFAULT_CACHE_PATH = path.join(os.tmpdir(), 'codewhisper-cache.json');
 const DEFAULT_GITIGNORE = '.gitignore';
 
 const pool = new Piscina({
