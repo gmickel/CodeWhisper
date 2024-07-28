@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/gmickel/CodeWhisper/compare/v1.3.5...v1.4.0) (2024-07-28)
+
+
+### Features
+
+* Optimize AI Response Generation, Expand Model Support, and Enhance Cost Calculation ([#28](https://github.com/gmickel/CodeWhisper/issues/28)) ([646131f](https://github.com/gmickel/CodeWhisper/commit/646131f695c11865e1a98003fdf02a833975f5d0))
+
 ## [1.3.5](https://github.com/gmickel/CodeWhisper/compare/v1.3.4...v1.3.5) (2024-07-28)
 
 
