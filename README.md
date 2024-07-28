@@ -72,9 +72,18 @@ cd /path/to/your/project
 # Generate an AI-friendly prompt using interactive mode
 codewhisper interactive
 
+# List available models
+codewhisper list-models
+
 # Start an AI-assisted coding task
-codewhisper task
+codewhisper task -m <model>
+
+e.g.
+
+codewhisper task -m claude-3-5-sonnet-20240620
 ```
+
+> Note: If you are using CodeWhisper's LLM integration with `codewhisper task` you will need to set the respective environment variable for the model you want to use (e.g. `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key` ).
 
 For more detailed instructions, see the [Installation](#-installation) and [Usage](#-usage) sections.
 
@@ -130,8 +139,8 @@ We welcome contributions to CodeWhisper! Please read our [CONTRIBUTING.md](CONTR
 
 * [x] Add AI-assisted task creation and code generation
 * [ ] Add GitHub/GitLab integration for fetching issues and pull requests
-* [ ] Finish OpenAI and Groq support
-* [ ] Add support for other LLMs
+* [x] Finish OpenAI and Groq support
+* [x] Add support for other LLMs
 * [ ] Experiment with partial file modifications
 * [ ] Experiment with generateObject with a fixed schema
 * [ ] Run evaluations on generated code

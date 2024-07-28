@@ -336,7 +336,7 @@ Here are some common issues and their solutions:
 04. **Issue**: AI-assisted tasks are not producing the expected results.
    **Solution**: Provide more detailed task descriptions and instructions. You can also try using a different AI model or adjusting the prompt in your custom template.
 
-05. **Issue**: Error "ANTHROPIC_API_KEY not set" when running AI-assisted tasks.
-   **Solution**: Ensure you've set the `ANTHROPIC_API_KEY` environment variable with your Anthropic API key. You can do this by running `export ANTHROPIC_API_KEY=your_api_key` before running CodeWhisper.
+05. **Issue**: Error "ANTHROPIC_API_KEY (or OPENAI_API_KEY or GROQ_API_KEY) not set" when running AI-assisted tasks.
+   **Solution**: Ensure you've set the `ANTHROPIC_API_KEY` (or `OPENAI_API_KEY` or `GROQ_API_KEY` ) environment variable with your API key. You can do this by running `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key` before running CodeWhisper.
 
 For more complex issues or if these solutions don't help, please open an issue on the [CodeWhisper GitHub repository](https://github.com/gmickel/CodeWhisper/issues).
