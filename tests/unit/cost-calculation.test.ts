@@ -66,6 +66,7 @@ describe('Cost Calculation', () => {
         'claude-3-haiku-20240307',
         'gpt-4o',
         'gpt-4o-mini',
+        'llama-3.1-70b-versatile',
       ]);
     });
   });

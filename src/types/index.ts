@@ -108,11 +108,14 @@ interface LLMPricing {
   outputCost: number;
 }
 
+export type ModelFamily = 'claude' | 'openai' | 'openai-compatible' | 'groq';
+
 export interface ModelSpec {
   contextWindow: number;
   maxOutput: number;
   modelName: string;
   pricing: LLMPricing;
+  modelFamily: ModelFamily;
 }
 
 export interface ModelSpecs {
