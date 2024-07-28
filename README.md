@@ -34,6 +34,9 @@ Whether you're tackling complex refactoring, conducting thorough code reviews, o
 
 ## ✨ Key Features
 
+* 🧠 AI-powered task planning and code generation
+* 🔄 Full git integration for version control of AI-generated changes
+* 🌍 Support for various models and LLM providers, such as Anthropic, OpenAI, and Groq
 * 🚀 Blazingly fast code processing with concurrent workers
 * 🎯 Customizable file filtering and exclusion
 * 📊 Intelligent caching for improved performance
@@ -45,8 +48,6 @@ Whether you're tackling complex refactoring, conducting thorough code reviews, o
 * 🌈 Full language support for all text-based file types
 * 🤖 Interactive mode for granular file selection and template customization
 * ⚡ Optimized for large repositories
-* 🧠 AI-powered task planning and code generation
-* 🔄 Full git integration for version control of AI-generated changes
 
 ## 📺 Video
 
@@ -141,6 +142,7 @@ We welcome contributions to CodeWhisper! Please read our [CONTRIBUTING.md](CONTR
 * [ ] Add GitHub/GitLab integration for fetching issues and pull requests
 * [x] Finish OpenAI and Groq support
 * [x] Add support for other LLMs
+* [ ] Add support for local models via Ollama
 * [ ] Experiment with partial file modifications
 * [ ] Experiment with generateObject with a fixed schema
 * [ ] Run evaluations on generated code
