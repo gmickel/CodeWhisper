@@ -13,6 +13,7 @@ import { getWorkerPath } from '../utils/worker-path';
 
 const workerFilePath = getWorkerPath();
 const DEFAULT_CACHE_PATH = path.join(os.tmpdir(), 'codewhisper-cache.json');
+const DEFAULT_GITIGNORE = '.gitignore';
 
 const pool = new Piscina({
   filename: workerFilePath,
@@ -89,12 +90,19 @@ export async function processFiles(
   options: ProcessOptions,
 ): Promise<FileInfo[]> {
   const basePath = path.resolve(options.path ?? '.');
+  if (!(await fs.pathExists(basePath))) {
+    return Promise.reject(new Error(`Path does not exist: ${basePath}`));
+  }
+
   const fileCache = new FileCache(options.cachePath ?? DEFAULT_CACHE_PATH);
+
+  // We set this for library-based usage as the values are not set from the CLI
+  const gitignorePath = options.gitignore ?? DEFAULT_GITIGNORE;
 
   const ig = ignore().add(DEFAULT_IGNORES);
 
-  if (await fs.pathExists(options.gitignore)) {
-    const gitignoreContent = await fs.readFile(options.gitignore, 'utf-8');
+  if (await fs.pathExists(gitignorePath)) {
+    const gitignoreContent = await fs.readFile(gitignorePath, 'utf-8');
     ig.add(gitignoreContent);
   }
 
