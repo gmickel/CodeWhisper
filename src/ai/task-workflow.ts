@@ -1,3 +1,4 @@
+import os from 'node:os';
 import path from 'node:path';
 import chalk from 'chalk';
 import fs from 'fs-extra';
@@ -8,6 +9,7 @@ import { generateMarkdown } from '../core/markdown-generator';
 import { applyChanges } from '../git/apply-changes';
 import { selectFilesPrompt } from '../interactive/select-files-prompt';
 import type { AiAssistedTaskOptions, MarkdownOptions } from '../types';
+import { DEFAULT_CACHE_PATH } from '../utils/cache-utils';
 import { createBranchAndCommit, ensureBranch } from '../utils/git-tools';
 import {
   collectVariables,
@@ -80,7 +82,7 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
 
     const customData = await collectVariables(
       data,
-      options.cachePath,
+      options.cachePath ?? DEFAULT_CACHE_PATH,
       variables,
       templatePath,
     );
@@ -145,7 +147,7 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
 
     const codegenCustomData = await collectVariables(
       codegenData,
-      options.cachePath,
+      options.cachePath ?? DEFAULT_CACHE_PATH,
       codegenVariables,
       codegenTemplatePath,
     );

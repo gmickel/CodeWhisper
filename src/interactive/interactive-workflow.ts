@@ -5,6 +5,7 @@ import ora from 'ora';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
 import type { InteractiveModeOptions, MarkdownOptions } from '../types';
+import { DEFAULT_CACHE_PATH } from '../utils/cache-utils';
 import { handleEditorAndOutput } from '../utils/editor-utils';
 import {
   collectVariables,
@@ -53,7 +54,7 @@ export async function runInteractiveMode(options: InteractiveModeOptions) {
 
     const customData = await collectVariables(
       options.customData ?? '',
-      options.cachePath,
+      options.cachePath ?? DEFAULT_CACHE_PATH,
       variables,
       templatePath,
     );

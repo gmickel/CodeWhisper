@@ -12,6 +12,7 @@ import { runAIAssistedTask } from '../ai/task-workflow';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
 import { runInteractiveMode } from '../interactive/interactive-workflow';
+import { DEFAULT_CACHE_PATH } from '../utils/cache-utils';
 import { handleEditorAndOutput } from '../utils/editor-utils';
 import {
   collectVariables,
@@ -88,7 +89,7 @@ export function cli(args: string[]) {
     .option(
       '--cache-path <path>',
       'Custom path for the cache file',
-      path.join(os.tmpdir(), 'codewhisper-cache.json'),
+      DEFAULT_CACHE_PATH,
     )
     .option('--respect-gitignore', 'Respect entries in .gitignore', true)
     .option(
@@ -173,7 +174,7 @@ export function cli(args: string[]) {
     .option(
       '--cache-path <path>',
       'Custom path for the cache file',
-      path.join(os.tmpdir(), 'codewhisper-cache.json'),
+      DEFAULT_CACHE_PATH,
     )
     .option('--respect-gitignore', 'Respect entries in .gitignore', true)
     .option(
@@ -278,7 +279,7 @@ export function cli(args: string[]) {
     .option(
       '--cache-path <path>',
       'Custom path for the cache file',
-      path.join(os.tmpdir(), 'codewhisper-cache.json'),
+      DEFAULT_CACHE_PATH,
     )
     .option('--respect-gitignore', 'Respect entries in .gitignore', true)
     .option(
