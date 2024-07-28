@@ -65,5 +65,6 @@ export function getModelConfig(modelKey: string): ModelSpec | undefined {
 
 export function getModelFamily(modelKey: string): ModelFamily {
   const config = getModelConfig(modelKey);
+  if (!config) throw new Error(`Unknown model: ${modelKey}`);
   return config.modelFamily;
 }
