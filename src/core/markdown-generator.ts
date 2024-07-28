@@ -3,10 +3,7 @@ import Handlebars from 'handlebars';
 import type { FileInfo, MarkdownOptions } from '../types';
 import { replaceTemplateVariables } from '../utils/template-utils';
 
-function registerHandlebarsHelpers(
-  noCodeblock: boolean,
-  options: MarkdownOptions,
-) {
+function registerHandlebarsHelpers(options: MarkdownOptions) {
   Handlebars.registerHelper(
     'codeblock',
     (content: string, language: string) => {
@@ -87,13 +84,9 @@ export async function generateMarkdown(
   templateContent: string,
   options: MarkdownOptions = {},
 ): Promise<string> {
-  const {
-    noCodeblock = false,
-    customData = {},
-    basePath = process.cwd(),
-  } = options;
+  const { customData = {}, basePath = process.cwd() } = options;
 
-  registerHandlebarsHelpers(noCodeblock, options);
+  registerHandlebarsHelpers(options);
 
   // Preprocess the template content to replace our custom variables
   const preprocessedContent = replaceTemplateVariables(

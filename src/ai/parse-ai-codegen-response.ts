@@ -1,4 +1,4 @@
-import type { AIFileInfo, AIParsedResponse } from '../types';
+import type { AIParsedResponse } from '../types';
 
 export function parseAICodegenResponse(response: string): AIParsedResponse {
   const result: AIParsedResponse = {

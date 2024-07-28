@@ -10,7 +10,6 @@ import { handleEditorAndOutput } from '../utils/editor-utils';
 import {
   collectVariables,
   extractTemplateVariables,
-  getAvailableTemplates,
   getTemplatePath,
 } from '../utils/template-utils';
 import { outputPathPrompt } from './output-path-prompt';

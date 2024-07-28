@@ -14,7 +14,11 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["inquirer-file-tree-selection-prompt"]
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "types": ["inquirer-file-tree-selection-prompt", "node"]
   },
   "include": ["src/**/*", "tests/**/*", "cli.js"],
   "exclude": ["tests/fixtures"]

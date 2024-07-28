@@ -17,9 +17,10 @@ export async function generateAIResponse(
   prompt: string,
   options: GenerateAIResponseOptions,
 ): Promise<string> {
-  if (!process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY) {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
     throw new Error(
-      'ANTHROPIC_API_KEY/OPENAI_API_KEY is not set in the environment variables.',
+      'ANTHROPIC_API_KEY is not set in the environment variables.',
     );
   }
 
@@ -31,7 +32,7 @@ export async function generateAIResponse(
   }
 
   const anthropic = createAnthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY,
+    apiKey,
     headers: {
       'anthropic-beta': 'max-tokens-3-5-sonnet-2024-07-15',
     },
@@ -94,8 +95,6 @@ export async function generateAIResponse(
     throw error;
   }
 }
-
-// ... (rest of the file remains the same)
 
 async function confirmCostExceedsThreshold(
   estimatedCost: number,

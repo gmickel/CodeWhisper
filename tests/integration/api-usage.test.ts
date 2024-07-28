@@ -1,7 +1,7 @@
 import path from 'node:path';
 import fs from 'fs-extra';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { type FileInfo, generateMarkdown, processFiles } from '../../src/index';
+import { generateMarkdown, processFiles } from '../../src/index';
 
 describe('API Usage', () => {
   const testProjectPath = path.resolve(

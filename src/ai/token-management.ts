@@ -12,7 +12,6 @@ export function truncateToContextLimit(text: string, modelKey: string): string {
   const tokens = encode(text);
   if (tokens.length <= modelConfig.contextWindow) return text;
 
-  // Truncate tokens and then decode
   return decode(tokens.slice(0, modelConfig.contextWindow));
 }
 

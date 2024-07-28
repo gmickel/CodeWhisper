@@ -12,11 +12,11 @@ vi.mock('fs-extra', () => ({
 }));
 
 vi.mock('node:child_process', () => ({
-  exec: vi.fn((cmd, callback) => {
+  exec: vi.fn((_cmd, callback) => {
     // Simulate the behavior of the exec function
     callback(null, '', ''); // Assuming no error, empty stdout and stderr
   }),
-  __promisify__: vi.fn((command) => {
+  __promisify__: vi.fn((_command) => {
     return new Promise<{
       error?: ExecException | null;
       stdout: string;

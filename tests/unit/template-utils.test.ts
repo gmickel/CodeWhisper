@@ -1,14 +1,11 @@
 import path from 'node:path';
-import { editor, input } from '@inquirer/prompts';
-import fs from 'fs-extra';
-import inquirer from 'inquirer';
+import { editor } from '@inquirer/prompts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getCachedValue, setCachedValue } from '../../src/utils/cache-utils';
 import { normalizePath } from '../../src/utils/normalize-path';
 import {
   collectVariables,
   extractTemplateVariables,
-  getAvailableTemplates,
   getTemplatePath,
   getTemplatesDir,
   replaceTemplateVariables,
