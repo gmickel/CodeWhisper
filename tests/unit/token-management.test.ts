@@ -104,7 +104,7 @@ describe('Token Management', () => {
       const specs = getModelConfig('llama-3.1-70b-versatile');
       expect(specs).toEqual({
         contextWindow: 131072,
-        maxOutput: 8192,
+        maxOutput: 8000,
         modelName: 'Llama 3.1 70B Groq',
         pricing: { inputCost: 0.15, outputCost: 0.6 },
         modelFamily: 'groq',
