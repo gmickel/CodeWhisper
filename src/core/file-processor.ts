@@ -1,4 +1,3 @@
-import os from 'node:os';
 import path from 'node:path';
 import fastGlob from 'fast-glob';
 import fs from 'fs-extra';
@@ -91,12 +90,11 @@ export async function processFiles(
 ): Promise<FileInfo[]> {
   const basePath = path.resolve(options.path ?? '.');
   if (!(await fs.pathExists(basePath))) {
-    return Promise.reject(new Error(`Path does not exist: ${basePath}`));
+    throw new Error(`Path does not exist: ${basePath}`);
   }
 
   const fileCache = new FileCache(options.cachePath ?? DEFAULT_CACHE_PATH);
 
-  // We set this for library-based usage as the values are not set from the CLI
   const gitignorePath = options.gitignore ?? DEFAULT_GITIGNORE;
 
   const ig = ignore().add(DEFAULT_IGNORES);
@@ -132,8 +130,6 @@ export async function processFiles(
       ? `{${normalizedFilters.join(',')}}`
       : normalizedFilters[0];
 
-  const globStream = fastGlob.stream(globPattern, globOptions);
-
   const matchFile = (relativePath: string, patterns: string[]) => {
     const matchOptions = {
       dot: true,
@@ -155,18 +151,18 @@ export async function processFiles(
   };
 
   return new Promise((resolve, reject) => {
+    const globStream = fastGlob.stream(globPattern, globOptions);
+
     globStream.on('data', (filePath) => {
       const filePathStr = path.resolve(filePath.toString());
       const relativePath = path.relative(basePath, filePathStr);
 
       const customIgnores = options.customIgnores || [];
 
-      // Check customIgnores first
       if (customIgnores.length > 0 && matchFile(relativePath, customIgnores)) {
         return;
       }
 
-      // Check normalizedFilters first to ensure interactive mode selections are considered
       if (
         normalizedFilters.length > 0 &&
         !matchFile(relativePath, normalizedFilters)
@@ -174,25 +170,23 @@ export async function processFiles(
         return;
       }
 
-      // Conditionally check .gitignore patterns
       if (options.respectGitignore && ig.ignores(relativePath)) return;
 
       const exclude = options.exclude || [];
 
-      // Check exclude patterns
       if (exclude.length > 0 && matchFile(relativePath, exclude)) {
         return;
       }
+
       cachePromises.push(
         (async () => {
           try {
             const cached = await fileCache.get(normalizePath(filePathStr));
             if (cached) {
               fileInfos.push(cached);
-              return; // Skip processing and setting cache for cached files
+              return;
             }
 
-            // Only proceed with file processing if not cached
             const stats = await fs.stat(filePathStr);
             if (!stats.isFile()) return;
 

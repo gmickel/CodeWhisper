@@ -4,7 +4,6 @@ import { editor } from '@inquirer/prompts';
 import chalk from 'chalk';
 import fs from 'fs-extra';
 import inquirer from 'inquirer';
-import type { InteractiveModeOptions } from '../types';
 import { getCachedValue, setCachedValue } from './cache-utils';
 
 interface TemplateVariable {
@@ -13,8 +12,7 @@ interface TemplateVariable {
 }
 
 function escapeLineBreaks(str: string): string {
-  if (!str) return str;
-  return str.replace(/\r?\n/g, '\\n');
+  return str ? str.replace(/\r?\n/g, '\\n') : str;
 }
 
 export async function collectVariables(
@@ -23,11 +21,11 @@ export async function collectVariables(
   variables: TemplateVariable[],
   templatePath: string,
 ): Promise<Record<string, string>> {
-  let customData: { [key: string]: string } = {};
+  let customData: Record<string, string> = {};
 
   const escapedData = escapeLineBreaks(data);
 
-  if (data) {
+  if (escapedData) {
     try {
       customData = JSON.parse(escapedData);
     } catch (error) {
@@ -94,38 +92,36 @@ export function replaceTemplateVariables(
 ): string {
   return templateContent.replace(
     /{{(var_|multiline_)(\w+)}}/g,
-    (match, prefix, name) => {
+    (match, _prefix, name) => {
       return customData[name] || match;
     },
   );
 }
 
-export function getTemplatesDir() {
+export function getTemplatesDir(): string {
   const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
   const isCLI = process.env.CODEWHISPER_CLI === 'true';
 
   if (isCLI) {
-    // We're running from CLI (global install or npx)
     return path.resolve(__dirname, '..');
   }
 
   if (__dirname.includes(`${path.sep}node_modules`)) {
-    // We're running in production mode (e.g., programmatic usage of installed package)
     return path.resolve(__dirname, '..', 'dist');
   }
 
   if (__dirname.includes(`${path.sep}dist`)) {
-    // We're running in production mode (e.g., local build)
     return path.resolve(__dirname, '..');
   }
 
-  // We're running in development mode
   return path.resolve(__dirname, '..', '..', 'src', 'templates');
 }
 
 const templatesDir = getTemplatesDir();
 
-export async function getAvailableTemplates() {
+export async function getAvailableTemplates(): Promise<
+  Array<{ name: string; path: string }>
+> {
   const templateFiles = await fs.readdir(templatesDir);
   return templateFiles
     .filter((file) => file.endsWith('.hbs'))
