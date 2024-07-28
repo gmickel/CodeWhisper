@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/gmickel/CodeWhisper/compare/v1.4.0...v1.4.1) (2024-07-28)
+
+
+### Bug Fixes
+
+* groq max_tokens ([#29](https://github.com/gmickel/CodeWhisper/issues/29)) ([284615c](https://github.com/gmickel/CodeWhisper/commit/284615c39858b51847885de086e43c27b600b633))
+
 # [1.4.0](https://github.com/gmickel/CodeWhisper/compare/v1.3.5...v1.4.0) (2024-07-28)
 
 
