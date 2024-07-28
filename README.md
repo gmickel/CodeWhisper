@@ -31,6 +31,12 @@ Whether you're tackling complex refactoring, conducting thorough code reviews, o
 
 ## 📺 Video
 
+### Code Generation workflow
+
+https://github.com/user-attachments/assets/64922cf6-658e-4036-a251-cfc458a14801
+
+### Interactive codebas-to-LLM
+
 https://github.com/user-attachments/assets/a3a1ad99-d402-4781-9672-7228c0aa2f93
 
 ## ✨ Key Features
