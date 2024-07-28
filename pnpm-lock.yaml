@@ -12,7 +12,7 @@ importers:
         specifier: 0.0.33
         version: 0.0.33(zod@3.23.8)
       '@ai-sdk/openai':
-        specifier: ^0.0.40
+        specifier: 0.0.40
         version: 0.0.40(zod@3.23.8)
       '@anthropic-ai/sdk':
         specifier: 0.24.3
