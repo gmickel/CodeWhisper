@@ -12,6 +12,7 @@ import { normalizePath } from '../utils/normalize-path';
 import { getWorkerPath } from '../utils/worker-path';
 
 const workerFilePath = getWorkerPath();
+const DEFAULT_CACHE_PATH = path.join(os.tmpdir(), 'codewhisper-cache.json');
 
 const pool = new Piscina({
   filename: workerFilePath,
@@ -88,7 +89,7 @@ export async function processFiles(
   options: ProcessOptions,
 ): Promise<FileInfo[]> {
   const basePath = path.resolve(options.path ?? '.');
-  const fileCache = new FileCache(options.cachePath);
+  const fileCache = new FileCache(options.cachePath ?? DEFAULT_CACHE_PATH);
 
   const ig = ignore().add(DEFAULT_IGNORES);
 

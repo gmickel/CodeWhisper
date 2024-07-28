@@ -13,16 +13,16 @@ import {
 
 dotenv.config();
 
-if (!process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY) {
-  throw new Error(
-    'ANTHROPIC_API_KEY/OPENAI_API_KEY is not set in the environment variables.',
-  );
-}
-
 export async function generateAIResponse(
   prompt: string,
   options: GenerateAIResponseOptions,
 ): Promise<string> {
+  if (!process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY) {
+    throw new Error(
+      'ANTHROPIC_API_KEY/OPENAI_API_KEY is not set in the environment variables.',
+    );
+  }
+
   const modelKey = options.model;
   const modelConfig = getModelConfig(modelKey);
 

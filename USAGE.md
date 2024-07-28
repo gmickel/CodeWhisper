@@ -7,7 +7,9 @@ This document provides comprehensive usage instructions and examples for CodeWhi
 * [Command Overview](#command-overview)
 * [Detailed Command Usage](#detailed-command-usage)
 * [Usage Examples](#usage-examples)
+* [Advanced Usage Scenarios](#advanced-usage-scenarios)
 * [CI/CD Integration](#cicd-integration)
+* [Troubleshooting](#troubleshooting)
 
 ## Command Overview
 
@@ -91,98 +93,127 @@ Options:
 01. Include only JavaScript and TypeScript files:
 
 ```bash
-   codewhisper generate -f "**/*.js" "**/*.ts"
-   ```
+codewhisper generate -f "**/*.js" "**/*.ts"
+```
 
 02. Exclude test files and the `dist` directory:
 
 ```bash
-   codewhisper generate -e "**/*.test.js" "dist/**/*"
-   ```
+codewhisper generate -e "**/*.test.js" "dist/**/*"
+```
 
 03. Combine include and exclude patterns:
 
 ```bash
-   codewhisper generate -f "src/**/*" -e "**/*.test.js" "**/*.spec.js"
-   ```
+codewhisper generate -f "src/**/*" -e "**/*.test.js" "**/*.spec.js"
+```
 
 04. Use custom data in a template:
 
 ```bash
-   codewhisper generate --custom-data '{"projectName": "MyApp", "version": "1.0.0"}' --custom-template my-template.hbs
-   ```
+codewhisper generate --custom-data '{"projectName": "MyApp", "version": "1.0.0"}' --custom-template my-template.hbs
+```
 
 05. Generate a diff-based summary:
 
 ```bash
-   codewhisper generate --filter $(git diff --name-only HEAD^)
-   ```
+codewhisper generate --filter $(git diff --name-only HEAD^)
+```
 
 06. Analyze a specific subdirectory:
 
 ```bash
-   codewhisper generate -p ./src/components -f "**/*.tsx"
-   ```
+codewhisper generate -p ./src/components -f "**/*.tsx"
+```
 
 07. Generate a summary with a custom prompt:
 
 ```bash
-   codewhisper generate -pr "Analyze this code for potential security vulnerabilities"
-   ```
+codewhisper generate -pr "Analyze this code for potential security vulnerabilities"
+```
 
 08. Use interactive mode with inverted (exclude all selected files) selection:
 
 ```bash
-   codewhisper interactive --invert
-   ```
+codewhisper interactive --invert
+```
 
 09. Generate output with line numbers in code blocks:
 
 ```bash
-   codewhisper generate -l
-   ```
+codewhisper generate -l
+```
 
 10. Review changes in a specific branch compared to main:
 
 ```bash
-    codewhisper generate --filter $(git diff --name-only main...feature-branch) --template deep-code-review
-    ```
+codewhisper generate --filter $(git diff --name-only main...feature-branch) --template deep-code-review
+```
+
+## Advanced Usage Scenarios
 
 11. Generate documentation for a new release:
 
 ```bash
-    codewhisper generate --filter $(git diff --name-only v1.0.0...v1.1.0) --template generate-project-documentation
-    ```
+codewhisper generate --filter $(git diff --name-only v1.0.0...v1.1.0) --template generate-project-documentation
+```
 
 12. Perform a security audit on recent changes:
 
 ```bash
-    codewhisper generate --filter $(git diff --name-only HEAD~10) --template security-focused-review
-    ```
+codewhisper generate --filter $(git diff --name-only HEAD~10) --template security-focused-review
+```
 
 13. Create a code overview for onboarding new team members:
 
 ```bash
-    codewhisper generate -f "src/**/*" --template codebase-summary -o onboarding-guide.md
-    ```
+codewhisper generate -f "src/**/*" --template codebase-summary -o onboarding-guide.md
+```
 
 14. Generate an optimized LLM prompt for code explanation:
 
 ```bash
-    codewhisper generate --template optimize-llm-prompt --editor --custom-data '{"prompt": "your prompt goes here"}'
-    ```
+codewhisper generate --template optimize-llm-prompt --editor --custom-data '{"prompt": "your prompt goes here"}'
+```
 
 15. Start an AI-assisted coding task with a dry run:
 
 ```bash
-    codewhisper task --dry-run -t "Implement user authentication" -d "Add user login and registration functionality using JWT"
-    ```
+codewhisper task --dry-run -t "Implement user authentication" -d "Add user login and registration functionality using JWT"
+```
 
 16. Apply an AI-generated task with automatic commit:
 
 ```bash
-    codewhisper apply-task ./codewhisper-task-output.json --auto-commit
-    ```
+codewhisper apply-task ./codewhisper-task-output.json --auto-commit
+```
+
+17. Analyze code changes between two specific commits:
+
+```bash
+codewhisper generate --filter $(git diff --name-only commit1..commit2) --template deep-code-review
+```
+
+18. Generate a code summary for a specific pull request:
+
+```bash
+codewhisper generate --filter $(git diff --name-only main...pull-request-branch) --template codebase-summary
+```
+
+19. Create a custom template for generating API documentation:
+
+```bash
+codewhisper export-templates
+# Edit the exported template to focus on API documentation
+codewhisper generate --custom-template ./my-templates/api-docs.hbs -f "src/api/**/*"
+```
+
+20. Use CodeWhisper with a different LLM provider:
+
+```bash
+# Assuming you've set up the necessary environment variables for the new LLM provider
+codewhisper generate --model my-custom-llm -t "Refactor the authentication module"
+```
 
 ## CI/CD Integration
 
@@ -246,3 +277,24 @@ Perform a comprehensive analysis of this codebase. Identify areas for improvemen
 ```
 
 This workflow generates a codebase summary using CodeWhisper and then uses Anthropic's AI to analyze the summary and provide insights.
+
+## Troubleshooting
+
+Here are some common issues and their solutions:
+
+01. **Issue**: CodeWhisper is not recognizing my custom template.
+   **Solution**: Ensure that your custom template file has a `.hbs` extension and is in the correct directory. Use the `--custom-template` option with the full path to your template file.
+
+02. **Issue**: The generated output is empty or incomplete.
+   **Solution**: Check your file filters and ensure they're not excluding important files. Try running the command with the `--no-respect-gitignore` option to see if `.gitignore` is causing the issue.
+
+03. **Issue**: CodeWhisper is running slowly on large codebases.
+   **Solution**: Use more specific file filters to reduce the number of files processed. You can also try increasing the cache size or using a faster storage medium for the cache file.
+
+04. **Issue**: AI-assisted tasks are not producing the expected results.
+   **Solution**: Provide more detailed task descriptions and instructions. You can also try using a different AI model or adjusting the prompt in your custom template.
+
+05. **Issue**: Error "ANTHROPIC_API_KEY not set" when running AI-assisted tasks.
+   **Solution**: Ensure you've set the `ANTHROPIC_API_KEY` environment variable with your Anthropic API key. You can do this by running `export ANTHROPIC_API_KEY=your_api_key` before running CodeWhisper.
+
+For more complex issues or if these solutions don't help, please open an issue on the [CodeWhisper GitHub repository](https://github.com/gmickel/CodeWhisper/issues).
