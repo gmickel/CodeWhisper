@@ -8,7 +8,7 @@ import { normalizePath } from '../../src/utils/normalize-path';
 
 const execAsync = promisify(exec);
 
-describe('CLI Commands', () => {
+describe.sequential('CLI Commands', () => {
   const cliPath = path.resolve(__dirname, '..', '..', 'src', 'cli', 'index.ts');
   const testProjectPath = path.resolve(
     __dirname,
