@@ -29,16 +29,6 @@ Whether you're tackling complex refactoring, conducting thorough code reviews, o
 
 ![CodeWhisper](https://raw.githubusercontent.com/gmickel/CodeWhisper/main/assets/worker_sm.jpg)
 
-## 📺 Video
-
-### Code Generation workflow
-
-https://github.com/user-attachments/assets/64922cf6-658e-4036-a251-cfc458a14801
-
-### Interactive codebas-to-LLM
-
-https://github.com/user-attachments/assets/a3a1ad99-d402-4781-9672-7228c0aa2f93
-
 ## ✨ Key Features
 
 * 🚀 Blazingly fast code processing with concurrent workers
@@ -54,6 +44,16 @@ https://github.com/user-attachments/assets/a3a1ad99-d402-4781-9672-7228c0aa2f93
 * ⚡ Optimized for large repositories
 * 🧠 AI-powered task planning and code generation
 * 🔄 Full git integration for version control of AI-generated changes
+
+## 📺 Video
+
+### Code Generation workflow
+
+https://github.com/user-attachments/assets/64922cf6-658e-4036-a251-cfc458a14801
+
+### Interactive codebas-to-LLM
+
+https://github.com/user-attachments/assets/a3a1ad99-d402-4781-9672-7228c0aa2f93
 
 ## 🚀 Quick Start
 
