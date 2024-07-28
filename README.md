@@ -7,7 +7,8 @@ Blazingly fast codebase-to-LLM context bridge and AI-powered code generation wor
 [![License](https://img.shields.io/github/license/gmickel/codewhisper)](https://github.com/gmickel/CodeWhisper/blob/main/LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/gmickel/codewhisper)](https://github.com/gmickel/CodeWhisper/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/gmickel/codewhisper)](https://github.com/gmickel/CodeWhisper/network)
-[![npm version](https://badge.fury.io/js/codewhisper.svg)](https://badge.fury.io/js/codewhisper)
+[![NPM Version](https://img.shields.io/npm/v/codewhisper)](https://www.npmjs.com/package/codewhisper)
+[![NPM Downloads](https://img.shields.io/npm/dw/codewhisper)](https://www.npmjs.com/package/codewhisper)
 
 [About](#-about) •
 [Key Features](#-key-features) •
