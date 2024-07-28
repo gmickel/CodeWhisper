@@ -1,6 +1,6 @@
 # Customizing CodeWhisper
 
-This guide explains how to customize CodeWhisper to fit your specific needs.
+This guide explains how to customize CodeWhisper to fit your specific needs and workflow.
 
 ## Table of Contents
 
@@ -8,26 +8,26 @@ This guide explains how to customize CodeWhisper to fit your specific needs.
 * [Template Variables](#template-variables)
 * [Customizing AI Models](#customizing-ai-models)
 * [Extending CodeWhisper](#extending-codewhisper)
+* [Performance Tuning](#performance-tuning)
+* [Integrating with Other Tools](#integrating-with-other-tools)
 
 ## Custom Templates
 
 To create and use custom templates:
 
 1. Export the built-in templates:
-   
 
 ```bash
-   codewhisper export-templates -d ./my-templates
-   ```
+codewhisper export-templates -d ./my-templates
+```
 
 2. Edit or create new template files in the `./my-templates` directory.
 
 3. Use your custom template:
-   
 
 ```bash
-   codewhisper generate --custom-template ./my-templates/my-custom-template.hbs
-   ```
+codewhisper generate --custom-template ./my-templates/my-custom-template.hbs
+```
 
 ### Example: Creating a Custom Template
 
@@ -66,6 +66,14 @@ Save this as `code-stats.hbs` in your templates directory and use it with:
 codewhisper generate --custom-template ./my-templates/code-stats.hbs --custom-data '{"projectName": "My Project"}'
 ```
 
+### Best Practices for Template Creation
+
+1. Use clear and descriptive variable names.
+2. Leverage Handlebars helpers for complex logic.
+3. Include comments in your templates for better maintainability.
+4. Consider creating modular templates that can be composed together.
+5. Test your templates with various input data to ensure they handle edge cases.
+
 ## Template Variables
 
 CodeWhisper supports two types of special variable prefixes in templates to enable interactive prompting:
@@ -91,6 +99,18 @@ When using a template with these variables, CodeWhisper will automatically promp
 
 Note: Variable values are cached to speed up repeated use of templates. The cache can be cleared by using a different cache path with the `--cache-path` option.
 
+### Advanced Variable Usage
+
+You can also use computed values and conditional logic in your templates:
+
+```handlebars
+{{#if (gt files.length 10)}}
+This is a large project with {{files.length}} files.
+{{else}}
+This is a small project with {{files.length}} files.
+{{/if}}
+```
+
 ## Customizing AI Models
 
 CodeWhisper allows you to specify which AI model to use for tasks. You can customize this in your commands:
@@ -103,6 +123,24 @@ To add support for new models:
 
 1. Modify the `MODEL_CONFIGS` object in `src/ai/model-config.ts`
 2. Update the `generateAIResponse` function in `src/ai/generate-ai-response.ts` to handle the new model
+
+### Example: Adding a New AI Model
+
+```typescript
+// In src/ai/model-config.ts
+export const MODEL_CONFIGS: ModelSpecs = {
+  // ... existing models ...
+  'new-model-name': {
+    contextWindow: 100000,
+    maxOutput: 4096,
+    modelName: 'New Model',
+    pricing: { inputCost: 1, outputCost: 2 },
+  },
+};
+
+// In src/ai/generate-ai-response.ts
+// Update the generateAIResponse function to handle the new model
+```
 
 ## Extending CodeWhisper
 
@@ -166,4 +204,33 @@ registerAnalyzeCommand(program);
 
 4. Update the documentation to include information about the new `analyze` command
 
-By following these customization guidelines, you can tailor CodeWhisper to better suit your specific needs and workflows.
+## Performance Tuning
+
+To optimize CodeWhisper's performance:
+
+1. Use specific file filters to reduce the number of processed files.
+2. Leverage the caching mechanism by using a consistent cache path.
+
+Example:
+
+```bash
+codewhisper generate --filter "src/**/*.js" --cache-path /path/to/cache
+```
+
+## Integrating with Other Tools
+
+CodeWhisper can be easily integrated with other development tools:
+
+1. Version Control: Use CodeWhisper in pre-commit hooks to generate documentation or perform code analysis.
+2. CI/CD: Incorporate CodeWhisper in your CI/CD pipeline for automated code reviews or documentation generation.
+3. IDE Extensions: Create IDE extensions that leverage CodeWhisper's API for in-editor code analysis and AI assistance.
+
+Example Git pre-commit hook:
+
+```bash
+#!/bin/sh
+codewhisper analyze --path ./src --output ./docs/analysis.md
+git add ./docs/analysis.md
+```
+
+By following these customization guidelines and leveraging the advanced features, you can tailor CodeWhisper to better suit your specific needs and workflows.

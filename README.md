@@ -7,6 +7,7 @@ Blazingly fast codebase-to-LLM context bridge and AI-powered code generation wor
 [![License](https://img.shields.io/github/license/gmickel/codewhisper)](https://github.com/gmickel/CodeWhisper/blob/main/LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/gmickel/codewhisper)](https://github.com/gmickel/CodeWhisper/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/gmickel/codewhisper)](https://github.com/gmickel/CodeWhisper/network)
+[![npm version](https://badge.fury.io/js/codewhisper.svg)](https://badge.fury.io/js/codewhisper)
 
 [About](#-about) •
 [Key Features](#-key-features) •
@@ -16,6 +17,7 @@ Blazingly fast codebase-to-LLM context bridge and AI-powered code generation wor
 [Templates](#-templates) •
 [Configuration](#-configuration) •
 [API](#-api) •
+[Contributing](#-contributing) •
 [FAQ](#-faq)
 
 ## 📖 About
@@ -51,34 +53,29 @@ Whether you're tackling complex refactoring, conducting thorough code reviews, o
 
 https://github.com/user-attachments/assets/64922cf6-658e-4036-a251-cfc458a14801
 
-### Interactive codebas-to-LLM
+### Interactive codebase-to-LLM
 
 https://github.com/user-attachments/assets/a3a1ad99-d402-4781-9672-7228c0aa2f93
 
 ## 🚀 Quick Start
 
-### Codebase to Prompt Generation
+Get started with CodeWhisper in just a few steps:
 
 ```bash
+# Install CodeWhisper globally
+npm install -g codewhisper
+
 # Navigate to your project directory
 cd /path/to/your/project
 
 # Generate an AI-friendly prompt using interactive mode
-npx codewhisper interactive
+codewhisper interactive
 
-# Follow the prompts to select files and customize the output
-```
-
-### AI-Assisted Task Creation and Code Generation
-
-```bash
 # Start an AI-assisted coding task
-npx codewhisper task
-
-# Describe your task when prompted
-# Review and approve the AI-generated plan
-# AI-generated changes are applied to a new git branch
+codewhisper task
 ```
+
+For more detailed instructions, see the [Installation](#-installation) and [Usage](#-usage) sections.
 
 ## 📦 Installation
 
@@ -94,7 +91,23 @@ npm install -g codewhisper
 
 ## 💻 Usage
 
-CodeWhisper offers several commands to cater to different use cases. For detailed usage instructions and examples, please refer to [USAGE.md](USAGE.md).
+CodeWhisper offers several commands to cater to different use cases:
+
+```bash
+# Generate a codebase summary
+codewhisper generate
+
+# Start an interactive session
+codewhisper interactive
+
+# Begin an AI-assisted coding task
+codewhisper task
+
+# List available templates
+codewhisper list-templates
+```
+
+For detailed usage instructions and examples, please refer to [USAGE.md](USAGE.md).
 
 ## 📝 Templates
 
@@ -107,6 +120,21 @@ Create a `.codewhisperrc` file in your project root for custom configurations. F
 ## 📚 API
 
 CodeWhisper can be used programmatically in your Node.js projects. For detailed API documentation and examples, please refer to [LIBRARY_USAGE.md](LIBRARY_USAGE.md).
+
+## 🤝 Contributing
+
+We welcome contributions to CodeWhisper! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## 🏎️ Roadmap
+
+* [x] Add AI-assisted task creation and code generation
+* [ ] Add GitHub/GitLab integration for fetching issues and pull requests
+* [ ] Finish OpenAI and Groq support
+* [ ] Add support for other LLMs
+* [ ] Experiment with partial file modifications
+* [ ] Experiment with generateObject with a fixed schema
+* [ ] Run evaluations on generated code
+* [ ] Possibly add agentic behaviors
 
 ## ❓ FAQ
 

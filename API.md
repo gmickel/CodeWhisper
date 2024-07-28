@@ -8,7 +8,13 @@ This document provides detailed information on using CodeWhisper programmaticall
 * [Basic Usage](#basic-usage)
 * [Advanced Usage](#advanced-usage)
 * [API Reference](#api-reference)
+  + [processFiles](#processfilesoptions-processoptions-promisefileinfo)
+  + [generateMarkdown](#generatemarkdownfiles-fileinfo-templatecontent-string-options-markdownoptions-promisestring)
+  + [runAIAssistedTask](#runaiassistedtaskoptions-aiassistedtaskoptions-promisevoid)
 * [Examples](#examples)
+* [Error Handling](#error-handling)
+* [Best Practices](#best-practices)
+* [Troubleshooting](#troubleshooting)
 
 ## Installation
 
@@ -29,20 +35,24 @@ import {
 } from 'codewhisper';
 
 async function generateCodeSummary() {
-    const files = await processFiles({
-        path: '/path/to/project',
-        filter: ['**/*.js', '**/*.ts'],
-        exclude: ['**/node_modules/**'],
-    });
+    try {
+        const files = await processFiles({
+            path: '/path/to/project',
+            filter: ['**/*.js', '**/*.ts'],
+            exclude: ['**/node_modules/**'],
+        });
 
-    const markdown = await generateMarkdown(files, 'default', {
-        noCodeblock: false,
-        customData: {
-            projectName: 'My Project'
-        },
-    });
+        const markdown = await generateMarkdown(files, 'default', {
+            noCodeblock: false,
+            customData: {
+                projectName: 'My Project'
+            },
+        });
 
-    console.log(markdown);
+        console.log(markdown);
+    } catch (error) {
+        console.error('Error generating code summary:', error);
+    }
 }
 
 generateCodeSummary();
@@ -60,21 +70,26 @@ import {
 import fs from 'fs/promises';
 
 async function generateCustomOutput() {
-    const files = await processFiles({
-        path: '/path/to/project',
-        filter: ['src/**/*.js'],
-    });
+    try {
+        const files = await processFiles({
+            path: '/path/to/project',
+            filter: ['src/**/*.js'],
+        });
 
-    const customTemplate = await fs.readFile('path/to/custom-template.hbs', 'utf-8');
+        const customTemplate = await fs.readFile('path/to/custom-template.hbs', 'utf-8');
 
-    const output = await generateMarkdown(files, customTemplate, {
-        customData: {
-            projectName: 'My Project',
-            version: '1.0.0',
-        },
-    });
+        const output = await generateMarkdown(files, customTemplate, {
+            customData: {
+                projectName: 'My Project',
+                version: '1.0.0',
+            },
+        });
 
-    await fs.writeFile('output.md', output);
+        await fs.writeFile('output.md', output);
+        console.log('Custom output generated successfully!');
+    } catch (error) {
+        console.error('Error generating custom output:', error);
+    }
 }
 
 generateCustomOutput();
@@ -96,6 +111,7 @@ async function performAITask() {
             model: 'claude-3-5-sonnet-20240620',
             dryRun: true,
         });
+        console.log('AI-assisted task completed successfully!');
     } catch (error) {
         console.error('Error in AI-assisted task:', error);
     }
@@ -127,6 +143,16 @@ Processes files in the specified directory based on the given options.
 
 * `Promise<FileInfo[]>` - An array of processed file information
 
+#### Example:
+
+```javascript
+const files = await processFiles({
+    path: '/path/to/project',
+    filter: ['**/*.js', '**/*.ts'],
+    exclude: ['**/node_modules/**'],
+});
+```
+
 ### `generateMarkdown(files: FileInfo[], templateContent: string, options: MarkdownOptions): Promise<string>`
 
 Generates markdown output based on the processed files and template.
@@ -144,6 +170,18 @@ Generates markdown output based on the processed files and template.
 #### Returns:
 
 * `Promise<string>` - Generated markdown content
+
+#### Example:
+
+```javascript
+const markdown = await generateMarkdown(files, customTemplate, {
+    customData: {
+        projectName: 'My Project',
+        version: '1.0.0',
+    },
+    lineNumbers: true,
+});
+```
 
 ### `runAIAssistedTask(options: AiAssistedTaskOptions): Promise<void>`
 
@@ -165,6 +203,20 @@ Runs an AI-assisted coding task.
 
 * `Promise<void>`
 
+#### Example:
+
+```javascript
+await runAIAssistedTask({
+    path: '/path/to/project',
+    task: 'Refactor authentication module',
+    description: 'Improve the current authentication module...',
+    instructions: 'Use bcrypt for password hashing...',
+    model: 'claude-3-5-sonnet-20240620',
+    dryRun: false,
+    autoCommit: true,
+});
+```
+
 ## Examples
 
 ### Generate a Security-Focused Code Review
@@ -177,24 +229,28 @@ import {
 import fs from 'fs/promises';
 
 async function generateSecurityReview() {
-    const files = await processFiles({
-        path: '/path/to/project',
-        filter: ['**/*.js', '**/*.ts', '**/*.php'],
-        exclude: ['**/vendor/**', '**/node_modules/**'],
-    });
+    try {
+        const files = await processFiles({
+            path: '/path/to/project',
+            filter: ['**/*.js', '**/*.ts', '**/*.php'],
+            exclude: ['**/vendor/**', '**/node_modules/**'],
+        });
 
-    const templateContent = await fs.readFile('security-review-template.hbs', 'utf-8');
+        const templateContent = await fs.readFile('security-review-template.hbs', 'utf-8');
 
-    const markdown = await generateMarkdown(files, templateContent, {
-        customData: {
-            projectName: 'My Secure Project',
-            reviewDate: new Date().toISOString(),
-        },
-        lineNumbers: true,
-    });
+        const markdown = await generateMarkdown(files, templateContent, {
+            customData: {
+                projectName: 'My Secure Project',
+                reviewDate: new Date().toISOString(),
+            },
+            lineNumbers: true,
+        });
 
-    await fs.writeFile('security-review.md', markdown);
-    console.log('Security review generated successfully!');
+        await fs.writeFile('security-review.md', markdown);
+        console.log('Security review generated successfully!');
+    } catch (error) {
+        console.error('Error generating security review:', error);
+    }
 }
 
 generateSecurityReview();
@@ -226,3 +282,35 @@ async function refactorCode() {
 
 refactorCode();
 ```
+
+## Error Handling
+
+CodeWhisper functions throw errors when they encounter issues. It's recommended to wrap your code in try-catch blocks to handle these errors gracefully. For example:
+
+```javascript
+try {
+    const files = await processFiles(options);
+    // ... rest of your code
+} catch (error) {
+    console.error('Error processing files:', error.message);
+    // Handle the error appropriately
+}
+```
+
+## Best Practices
+
+1. Always use error handling when working with CodeWhisper functions.
+2. Use the `dryRun` option when testing AI-assisted tasks to preview changes before applying them.
+3. Regularly update CodeWhisper to benefit from the latest features and bug fixes.
+4. Use custom templates to tailor the output to your specific needs.
+5. Leverage the `customData` option to pass project-specific information to your templates.
+
+## Troubleshooting
+
+If you encounter issues while using CodeWhisper:
+
+1. Check that you're using the latest version of CodeWhisper.
+2. Verify that your project structure and file patterns are correct.
+3. Review the error messages for specific information about what went wrong.
+4. Consult the [FAQ section in the README](https://github.com/gmickel/CodeWhisper#-faq) for common issues and solutions.
+5. If the problem persists, please [open an issue on GitHub](https://github.com/gmickel/CodeWhisper/issues) with a detailed description of the problem and steps to reproduce it.
