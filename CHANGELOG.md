@@ -1,3 +1,10 @@
+## [1.3.4](https://github.com/gmickel/CodeWhisper/compare/v1.3.3...v1.3.4) (2024-07-28)
+
+
+### Bug Fixes
+
+* library usage ([#25](https://github.com/gmickel/CodeWhisper/issues/25)) ([cb70e36](https://github.com/gmickel/CodeWhisper/commit/cb70e36abe96876115857b6ddeae2f7823079fad))
+
 ## [1.3.3](https://github.com/gmickel/CodeWhisper/compare/v1.3.2...v1.3.3) (2024-07-27)
 
 
