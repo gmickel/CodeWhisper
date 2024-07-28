@@ -1,20 +1,13 @@
 import path from 'node:path';
 import chalk from 'chalk';
 import fs from 'fs-extra';
-import simpleGit, { type SimpleGit } from 'simple-git';
-import type {
-  AIFileInfo,
-  AIParsedResponse,
-  ApplyChangesOptions,
-} from '../types';
+import type { AIFileInfo, ApplyChangesOptions } from '../types';
 
 export async function applyChanges({
   basePath,
   parsedResponse,
   dryRun = false,
 }: ApplyChangesOptions): Promise<void> {
-  const git: SimpleGit = simpleGit(basePath);
-
   try {
     for (const file of parsedResponse.files) {
       await applyFileChange(basePath, file, dryRun);

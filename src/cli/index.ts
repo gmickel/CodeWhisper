@@ -24,7 +24,7 @@ const templatesDir = getTemplatesDir();
 
 const program = new Command();
 
-export function cli(args: string[]) {
+export function cli(_args: string[]) {
   program
     .name('codewhisper')
     .description('A powerful tool for converting code to AI-friendly prompts')

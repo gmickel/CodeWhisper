@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import fs from 'fs-extra';
 import simpleGit from 'simple-git';
 import { applyChanges } from '../git/apply-changes';
-import { createBranchAndCommit, ensureBranch } from '../utils/git-tools';
+import { ensureBranch } from '../utils/git-tools';
 
 export async function applyTask(
   filePath: string,

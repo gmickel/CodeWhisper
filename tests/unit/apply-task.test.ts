@@ -5,7 +5,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { applyTask } from '../../src/ai/apply-task';
 import * as applyChanges from '../../src/git/apply-changes';
 import * as gitTools from '../../src/utils/git-tools';
-import { normalizePath } from '../../src/utils/normalize-path';
 
 vi.mock('../../src/utils/git-tools');
 vi.mock('../../src/git/apply-changes');

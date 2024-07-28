@@ -326,7 +326,6 @@ describe('processFiles', () => {
   it('should process and cache files, then use cached data on reprocessing', async () => {
     const TEST_DIR = path.join(os.tmpdir(), 'file-processor-test');
     const CACHE_FILE = path.join(TEST_DIR, 'test-cache.json');
-    let fileCache: FileCache;
 
     await fs.ensureDir(TEST_DIR);
 

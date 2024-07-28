@@ -1,10 +1,8 @@
 import path from 'node:path';
 import fs from 'fs-extra';
-import simpleGit from 'simple-git';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { applyChanges } from '../../src/git/apply-changes';
 import type { AIParsedResponse } from '../../src/types';
-import * as gitTools from '../../src/utils/git-tools';
 
 vi.mock('fs-extra');
 vi.mock('simple-git');

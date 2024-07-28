@@ -1,4 +1,3 @@
-import os from 'node:os';
 import path from 'node:path';
 import chalk from 'chalk';
 import fs from 'fs-extra';
@@ -10,7 +9,7 @@ import { applyChanges } from '../git/apply-changes';
 import { selectFilesPrompt } from '../interactive/select-files-prompt';
 import type { AiAssistedTaskOptions, MarkdownOptions } from '../types';
 import { DEFAULT_CACHE_PATH } from '../utils/cache-utils';
-import { createBranchAndCommit, ensureBranch } from '../utils/git-tools';
+import { ensureBranch } from '../utils/git-tools';
 import {
   collectVariables,
   extractTemplateVariables,
