@@ -34,7 +34,19 @@ codewhisper task [options]
 Options:
 * `-p, --path <path>`: Path to the codebase (default: current directory)
 * `-m, --model <modelId>`: Specify the AI model to use (default: claude-3-5-sonnet-20240620)
-* `--dry-run`: Perform a dry run without making actual changes, saves a dry-run file that can be applied later
+* `-g, --gitignore <path>`: Path to .gitignore file (default: .gitignore)
+* `-f, --filter <patterns...>`: File patterns to include (use glob patterns, e.g., "src/**/*.js")
+* `-e, --exclude <patterns...>`: File patterns to exclude (use glob patterns, e.g., "**/*.test.js")
+* `-s, --suppress-comments`: Strip comments from the code
+* `-l, --line-numbers`: Add line numbers to code blocks
+* `--case-sensitive`: Use case-sensitive pattern matching
+* `--custom-ignores <patterns...>`: Additional patterns to ignore
+* `--cache-path <path>`: Custom path for the cache file
+* `--respect-gitignore`: Respect entries in .gitignore (default: true)
+* `--no-respect-gitignore`: Do not respect entries in .gitignore
+* `--invert`: Selected files will be excluded
+* `--dry-run`: Perform a dry run without making actual changes. Saves changes to a file so you can apply them after review using apply-task
+* `-max, --max-cost-threshold <number>`: Set a maximum cost threshold for AI operations in USD (e.g., 0.5 for $0.50)
 * `--auto-commit`: Automatically commit changes
 * `-t, --task <task>`: Short task title
 * `-d, --description <description>`: Detailed task description
@@ -57,25 +69,12 @@ codewhisper interactive [options]
 
 Options:
 * `-p, --path <path>`: Path to the codebase (default: current directory)
+* `-pr, --prompt <prompt>`: Custom prompt to append to the output
 * `-t, --template <template>`: Template to use
-* `-o, --output <output>`: Output file name
+* `-g, --gitignore <path>`: Path to .gitignore file (default: .gitignore)
+* `-f, --filter <patterns...>`: File patterns to include (use glob patterns, e.g., "src/**/*.js")
+* `-e, --exclude <patterns...>`: File patterns to exclude (use glob patterns, e.g., "**/*.test.js")
 * `-E, --open-editor`: Open the result in your default editor
-* (... other options same as `generate` command)
-
-### `generate` : Generate Output
-
-```bash
-codewhisper generate [options]
-```
-
-Options:
-* `-p, --path <path>`: Path to the codebase (default: current directory)
-* `-o, --output <output>`: Output file name
-* `-E, --open-editor`: Open the result in your default editor
-* `-t, --template <template>`: Template to use (default: "default")
-* `-g, --gitignore <path>`: Path to .gitignore file
-* `-f, --filter <patterns...>`: File patterns to include (use glob patterns)
-* `-e, --exclude <patterns...>`: File patterns to exclude (use glob patterns)
 * `-s, --suppress-comments`: Strip comments from the code
 * `-l, --line-numbers`: Add line numbers to code blocks
 * `--case-sensitive`: Use case-sensitive pattern matching
@@ -86,7 +85,50 @@ Options:
 * `--cache-path <path>`: Custom path for the cache file
 * `--respect-gitignore`: Respect entries in .gitignore (default: true)
 * `--no-respect-gitignore`: Do not respect entries in .gitignore
+* `--invert`: Selected files will be excluded
+
+### `generate` : Generate Output
+
+```bash
+codewhisper generate [options]
+```
+
+Options:
+* `-p, --path <path>`: Path to the codebase (default: current directory)
 * `-pr, --prompt <prompt>`: Custom prompt to append to the output
+* `-o, --output <output>`: Output file name
+* `-E, --open-editor`: Open the result in your default editor
+* `-t, --template <template>`: Template to use (default: "default")
+* `-g, --gitignore <path>`: Path to .gitignore file (default: .gitignore)
+* `-f, --filter <patterns...>`: File patterns to include (use glob patterns, e.g., "src/**/*.js")
+* `-e, --exclude <patterns...>`: File patterns to exclude (use glob patterns, e.g., "**/*.test.js")
+* `-s, --suppress-comments`: Strip comments from the code
+* `-l, --line-numbers`: Add line numbers to code blocks
+* `--case-sensitive`: Use case-sensitive pattern matching
+* `--no-codeblock`: Disable wrapping code inside markdown code blocks
+* `--custom-data <json>`: Custom data to pass to the template (JSON string)
+* `--custom-template <path>`: Path to a custom Handlebars template
+* `--custom-ignores <patterns...>`: Additional patterns to ignore
+* `--cache-path <path>`: Custom path for the cache file
+* `--respect-gitignore`: Respect entries in .gitignore (default: true)
+* `--no-respect-gitignore`: Do not respect entries in .gitignore
+
+### `list-templates` : List Available Templates
+
+```bash
+codewhisper list-templates
+```
+
+This command lists all available templates in the templates directory. It doesn't take any options.
+
+### `export-templates` : Export Templates
+
+```bash
+codewhisper export-templates [options]
+```
+
+Options:
+* `-d, --dir <directory>`: Target directory for exported templates (default: current directory)
 
 ## Usage Examples
 
@@ -294,7 +336,7 @@ Here are some common issues and their solutions:
 04. **Issue**: AI-assisted tasks are not producing the expected results.
    **Solution**: Provide more detailed task descriptions and instructions. You can also try using a different AI model or adjusting the prompt in your custom template.
 
-05. **Issue**: Error "ANTHROPIC_API_KEY not set" when running AI-assisted tasks.
-   **Solution**: Ensure you've set the `ANTHROPIC_API_KEY` environment variable with your Anthropic API key. You can do this by running `export ANTHROPIC_API_KEY=your_api_key` before running CodeWhisper.
+05. **Issue**: Error "ANTHROPIC_API_KEY (or OPENAI_API_KEY or GROQ_API_KEY) not set" when running AI-assisted tasks.
+   **Solution**: Ensure you've set the `ANTHROPIC_API_KEY` (or `OPENAI_API_KEY` or `GROQ_API_KEY` ) environment variable with your API key. You can do this by running `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key` before running CodeWhisper.
 
 For more complex issues or if these solutions don't help, please open an issue on the [CodeWhisper GitHub repository](https://github.com/gmickel/CodeWhisper/issues).

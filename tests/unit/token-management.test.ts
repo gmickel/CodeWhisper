@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getModelConfig } from '../../src/ai/model-config';
 import {
-  calculateTokenUsage,
   countTokens,
   estimateTokenCount,
   truncateToContextLimit,
@@ -78,20 +77,6 @@ describe('Token Management', () => {
     });
   });
 
-  describe('calculateTokenUsage', () => {
-    it('should calculate token usage correctly', () => {
-      const input = 'Input text';
-      const output = 'Output text';
-      const usage = calculateTokenUsage(
-        input,
-        output,
-        'claude-3-5-sonnet-20240620',
-      );
-      expect(usage.inputTokens).toBeGreaterThan(0);
-      expect(usage.outputTokens).toBeGreaterThan(0);
-    });
-  });
-
   describe('getModelSpecs', () => {
     it('should return correct specs for Claude models', () => {
       const specs = getModelConfig('claude-3-5-sonnet-20240620');
@@ -100,6 +85,7 @@ describe('Token Management', () => {
         maxOutput: 8192,
         modelName: 'Claude 3.5 Sonnet',
         pricing: { inputCost: 3, outputCost: 15 },
+        modelFamily: 'claude',
       });
     });
 
@@ -110,6 +96,18 @@ describe('Token Management', () => {
         maxOutput: 4096,
         modelName: 'GPT 4 Omni',
         pricing: { inputCost: 5, outputCost: 15 },
+        modelFamily: 'openai',
+      });
+    });
+
+    it('should return correct specs for GROQ models', () => {
+      const specs = getModelConfig('llama-3.1-70b-versatile');
+      expect(specs).toEqual({
+        contextWindow: 131072,
+        maxOutput: 8192,
+        modelName: 'Llama 3.1 70B Groq',
+        pricing: { inputCost: 0.15, outputCost: 0.6 },
+        modelFamily: 'groq',
       });
     });
 
