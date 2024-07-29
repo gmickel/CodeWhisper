@@ -271,7 +271,13 @@ Project Link: [https://github.com/gmickel/CodeWhisper](https://github.com/gmicke
 
 ## Project Growth
 
-[![Star History Chart](https://api.star-history.com/svg?repos=gmickel/CodeWhisper&type=Date)](https://star-history.com/#gmickel/CodeWhisper&Date)
+<a href="https://star-history.com/#gmickel/CodeWhisper&Timeline">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=gmickel/CodeWhisper&type=Timeline&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=gmickel/CodeWhisper&type=Timeline" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=gmickel/CodeWhisper&type=Timeline" />
+ </picture>
+</a>
 
 ---
 
