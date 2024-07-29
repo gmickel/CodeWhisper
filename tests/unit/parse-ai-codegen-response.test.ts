@@ -130,8 +130,10 @@ This is not even close to valid XML
 
     expect(result.fileList).toEqual([]);
     expect(result.files).toHaveLength(0);
-    expect(result.gitBranchName).toBe('');
+    expect(result.gitBranchName).toMatch(/^feature\/ai-task-\d+$/);
     expect(result.gitCommitMessage).toBe('Error: Malformed response');
+    expect(result.summary).toBe('');
+    expect(result.potentialIssues).toBe('');
   });
 
   it('should handle responses with missing sections', () => {
@@ -153,10 +155,45 @@ console.log('Hello, World!');
 
     expect(result.fileList).toEqual(['file1.js']);
     expect(result.files).toHaveLength(1);
-    expect(result.gitBranchName).toBe('');
     expect(result.gitCommitMessage).toBe('');
     expect(result.summary).toBe('');
     expect(result.potentialIssues).toBe('');
+  });
+
+  it('should provide a default branch name when gitBranchName is empty', () => {
+    const mockResponse = `
+<file_list></file_list>
+<git_branch_name></git_branch_name>
+<git_commit_message>Some commit message</git_commit_message>
+`;
+
+    const result = parseAICodegenResponse(mockResponse);
+
+    expect(result.gitBranchName).toMatch(/^feature\/ai-task-\d+$/);
+  });
+
+  it('should sanitize invalid branch names', () => {
+    const mockResponse = `
+<file_list></file_list>
+<git_branch_name>invalid/branch/name!@#$%^&*()</git_branch_name>
+<git_commit_message>Some commit message</git_commit_message>
+`;
+
+    const result = parseAICodegenResponse(mockResponse);
+
+    expect(result.gitBranchName).toBe('invalid/branch/name----------');
+  });
+
+  it('should provide a default branch name when sanitized name is empty', () => {
+    const mockResponse = `
+<file_list></file_list>
+<git_branch_name>!@#$%^&*()</git_branch_name>
+<git_commit_message>Some commit message</git_commit_message>
+`;
+
+    const result = parseAICodegenResponse(mockResponse);
+
+    expect(result.gitBranchName).toMatch(/^feature\/ai-task-\d+$/);
   });
 
   it('should handle responses with extra whitespace and newlines', () => {
