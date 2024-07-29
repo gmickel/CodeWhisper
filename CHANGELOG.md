@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/gmickel/CodeWhisper/compare/v1.4.1...v1.4.2) (2024-07-29)
+
+
+### Bug Fixes
+
+* **docs:** add the why ([31fcdb4](https://github.com/gmickel/CodeWhisper/commit/31fcdb4089a3c18d69d3ec04f9f6a29a8130096d))
+
 ## [1.4.1](https://github.com/gmickel/CodeWhisper/compare/v1.4.0...v1.4.1) (2024-07-28)
 
 
