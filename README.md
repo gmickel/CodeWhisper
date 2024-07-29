@@ -106,6 +106,7 @@ While CodeWhisper excels at performing individual coding tasks and even large fe
 * 🧠 AI-powered task planning and code generation
 * 🔄 Full git integration for version control of AI-generated changes
 * 🌍 Support for various models and LLM providers, such as Anthropic, OpenAI, and Groq
+* 🔐 Support for local models via Ollama
 * 🚀 Blazingly fast code processing with concurrent workers
 * 🎯 Customizable file filtering and exclusion
 * 📊 Intelligent caching for improved performance
@@ -150,7 +151,11 @@ codewhisper task -m <model>
 
 e.g.
 
+# Claude-3.5 Sonnet
 codewhisper task -m claude-3-5-sonnet-20240620
+
+# Or use a local Ollama model
+codewhisper task -m ollama:llama3.1:70b --context-window 131072 --max-tokens 8192
 ```
 
 > Note: If you are using CodeWhisper's LLM integration with `codewhisper task` you will need to set the respective environment variable for the model you want to use (e.g. `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key` ).

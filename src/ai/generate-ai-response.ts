@@ -3,6 +3,7 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 import chalk from 'chalk';
 import dotenv from 'dotenv';
+import { createOllama } from 'ollama-ai-provider';
 import type { GenerateAIResponseOptions, ModelFamily } from '../types';
 import { calculateCost, estimateCost } from './cost-calculation';
 import { getModelConfig, getModelFamily } from './model-config';
@@ -12,14 +13,16 @@ dotenv.config();
 
 interface ModelFamilyConfig {
   initClient: (
-    apiKey: string,
-  ) => ReturnType<typeof createAnthropic | typeof createOpenAI>;
-  apiKeyEnv: string;
+    apiKey?: string,
+  ) => ReturnType<
+    typeof createAnthropic | typeof createOpenAI | typeof createOllama
+  >;
+  apiKeyEnv?: string;
 }
 
 const modelFamilies: Record<ModelFamily, ModelFamilyConfig> = {
   claude: {
-    initClient: (apiKey: string) =>
+    initClient: (apiKey?: string) =>
       createAnthropic({
         apiKey,
         headers: {
@@ -29,7 +32,7 @@ const modelFamilies: Record<ModelFamily, ModelFamilyConfig> = {
     apiKeyEnv: 'ANTHROPIC_API_KEY',
   },
   openai: {
-    initClient: (apiKey: string) =>
+    initClient: (apiKey?: string) =>
       createOpenAI({
         apiKey,
         compatibility: 'strict',
@@ -37,19 +40,25 @@ const modelFamilies: Record<ModelFamily, ModelFamilyConfig> = {
     apiKeyEnv: 'OPENAI_API_KEY',
   },
   'openai-compatible': {
-    initClient: (apiKey: string) =>
+    initClient: (apiKey?: string) =>
       createOpenAI({
         apiKey,
       }),
     apiKeyEnv: 'OPENAI_COMPATIBLE_API_KEY',
   },
   groq: {
-    initClient: (apiKey: string) =>
+    initClient: (apiKey?: string) =>
       createOpenAI({
         baseURL: 'https://api.groq.com/openai/v1',
         apiKey,
       }),
     apiKeyEnv: 'GROQ_API_KEY',
+  },
+  ollama: {
+    initClient: () =>
+      createOllama({
+        baseURL: 'http://localhost:11434/api',
+      }),
   },
 };
 
@@ -60,7 +69,7 @@ export async function generateAIResponse(
   options: GenerateAIResponseOptions,
 ): Promise<string> {
   const modelKey = options.model;
-  const modelConfig = getModelConfig(modelKey);
+  let modelConfig = getModelConfig(modelKey);
 
   if (!modelConfig) {
     throw new Error(`Unknown model: ${modelKey}`);
@@ -69,14 +78,34 @@ export async function generateAIResponse(
   const modelFamily = getModelFamily(modelKey);
   const familyConfig = modelFamilies[modelFamily];
 
-  const apiKey = process.env[familyConfig.apiKeyEnv];
-  if (!apiKey) {
-    throw new Error(
-      `${familyConfig.apiKeyEnv} is not set in the environment variables.`,
-    );
-  }
+  let client: ReturnType<
+    typeof createAnthropic | typeof createOpenAI | typeof createOllama
+  >;
 
-  const client = familyConfig.initClient(apiKey);
+  if (modelFamily === 'ollama') {
+    const ollamaModelName = modelKey.split(':')[1] || 'llama3.1:8b';
+    client = familyConfig.initClient();
+
+    // Use provided context window and max tokens, or fallback to defaults
+    modelConfig = {
+      ...modelConfig,
+      contextWindow: options.contextWindow || modelConfig.contextWindow,
+      maxOutput: options.maxTokens || modelConfig.maxOutput,
+      modelName: `Ollama ${ollamaModelName}`,
+    };
+  } else {
+    let apiKey: string | undefined;
+
+    if (familyConfig.apiKeyEnv) {
+      apiKey = process.env[familyConfig.apiKeyEnv];
+      if (!apiKey) {
+        throw new Error(
+          `${familyConfig.apiKeyEnv} is not set in the environment variables.`,
+        );
+      }
+    }
+    client = familyConfig.initClient(apiKey);
+  }
 
   const estimatedInputTokens = estimateTokenCount(prompt, modelKey);
   const estimatedOutputTokens = modelConfig.maxOutput;
@@ -114,7 +143,10 @@ export async function generateAIResponse(
 
   try {
     const result = await generateText({
-      model: client(modelKey),
+      model:
+        modelFamily === 'ollama'
+          ? client(modelKey.split(':')[1] || 'llama3.1:8b')
+          : client(modelKey),
       maxTokens: modelConfig.maxOutput,
       prompt: processedPrompt,
     });
@@ -142,7 +174,6 @@ export async function generateAIResponse(
     throw error;
   }
 }
-
 async function confirmCostExceedsThreshold(
   estimatedCost: number,
   threshold: number,

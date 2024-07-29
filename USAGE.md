@@ -254,7 +254,13 @@ codewhisper generate --custom-template ./my-templates/api-docs.hbs -f "src/api/*
 
 ```bash
 # Assuming you've set up the necessary environment variables for the new LLM provider
-codewhisper generate --model my-custom-llm -t "Refactor the authentication module"
+codewhisper generate --model llm
+```
+
+21. Use a local Ollama model:
+
+```bash
+codewhisper generate --model ollama:llama3.1:70b --context-window 131072 --max-tokens 8192
 ```
 
 ## CI/CD Integration

@@ -111,10 +111,21 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     spinner.succeed('Plan prompt generated successfully');
 
     spinner.start('Generating AI plan...');
-    const generatedPlan = await generateAIResponse(planPrompt, {
-      maxCostThreshold: options.maxCostThreshold,
-      model: options.model,
-    });
+    let generatedPlan: string;
+    if (options.model.includes('ollama')) {
+      generatedPlan = await generateAIResponse(planPrompt, {
+        maxCostThreshold: options.maxCostThreshold,
+        model: options.model,
+        contextWindow: options.contextWindow,
+        maxTokens: options.maxTokens,
+      });
+    } else {
+      generatedPlan = await generateAIResponse(planPrompt, {
+        maxCostThreshold: options.maxCostThreshold,
+        model: options.model,
+      });
+    }
+
     spinner.succeed('AI plan generated successfully');
 
     const reviewedPlan = await reviewPlan(generatedPlan);
@@ -167,10 +178,20 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     spinner.succeed('Codegen prompt generated successfully');
 
     spinner.start('Generating AI Code Modifications...');
-    const generatedCode = await generateAIResponse(codeGenPrompt, {
-      maxCostThreshold: options.maxCostThreshold,
-      model: options.model,
-    });
+    let generatedCode: string;
+    if (options.model.includes('ollama')) {
+      generatedCode = await generateAIResponse(codeGenPrompt, {
+        maxCostThreshold: options.maxCostThreshold,
+        model: options.model,
+        contextWindow: options.contextWindow,
+        maxTokens: options.maxTokens,
+      });
+    } else {
+      generatedCode = await generateAIResponse(codeGenPrompt, {
+        maxCostThreshold: options.maxCostThreshold,
+        model: options.model,
+      });
+    }
     spinner.succeed('AI Code Modifications generated successfully');
 
     const parsedResponse = parseAICodegenResponse(generatedCode);

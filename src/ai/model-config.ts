@@ -50,21 +50,36 @@ export const MODEL_CONFIGS: ModelSpecs = {
     pricing: { inputCost: 0.15, outputCost: 0.6 },
     modelFamily: 'groq',
   },
+  ollama: {
+    contextWindow: 4096,
+    maxOutput: 4096,
+    modelName: 'Ollama Model',
+    pricing: { inputCost: 0, outputCost: 0 },
+    modelFamily: 'ollama',
+  },
 };
 
 export function getModelNames(): string[] {
   return Object.keys(MODEL_CONFIGS);
 }
 
-export function getModelConfig(modelKey: string): ModelSpec | undefined {
-  if (!MODEL_CONFIGS[modelKey]) {
+export function getModelConfig(modelKey: string): ModelSpec {
+  if (modelKey.startsWith('ollama:')) {
+    return MODEL_CONFIGS.ollama;
+  }
+
+  const config = MODEL_CONFIGS[modelKey];
+  if (!config) {
     throw new Error(`Unknown model: ${modelKey}`);
   }
-  return MODEL_CONFIGS[modelKey];
+  return config;
 }
 
 export function getModelFamily(modelKey: string): ModelFamily {
+  if (modelKey.startsWith('ollama:')) {
+    return 'ollama';
+  }
+
   const config = getModelConfig(modelKey);
-  if (!config) throw new Error(`Unknown model: ${modelKey}`);
   return config.modelFamily;
 }
