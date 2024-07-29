@@ -32,6 +32,64 @@ Whether you're tackling complex refactoring, conducting thorough code reviews, o
 
 ![CodeWhisper](https://raw.githubusercontent.com/gmickel/CodeWhisper/main/assets/worker_sm.jpg)
 
+## 🤔 Why CodeWhisper?
+
+CodeWhisper was born out of a simple yet powerful idea: to provide AI models with meticulously curated context from your entire codebase in the most comfortable way possible. What started as a tool to generate comprehensive and customizable prompts from your codebase has evolved into a full-fledged AI-assisted development workflow solution.
+
+### The Power of Manual Context Curation
+
+Many AI coding assistants and tools fall short when tackling tasks that demand a comprehensive understanding of your project. They often lack the big-picture context necessary for making informed decisions about your codebase as a whole. CodeWhisper addresses this limitation through its unique manually curated context approach, delivering end-to-end task implementation with a git-first workflow:
+
+01. **Precision Through Human-Guided Curation**: CodeWhisper trusts you to handpick the most relevant parts of your codebase for any given task. This ensures the AI model receives exactly the context it needs, leading to more accurate and comprehensive task implementation.
+
+   Example: For a task to "Implement user authentication":
+   - You select core auth components, user models, and key API endpoints.
+   - CodeWhisper then generates and applies all necessary code modifications across selected files.
+   - The result is a fully implemented feature, from backend logic to frontend integration.
+
+02. **Project-Specific Knowledge Integration**: Manual curation allows you to include non-code context that automated tools might miss, such as architectural decisions or business logic explanations.
+
+   Example: When enhancing your payment system, you can include:
+   - Relevant code files
+   - Snippets from financial compliance documents
+   - Notes on transaction flow architecture
+   CodeWhisper uses this rich context to generate compliant, architecturally sound code modifications.
+
+03. **Noise Reduction, Signal Amplification**: By manually curating the context, you eliminate irrelevant information, enabling CodeWhisper to generate more focused and effective code modifications.
+
+   Example: For a UI redesign task, you can exclude backend complexities, allowing CodeWhisper to concentrate on generating precise frontend component updates and style changes.
+
+04. **Adaptive to Project Evolution**: As your project evolves, manual curation ensures CodeWhisper always works with the most up-to-date and relevant information.
+
+   Example: After adopting a new state management library, you can immediately update the context, ensuring CodeWhisper's generated code aligns with your new architecture.
+
+05. **Seamless Integration of External Knowledge**: CodeWhisper's approach allows you to easily incorporate relevant code snippets or documentation from outside your current project.
+
+   Example: When implementing a new API integration, you could include:
+   - Your existing API service files
+   - Official documentation of the third-party API
+   - Example implementations from other projects
+   CodeWhisper will then use this context to generate a fully functional integration, handling authentication, data mapping, and error scenarios.
+
+06. **Git-First Workflow**: CodeWhisper automatically creates new branches before applying any code modifications, ensuring a clean and organized development process.
+
+   Example: For a task to "Add user profile management":
+   - CodeWhisper creates a new branch (e.g., `feature/user-profile-management` )
+   - Generates and applies all necessary code changes within this branch
+   - Optionally prepares a commit with a descriptive message
+   This approach makes it straightforward to track CodeWhisper's output and review the changes in a dedicated branch.
+
+By leveraging manually curated context and a git-first approach, CodeWhisper transforms from a simple code assistant into a comprehensive task implementation tool. It doesn't just suggest code snippets; it generates, applies, and organizes entire feature implementations. This approach combines the best of both worlds: the vast knowledge and processing power of AI models with the nuanced understanding and decision-making capabilities of experienced developers.
+
+### Beyond Simple Code Completion
+
+While CodeWhisper excels at performing individual coding tasks and even large feature implementations, its true power shines in its flexibility to also tackle scenarios that require understanding the big picture:
+
+* **Refactoring**: Make informed decisions about restructuring your code based on a comprehensive understanding of your project's architecture.
+* **Architectural Insights**: Get AI-driven suggestions for improving your overall code structure and design patterns.
+* **Code Reviews**: Conduct more thorough and context-aware code reviews with AI assistance.
+* **Documentation**: Generate more accurate and comprehensive documentation that takes into account the entire project structure.
+
 ## ✨ Key Features
 
 * 🧠 AI-powered task planning and code generation
