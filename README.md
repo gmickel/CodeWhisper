@@ -195,7 +195,7 @@ CodeWhisper uses Handlebars templates to generate output. You can use pre-define
 
 ## 🔧 Configuration
 
-Create a `.codewhisperrc` file in your project root for custom configurations. For more details on configuration options, check [CUSTOMIZATION.md](CUSTOMIZATION.md).
+For more details on custom templates, extending CodeWhisper, and integrating with other tools, check [CUSTOMIZATION.md](CUSTOMIZATION.md).
 
 ## 📚 API
 
