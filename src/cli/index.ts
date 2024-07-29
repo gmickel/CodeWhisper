@@ -20,8 +20,16 @@ import {
   getTemplatesDir,
 } from '../utils/template-utils';
 
-const templatesDir = getTemplatesDir();
+function parseOptionStringToInt(value: string): number {
+  // parseInt takes a string and a radix
+  const parsedValue = Number.parseInt(value, 10);
+  if (Number.isNaN(parsedValue)) {
+    throw new Error(`Invalid number: ${value}`);
+  }
+  return parsedValue;
+}
 
+const templatesDir = getTemplatesDir();
 const program = new Command();
 
 export function cli(_args: string[]) {
@@ -71,6 +79,18 @@ export function cli(_args: string[]) {
       '-m, --model <modelId>',
       'Specify the AI model to use',
       'claude-3-5-sonnet-20240620',
+    )
+    .option(
+      '-c, --context-window <number>',
+      'Specify the context window for the AI model. Only applicable for Ollama models.',
+      parseOptionStringToInt,
+      undefined,
+    )
+    .option(
+      '-mt, --max-tokens <number>',
+      'Specify the max output tokens for the AI model. Only applicable for Ollama models.',
+      parseOptionStringToInt,
+      undefined,
     )
     .option('-g, --gitignore <path>', 'Path to .gitignore file', '.gitignore')
     .option(

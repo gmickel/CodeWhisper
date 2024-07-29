@@ -48,6 +48,8 @@ export type AiAssistedTaskOptions = Pick<
   instructions?: string;
   autoCommit?: boolean;
   model: string;
+  contextWindow?: number;
+  maxTokens?: number;
 };
 
 export type ProcessOptions = Pick<
@@ -95,6 +97,8 @@ export interface AIParsedResponse {
 export interface GenerateAIResponseOptions {
   maxCostThreshold?: number;
   model: string;
+  contextWindow?: number;
+  maxTokens?: number;
 }
 
 export interface ApplyChangesOptions {
@@ -108,7 +112,12 @@ interface LLMPricing {
   outputCost: number;
 }
 
-export type ModelFamily = 'claude' | 'openai' | 'openai-compatible' | 'groq';
+export type ModelFamily =
+  | 'claude'
+  | 'openai'
+  | 'openai-compatible'
+  | 'groq'
+  | 'ollama';
 
 export interface ModelSpec {
   contextWindow: number;

@@ -67,6 +67,7 @@ describe('Cost Calculation', () => {
         'gpt-4o',
         'gpt-4o-mini',
         'llama-3.1-70b-versatile',
+        'ollama',
       ]);
     });
   });
