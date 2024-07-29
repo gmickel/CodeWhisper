@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/gmickel/CodeWhisper/compare/v1.4.2...v1.5.0) (2024-07-29)
+
+
+### Features
+
+* add ollama support ([#32](https://github.com/gmickel/CodeWhisper/issues/32)) ([6c3b644](https://github.com/gmickel/CodeWhisper/commit/6c3b644dcdb3ce32b768906920f64bb2631b4546))
+
 ## [1.4.2](https://github.com/gmickel/CodeWhisper/compare/v1.4.1...v1.4.2) (2024-07-29)
 
 
