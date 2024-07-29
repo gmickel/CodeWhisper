@@ -20,6 +20,7 @@ Blazingly fast codebase-to-LLM context bridge and AI-powered code generation wor
 [Configuration](#-configuration) •
 [API](#-api) •
 [Contributing](#-contributing) •
+[Roadmap](#-roadmap) •
 [FAQ](#-faq)
 
 ## 📖 About
@@ -216,7 +217,7 @@ We welcome contributions to CodeWhisper! Please read our [CONTRIBUTING.md](CONTR
 * [ ] Add GitHub/GitLab integration for fetching issues and pull requests
 * [x] Finish OpenAI and Groq support
 * [x] Add support for other LLMs
-* [ ] Add support for local models via Ollama
+* [x] Add support for local models via Ollama
 * [ ] Experiment with partial file modifications
 * [ ] Experiment with generateObject with a fixed schema
 * [ ] Run evaluations on generated code
