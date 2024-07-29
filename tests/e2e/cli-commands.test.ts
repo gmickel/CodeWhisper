@@ -8,7 +8,7 @@ import { normalizePath } from '../../src/utils/normalize-path';
 
 const execAsync = promisify(exec);
 
-describe.sequential('CLI Commands', () => {
+describe('CLI Commands', () => {
   const cliPath = path.resolve(__dirname, '..', '..', 'src', 'cli', 'index.ts');
   const testProjectPath = path.resolve(
     __dirname,
@@ -19,7 +19,10 @@ describe.sequential('CLI Commands', () => {
   const outputPath = path.join(testProjectPath, 'output.md');
   const tempGitignorePath = path.join(testProjectPath, '.gitignore');
   const tempTodosPath = path.join(testProjectPath, 'todos.md');
-  const customTemplatePath = path.join(testProjectPath, 'custom-template.hbs');
+  const customTemplatePath = path.join(
+    testProjectPath,
+    'custom-template-e2e.hbs',
+  );
   const customReadmeTemplatePath = path.join(
     testProjectPath,
     '..',
@@ -88,7 +91,7 @@ describe.sequential('CLI Commands', () => {
     }
   });
 
-  it('should generate markdown with custom template', () => {
+  it('should generate markdown with custom template', async () => {
     try {
       const command = `pnpm exec esno ${cliPath} generate -p "${normalizePath(testProjectPath)}" -o "${normalizePath(outputPath)}" --custom-template "${normalizePath(customTemplatePath)}"`;
 
@@ -98,10 +101,11 @@ describe.sequential('CLI Commands', () => {
         cwd: path.resolve(__dirname, '../..'), // Set working directory to project root
       });
 
+      await new Promise((resolve) => setTimeout(resolve, 500));
       const output = fs.readFileSync(outputPath, 'utf-8');
 
       expect(output).toContain('# Custom Template');
-      expect(output).toContain(normalizePath('custom-template.hbs'));
+      expect(output).toContain(normalizePath('custom-template-e2e.hbs'));
       expect(output).toContain('package.json');
     } catch (error) {
       console.error('Error executing command:', error);
