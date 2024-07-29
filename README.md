@@ -154,7 +154,7 @@ e.g.
 # Claude-3.5 Sonnet
 codewhisper task -m claude-3-5-sonnet-20240620
 
-# Or use a local Ollama model
+# Or use a local Ollama model (not recommended as it will be slow and inaccurate for comprehensive feature implementation tasks)
 codewhisper task -m ollama:llama3.1:70b --context-window 131072 --max-tokens 8192
 ```
 
