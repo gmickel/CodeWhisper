@@ -9,7 +9,7 @@ import { applyChanges } from '../git/apply-changes';
 import { selectFilesPrompt } from '../interactive/select-files-prompt';
 import type { AiAssistedTaskOptions, MarkdownOptions } from '../types';
 import { DEFAULT_CACHE_PATH } from '../utils/cache-utils';
-import { ensureBranch } from '../utils/git-tools';
+import { ensureBranch, ensureValidBranchName } from '../utils/git-tools';
 import {
   collectVariables,
   extractTemplateVariables,
@@ -195,6 +195,10 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     spinner.succeed('AI Code Modifications generated successfully');
 
     const parsedResponse = parseAICodegenResponse(generatedCode);
+
+    parsedResponse.gitBranchName = ensureValidBranchName(
+      parsedResponse.gitBranchName,
+    );
 
     if (options.dryRun) {
       spinner.info(

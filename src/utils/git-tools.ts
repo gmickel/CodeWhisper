@@ -32,6 +32,21 @@ export async function prReview(prNumber: string): Promise<FileInfo[]> {
   return [];
 }
 
+export function ensureValidBranchName(branchName: string): string {
+  // Remove any characters that are not allowed in Git branch names
+  let sanitizedName = branchName.replace(/[^a-zA-Z0-9-_./]/g, '-');
+
+  // Ensure the branch name doesn't start or end with a slash
+  sanitizedName = sanitizedName.replace(/^\/+|\/+$/g, '');
+
+  // If the branch name is empty after sanitization, provide a default
+  if (!sanitizedName) {
+    sanitizedName = `feature/ai-task-${Date.now()}`;
+  }
+
+  return sanitizedName;
+}
+
 export async function ensureBranch(
   basePath: string,
   initialBranchName: string,
