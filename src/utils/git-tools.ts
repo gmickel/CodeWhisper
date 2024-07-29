@@ -39,8 +39,8 @@ export function ensureValidBranchName(branchName: string): string {
   // Ensure the branch name doesn't start or end with a slash
   sanitizedName = sanitizedName.replace(/^\/+|\/+$/g, '');
 
-  // If the branch name is empty after sanitization, provide a default
-  if (!sanitizedName) {
+  // If the branch name is empty or consists only of dashes after sanitization, provide a default
+  if (!sanitizedName || /^-+$/.test(sanitizedName)) {
     sanitizedName = `feature/ai-task-${Date.now()}`;
   }
 

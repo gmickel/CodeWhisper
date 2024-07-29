@@ -1,4 +1,5 @@
 import type { AIParsedResponse } from '../types';
+import { ensureValidBranchName } from '../utils/git-tools';
 
 export function parseAICodegenResponse(response: string): AIParsedResponse {
   const result: AIParsedResponse = {
@@ -55,9 +56,9 @@ export function parseAICodegenResponse(response: string): AIParsedResponse {
     }
 
     // Parse other fields
-    result.gitBranchName =
-      parseField(response, 'git_branch_name') ||
-      `feature/ai-task-${Date.now()}`;
+    result.gitBranchName = ensureValidBranchName(
+      parseField(response, 'git_branch_name'),
+    );
     result.gitCommitMessage = parseField(response, 'git_commit_message');
     result.summary = parseField(response, 'summary');
     result.potentialIssues = parseField(response, 'potential_issues');
@@ -85,7 +86,6 @@ function isResponseMalformed(result: AIParsedResponse): boolean {
   return (
     result.fileList.length === 0 &&
     result.files.length === 0 &&
-    result.gitBranchName === '' &&
     result.gitCommitMessage === ''
   );
 }
