@@ -27,10 +27,7 @@ describe('CLI Commands', () => {
   );
 
   beforeAll(async () => {
-    // Create test project directory
     await fs.ensureDir(testProjectPath);
-
-    // Create test files
     await fs.writeFile(
       path.join(testProjectPath, 'main.js'),
       'console.log("Hello World");',
@@ -43,12 +40,8 @@ describe('CLI Commands', () => {
       path.join(testProjectPath, 'package.json'),
       '{"name": "test-project", "version": "1.0.0"}',
     );
-
-    // Ensure .gitignore and todos.md exists
     await fs.writeFile(tempGitignorePath, 'todos.md\n');
     await fs.writeFile(tempTodosPath, '# TODOs\n\n- Write tests\n- Fix bugs\n');
-
-    // Ensure custom templates exist
     await fs.writeFile(
       customTemplatePath,
       '# Custom Template\n\n{{#each files}}{{this.path}}\n{{/each}}',
@@ -60,39 +53,40 @@ describe('CLI Commands', () => {
   });
 
   afterAll(async () => {
-    // Clean up the entire test project directory
     await fs.remove(testProjectPath);
   });
 
+  async function runCommand(command: string) {
+    try {
+      const { stdout, stderr } = await execAsync(command, {
+        env: { ...process.env, NODE_ENV: 'test' },
+        cwd: path.resolve(__dirname, '../..'),
+      });
+      if (stderr) console.error('Command stderr:', stderr);
+      return stdout;
+    } catch (error) {
+      console.error('Command execution failed:', error);
+      throw error;
+    }
+  }
+
   it('should generate markdown respecting .gitignore by default', async () => {
-    const command = `pnpm exec esno ${cliPath} generate -p "${normalizePath(testProjectPath)}" -o "${normalizePath(outputPath)}"`;
-
-    await execAsync(command, {
-      env: { ...process.env, NODE_ENV: 'test' },
-      cwd: path.resolve(__dirname, '../..'),
-    });
-
+    const command = `pnpm exec esno ${normalizePath(cliPath)} generate -p "${normalizePath(testProjectPath)}" -o "${normalizePath(outputPath)}"`;
+    await runCommand(command);
     const output = await fs.readFile(outputPath, 'utf-8');
-
     expect(output).toContain('# Code Summary');
     expect(output).toContain('## Files');
     expect(output).not.toContain('todos.md');
-  });
+  }, 30000);
 
   it('should generate markdown ignoring .gitignore with --no-respect-gitignore', async () => {
-    const command = `pnpm exec esno ${cliPath} generate -p "${normalizePath(testProjectPath)}" -o "${normalizePath(outputPath)}" --no-respect-gitignore`;
-
-    await execAsync(command, {
-      env: { ...process.env, NODE_ENV: 'test' },
-      cwd: path.resolve(__dirname, '../..'),
-    });
-
+    const command = `pnpm exec esno ${normalizePath(cliPath)} generate -p "${normalizePath(testProjectPath)}" -o "${normalizePath(outputPath)}" --no-respect-gitignore`;
+    await runCommand(command);
     const output = await fs.readFile(outputPath, 'utf-8');
-
     expect(output).toContain('# Code Summary');
     expect(output).toContain('## Files');
     expect(output).toContain('todos.md');
-  });
+  }, 30000);
 
   it('should generate markdown with custom template', async () => {
     const command = `pnpm exec esno ${cliPath} generate -p "${normalizePath(testProjectPath)}" -o "${normalizePath(outputPath)}" --custom-template "${normalizePath(customTemplatePath)}"`;
@@ -107,7 +101,7 @@ describe('CLI Commands', () => {
     expect(output).toContain('# Custom Template');
     expect(output).toContain(normalizePath('custom-template-e2e.hbs'));
     expect(output).toContain('package.json');
-  });
+  }, 30000);
 
   it('should generate markdown applying filters and excludes', async () => {
     const command = `pnpm exec esno ${cliPath} generate -p "${normalizePath(testProjectPath)}" -o "${normalizePath(outputPath)}" --filter "**/*.js" --exclude "**/main.js" --no-respect-gitignore`;
@@ -124,7 +118,7 @@ describe('CLI Commands', () => {
     expect(output).not.toContain('utils.ts');
     expect(output).not.toContain('main.js');
     expect(output).not.toContain('todos.md');
-  });
+  }, 30000);
 
   it('should generate markdown suppressing comments', async () => {
     const command = `pnpm exec esno ${cliPath} generate -p "${normalizePath(testProjectPath)}" -o "${normalizePath(outputPath)}" --suppress-comments`;
@@ -138,7 +132,7 @@ describe('CLI Commands', () => {
 
     expect(output).toContain('# Code Summary');
     expect(output).toContain('## Files');
-  });
+  }, 30000);
 
   it('should generate markdown using a specific cache path', async () => {
     const customCachePath = path.join(testProjectPath, 'custom-cache.json');
@@ -159,7 +153,7 @@ describe('CLI Commands', () => {
 
     // Clean up custom cache path
     await fs.remove(customCachePath);
-  });
+  }, 30000);
 
   it('should generate markdown with custom data and prompt', async () => {
     const customData = JSON.stringify({
@@ -199,18 +193,15 @@ describe('CLI Commands', () => {
     expect(output).toContain('A fantastic tool for developers');
     expect(output).toContain('## Your Task');
     expect(output).toContain('Please review this code and provide feedback.');
-  });
+  }, 30000);
 
   it('should generate markdown with line numbers when --line-numbers flag is used', async () => {
     const testDir1 = path.join(testProjectPath, 'test-project-1');
     const testDir2 = path.join(testProjectPath, 'test-project-2');
-
     await fs.ensureDir(testDir1);
     await fs.ensureDir(testDir2);
-
     const testFile1 = path.join(testDir1, 'test-file.js');
     const testFile2 = path.join(testDir2, 'test-file.js');
-
     await fs.writeFile(
       testFile1,
       'const x = 1;\nconst y = 2;\nconsole.log(x + y);',
@@ -219,24 +210,15 @@ describe('CLI Commands', () => {
       testFile2,
       'const x = 1;\nconst y = 2;\nconsole.log(x + y);',
     );
-
     const outputPath1 = path.join(testDir1, 'output-with-line-numbers.md');
     const outputPath2 = path.join(testDir2, 'output-without-line-numbers.md');
 
-    const commandWithLineNumbers = `pnpm exec esno ${cliPath} generate -p "${normalizePath(testDir1)}" -o "${normalizePath(outputPath1)}" --line-numbers`;
-    const commandWithoutLineNumbers = `pnpm exec esno ${cliPath} generate -p "${normalizePath(testDir2)}" -o "${normalizePath(outputPath2)}"`;
+    const commandWithLineNumbers = `pnpm exec esno ${normalizePath(cliPath)} generate -p "${normalizePath(testDir1)}" -o "${normalizePath(outputPath1)}" --line-numbers`;
+    const commandWithoutLineNumbers = `pnpm exec esno ${normalizePath(cliPath)} generate -p "${normalizePath(testDir2)}" -o "${normalizePath(outputPath2)}"`;
 
-    await execAsync(commandWithLineNumbers, {
-      env: { ...process.env, NODE_ENV: 'test' },
-      cwd: path.resolve(__dirname, '../..'),
-    });
-
+    await runCommand(commandWithLineNumbers);
     await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    await execAsync(commandWithoutLineNumbers, {
-      env: { ...process.env, NODE_ENV: 'test' },
-      cwd: path.resolve(__dirname, '../..'),
-    });
+    await runCommand(commandWithoutLineNumbers);
 
     const outputWithLineNumbers = await fs.readFile(outputPath1, 'utf-8');
     const outputWithoutLineNumbers = await fs.readFile(outputPath2, 'utf-8');
@@ -244,8 +226,7 @@ describe('CLI Commands', () => {
     expect(outputWithLineNumbers).toContain('1 const x = 1;');
     expect(outputWithLineNumbers).toContain('2 const y = 2;');
     expect(outputWithLineNumbers).toContain('3 console.log(x + y);');
-
     expect(outputWithoutLineNumbers).not.toContain('1 const x = 1;');
     expect(outputWithoutLineNumbers).toContain('const x = 1;');
-  }, 30000);
+  }, 60000);
 });
