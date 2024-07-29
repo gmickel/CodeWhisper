@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/gmickel/CodeWhisper/compare/v1.5.0...v1.5.1) (2024-07-29)
+
+
+### Bug Fixes
+
+* ensure branch name is valid ([82ced3c](https://github.com/gmickel/CodeWhisper/commit/82ced3c1c5ead957979f03756e4e503a85c0b3a2))
+
 # [1.5.0](https://github.com/gmickel/CodeWhisper/compare/v1.4.2...v1.5.0) (2024-07-29)
 
 
