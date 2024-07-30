@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/gmickel/CodeWhisper/compare/v1.5.2...v1.6.0) (2024-07-30)
+
+
+### Features
+
+* add more optimal temperature settings for each AI generation task ([#36](https://github.com/gmickel/CodeWhisper/issues/36)) ([4593f42](https://github.com/gmickel/CodeWhisper/commit/4593f42908dce1590e2aa6000157bd34f320b61f))
+
 ## [1.5.2](https://github.com/gmickel/CodeWhisper/compare/v1.5.1...v1.5.2) (2024-07-29)
 
 
