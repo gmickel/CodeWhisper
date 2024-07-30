@@ -237,7 +237,8 @@ We welcome contributions to CodeWhisper! Please read our [CONTRIBUTING.md](CONTR
 ## 🏎️ Roadmap
 
 * [x] Add AI-assisted task creation and code generation
-* [ ] Add GitHub/GitLab integration for fetching issues and pull requests
+* [x] Add GitHub integration for fetching issues and pull requests
+* [x] Add other integrations for fetching issues and pull requests (GitLab, Jira, Linear, etc.)
 * [x] Finish OpenAI and Groq support
 * [x] Add support for other LLMs
 * [x] Add support for local models via Ollama
