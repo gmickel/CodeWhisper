@@ -50,7 +50,7 @@ export function ensureValidBranchName(branchName: string): string {
 export async function ensureBranch(
   basePath: string,
   initialBranchName: string,
-  options: { suffix?: string; maxAttempts?: number } = {},
+  options: { suffix?: string; maxAttempts?: number; issueNumber?: number } = {},
 ): Promise<string> {
   const git: SimpleGit = simpleGit(basePath);
   const suffix = options.suffix || '-ai-';
@@ -58,6 +58,11 @@ export async function ensureBranch(
 
   const branches = await git.branchLocal();
   let branchName = initialBranchName;
+
+  if (options.issueNumber) {
+    branchName = `issue-${options.issueNumber}/${branchName}`;
+  }
+
   let attempts = 0;
 
   while (attempts < maxAttempts) {
@@ -86,4 +91,34 @@ export async function createBranchAndCommit(
 
   await git.add('.');
   await git.commit(commitMessage);
+}
+
+export async function getGitHubRepoInfo(): Promise<{
+  owner: string;
+  repo: string;
+} | null> {
+  try {
+    const git: SimpleGit = simpleGit();
+    const remotes = await git.getRemotes(true);
+    const originRemote = remotes.find((remote) => remote.name === 'origin');
+
+    if (!originRemote) {
+      return null;
+    }
+
+    const match = originRemote.refs.fetch.match(
+      /github\.com[:/]([^/]+)\/([^.]+)\.git/,
+    );
+    if (!match) {
+      return null;
+    }
+
+    return {
+      owner: match[1],
+      repo: match[2],
+    };
+  } catch (error) {
+    console.error('Error getting GitHub repository information:', error);
+    return null;
+  }
 }

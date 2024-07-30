@@ -139,6 +139,7 @@ export function cli(_args: string[]) {
       '-i, --instructions <instructions>',
       'Additional instructions for the task',
     )
+    .option('--github-issue', 'Use GitHub issue for task input', false)
     .action(async (options) => {
       try {
         const modelConfig = getModelConfig(options.model);
