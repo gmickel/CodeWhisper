@@ -53,6 +53,40 @@ Options:
 * `-d, --description <description>`: Detailed task description
 * `-i, --instructions <instructions>`: Additional instructions for the task
 
+#### GitHub Issue Integration
+
+To use the GitHub issue integration feature:
+
+1. Create a GitHub fine-grained personal access token:
+   - Go to [GitHub's Personal Access Tokens page](https://github.com/settings/tokens?type=beta)
+   - Click "Generate new token"
+   - Set the token name and expiration
+   - Select the repository you want to access
+   - Under "Repository permissions", find "Issues" and set it to "Read-only"
+   - Generate the token
+
+   For detailed instructions, refer to [GitHub's documentation on creating fine-grained personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token).
+
+2. Set the `GITHUB_TOKEN` environment variable:
+
+   ```bash
+   export GITHUB_TOKEN=your_github_personal_access_token
+   ```
+
+3. Use the `--github-issue` flag when running a task:
+
+```bash
+codewhisper task --github-issue -m claude-3-5-sonnet-20240620
+```
+
+This will allow you to select from open issues in the current repository.
+
+Note:
+
+- The token must have "Issues" repository permission with read access.
+- This feature works with GitHub App user access tokens, GitHub App installation access tokens, and fine-grained personal access tokens.
+- If you're only accessing public repositories, you can use this feature without authentication, but a token is recommended to avoid rate limiting.
+
 ### `apply-task` : Apply AI-Generated Task from a previous dry-run
 
 ```bash

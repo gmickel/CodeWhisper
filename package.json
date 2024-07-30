@@ -84,6 +84,7 @@
     "@ai-sdk/openai": "0.0.40",
     "@anthropic-ai/sdk": "0.25.0",
     "@inquirer/prompts": "5.3.5",
+    "@octokit/rest": "^21.0.1",
     "ai": "3.2.39",
     "chalk": "5.3.0",
     "commander": "12.1.0",

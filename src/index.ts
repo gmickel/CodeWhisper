@@ -13,6 +13,7 @@ export type {
   MarkdownOptions,
   FileInfo,
   ModelSpecs,
+  GitHubIssue,
 } from './types';
 
 // Utilities

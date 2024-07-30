@@ -169,6 +169,7 @@ describe('runAIAssistedTask', () => {
     expect(ensureBranch).toHaveBeenCalledWith(
       expect.stringMatching(/[\\\/]test[\\\/]path$/),
       'feature/test-task',
+      { issueNumber: undefined },
     );
     expect(applyChanges).toHaveBeenCalledWith(
       expect.objectContaining({

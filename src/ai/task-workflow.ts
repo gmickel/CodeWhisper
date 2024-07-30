@@ -7,6 +7,7 @@ import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
 import { applyChanges } from '../git/apply-changes';
 import { selectFilesPrompt } from '../interactive/select-files-prompt';
+import { selectGitHubIssuePrompt } from '../interactive/select-github-issue-prompt';
 import type { AiAssistedTaskOptions, MarkdownOptions } from '../types';
 import { DEFAULT_CACHE_PATH } from '../utils/cache-utils';
 import { ensureBranch } from '../utils/git-tools';
@@ -28,20 +29,47 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     const basePath = path.resolve(options.path ?? '.');
 
     let taskDescription = '';
-    if (options.task || options.description) {
-      taskDescription =
-        `# ${options.task || 'Task'}\n\n${options.description || ''}`.trim();
-    } else {
-      taskDescription =
-        (await getTaskDescription()) ?? 'No task description provided.';
+    let instructions = '';
+
+    if (options.githubIssue) {
+      if (!process.env.GITHUB_TOKEN) {
+        console.log(
+          chalk.yellow(
+            'GITHUB_TOKEN not set. GitHub issue functionality may be limited.',
+          ),
+        );
+      }
+      const selectedIssue = await selectGitHubIssuePrompt();
+      if (selectedIssue) {
+        taskDescription = `# ${selectedIssue.title}\n\n${selectedIssue.body}`;
+        options.issueNumber = selectedIssue.number;
+      } else {
+        console.log(
+          chalk.yellow(
+            'No GitHub issue selected. Falling back to manual input.',
+          ),
+        );
+      }
     }
 
-    let instructions = '';
-    if (options.instructions) {
-      instructions = options.instructions;
-    } else {
-      instructions = (await getInstructions()) ?? 'No instructions provided.';
+    if (!taskDescription) {
+      if (options.task || options.description) {
+        taskDescription =
+          `# ${options.task || 'Task'}\n\n${options.description || ''}`.trim();
+      } else {
+        taskDescription =
+          (await getTaskDescription()) ?? 'No task description provided.';
+      }
     }
+
+    if (!instructions) {
+      if (options.instructions) {
+        instructions = options.instructions;
+      } else {
+        instructions = (await getInstructions()) ?? 'No instructions provided.';
+      }
+    }
+
     const userFilters = options.filter || [];
 
     const selectedFiles = await selectFilesPrompt(
@@ -259,6 +287,7 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
       const actualBranchName = await ensureBranch(
         basePath,
         parsedResponse.gitBranchName,
+        { issueNumber: options.issueNumber },
       );
 
       // Apply changes
@@ -267,7 +296,10 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
       if (options.autoCommit) {
         const git = simpleGit(basePath);
         await git.add('.');
-        await git.commit(parsedResponse.gitCommitMessage);
+        const commitMessage = options.issueNumber
+          ? `${parsedResponse.gitCommitMessage} (Closes #${options.issueNumber})`
+          : parsedResponse.gitCommitMessage;
+        await git.commit(commitMessage);
         spinner.succeed(
           `AI Code Modifications applied and committed to branch: ${actualBranchName}`,
         );
@@ -288,7 +320,9 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
         );
         console.log(chalk.cyan('  git add .'));
         console.log(
-          chalk.cyan(`  git commit -m "${parsedResponse.gitCommitMessage}"`),
+          chalk.cyan(
+            `  git commit -m "${parsedResponse.gitCommitMessage}${options.issueNumber ? ` (Closes #${options.issueNumber})` : ''}"`,
+          ),
         );
       }
     }
