@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { generateAIResponse } from '../../src/ai/generate-ai-response';
 import { getInstructions } from '../../src/ai/get-instructions';
 import { getTaskDescription } from '../../src/ai/get-task-description';
+import { getModelConfig } from '../../src/ai/model-config';
 import { parseAICodegenResponse } from '../../src/ai/parse-ai-codegen-response';
 import { reviewPlan } from '../../src/ai/plan-review';
 import { runAIAssistedTask } from '../../src/ai/task-workflow';
@@ -11,7 +12,11 @@ import { processFiles } from '../../src/core/file-processor';
 import { generateMarkdown } from '../../src/core/markdown-generator';
 import { applyChanges } from '../../src/git/apply-changes';
 import { selectFilesPrompt } from '../../src/interactive/select-files-prompt';
-import type { AIParsedResponse, AiAssistedTaskOptions } from '../../src/types';
+import type {
+  AIParsedResponse,
+  AiAssistedTaskOptions,
+  ModelSpec,
+} from '../../src/types';
 import { ensureBranch } from '../../src/utils/git-tools';
 
 vi.mock('../../src/ai/get-task-description');
@@ -24,6 +29,7 @@ vi.mock('../../src/ai/parse-ai-codegen-response');
 vi.mock('../../src/ai/plan-review');
 vi.mock('../../src/git/apply-changes');
 vi.mock('../../src/utils/git-tools');
+vi.mock('../../src/ai/model-config');
 vi.mock('simple-git');
 
 describe('runAIAssistedTask', () => {
@@ -116,6 +122,18 @@ describe('runAIAssistedTask', () => {
       potentialIssues: 'None',
     };
 
+    const mockModelConfig: ModelSpec = {
+      contextWindow: 100000,
+      maxOutput: 4096,
+      modelName: 'Claude 3.5 Sonnet',
+      pricing: { inputCost: 3, outputCost: 15 },
+      modelFamily: 'claude',
+      temperature: {
+        planningTemperature: 0.5,
+        codegenTemperature: 0.3,
+      },
+    };
+
     vi.mocked(getTaskDescription).mockResolvedValue(mockTaskDescription);
     vi.mocked(getInstructions).mockResolvedValue(mockInstructions);
     vi.mocked(selectFilesPrompt).mockResolvedValue(mockSelectedFiles);
@@ -129,6 +147,7 @@ describe('runAIAssistedTask', () => {
     );
     vi.mocked(ensureBranch).mockResolvedValue('feature/test-task');
     vi.mocked(applyChanges).mockResolvedValue();
+    vi.mocked(getModelConfig).mockReturnValue(mockModelConfig);
 
     await runAIAssistedTask(mockOptions);
 
@@ -217,6 +236,20 @@ describe('runAIAssistedTask', () => {
       potentialIssues: 'None',
     };
 
+    const mockModelConfig: ModelSpec = {
+      contextWindow: 100000,
+      maxOutput: 4096,
+      modelName: 'Claude 3.5 Sonnet',
+      pricing: { inputCost: 3, outputCost: 15 },
+      modelFamily: 'claude',
+      temperature: {
+        planningTemperature: 0.5,
+        codegenTemperature: 0.3,
+      },
+    };
+
+    vi.mocked(getModelConfig).mockReturnValue(mockModelConfig);
+
     vi.mocked(parseAICodegenResponse).mockReturnValue(
       mockParsedResponse as unknown as AIParsedResponse,
     );
@@ -270,6 +303,20 @@ describe('runAIAssistedTask', () => {
       summary: 'Test',
       potentialIssues: 'None',
     };
+
+    const mockModelConfig: ModelSpec = {
+      contextWindow: 100000,
+      maxOutput: 4096,
+      modelName: 'Claude 3.5 Sonnet',
+      pricing: { inputCost: 3, outputCost: 15 },
+      modelFamily: 'claude',
+      temperature: {
+        planningTemperature: 0.5,
+        codegenTemperature: 0.3,
+      },
+    };
+
+    vi.mocked(getModelConfig).mockReturnValue(mockModelConfig);
 
     vi.mocked(parseAICodegenResponse).mockReturnValue(
       mockParsedResponse as unknown as AIParsedResponse,
@@ -328,6 +375,20 @@ describe('runAIAssistedTask', () => {
     vi.mocked(parseAICodegenResponse).mockReturnValue(
       mockParsedResponse as unknown as AIParsedResponse,
     );
+
+    const mockModelConfig: ModelSpec = {
+      contextWindow: 100000,
+      maxOutput: 4096,
+      modelName: 'Claude 3.5 Sonnet',
+      pricing: { inputCost: 3, outputCost: 15 },
+      modelFamily: 'claude',
+      temperature: {
+        planningTemperature: 0.5,
+        codegenTemperature: 0.3,
+      },
+    };
+
+    vi.mocked(getModelConfig).mockReturnValue(mockModelConfig);
 
     await runAIAssistedTask(optionsWithoutTask);
 

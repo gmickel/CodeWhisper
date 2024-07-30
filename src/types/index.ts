@@ -125,8 +125,14 @@ export interface ModelSpec {
   modelName: string;
   pricing: LLMPricing;
   modelFamily: ModelFamily;
+  temperature?: ModelTemperature;
 }
 
 export interface ModelSpecs {
   [key: string]: ModelSpec;
+}
+
+export interface ModelTemperature {
+  planningTemperature?: number;
+  codegenTemperature?: number;
 }
