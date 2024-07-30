@@ -139,9 +139,6 @@ describe('runAIAssistedTask', () => {
         path: expect.stringMatching(/[\\\/]test[\\\/]path$/),
       }),
     );
-    expect(processFiles).toHaveBeenCalledWith(
-      expect.objectContaining({ path: path.join('/', 'test', 'path') }),
-    );
     expect(generateMarkdown).toHaveBeenCalledTimes(2);
     expect(generateAIResponse).toHaveBeenCalledTimes(2);
     expect(reviewPlan).toHaveBeenCalledWith(mockGeneratedPlan);

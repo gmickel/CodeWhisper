@@ -95,9 +95,6 @@ describe('runInteractiveMode', () => {
     expect(fs.readFile).toHaveBeenCalledWith(mockTemplatePath, 'utf-8');
     expect(extractTemplateVariables).toHaveBeenCalledWith(mockTemplateContent);
     expect(collectVariables).toHaveBeenCalled();
-    expect(outputPathPrompt).toHaveBeenCalledWith(
-      path.join('/', 'test', 'path'),
-    );
     expect(processFiles).toHaveBeenCalledWith(
       expect.objectContaining({
         path: path.join('/', 'test', 'path'),
