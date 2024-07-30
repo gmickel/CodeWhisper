@@ -72,7 +72,7 @@
     "prerelease": "pnpm run lint && pnpm run test && pnpm run build",
     "release": "semantic-release",
     "fixPermissions": "chmod +x ./dist/cli.js",
-    "dev": "esno src/cli/index.ts",
+    "dev": "NODE_ENV=development esno src/cli/index.ts",
     "start": "node dist/cli/index.js",
     "test": "vitest",
     "test:ui": "vitest --ui",

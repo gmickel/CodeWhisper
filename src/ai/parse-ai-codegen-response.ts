@@ -55,6 +55,10 @@ export function parseAICodegenResponse(response: string): AIParsedResponse {
       });
     }
 
+    if (process.env.NODE_ENV === 'development') {
+      console.log('AI-generated response:', result);
+    }
+
     // Parse other fields
     result.gitBranchName = ensureValidBranchName(
       parseField(response, 'git_branch_name'),
