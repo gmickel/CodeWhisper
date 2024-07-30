@@ -84,7 +84,7 @@
     "@ai-sdk/openai": "0.0.40",
     "@anthropic-ai/sdk": "0.25.0",
     "@inquirer/prompts": "5.3.5",
-    "ai": "3.2.38",
+    "ai": "3.2.39",
     "chalk": "5.3.0",
     "commander": "12.1.0",
     "dotenv": "16.4.5",
@@ -101,7 +101,8 @@
     "ora": "8.0.1",
     "piscina": "4.6.1",
     "simple-git": "3.25.0",
-    "strip-comments": "2.0.1"
+    "strip-comments": "2.0.1",
+    "winston": "3.13.1"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",

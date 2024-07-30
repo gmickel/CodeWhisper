@@ -119,6 +119,7 @@ While CodeWhisper excels at performing individual coding tasks and even large fe
 * 🌈 Full language support for all text-based file types
 * 🤖 Interactive mode for granular file selection and template customization
 * ⚡ Optimized for large repositories
+* 📝 Detailed logging of AI prompts, responses, and parsing results
 
 ## 📺 Video
 

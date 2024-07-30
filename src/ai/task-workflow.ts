@@ -122,6 +122,7 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
         model: options.model,
         contextWindow: options.contextWindow,
         maxTokens: options.maxTokens,
+        logAiInteractions: options.logAiInteractions,
       });
     } else {
       generatedPlan = await generateAIResponse(
@@ -129,6 +130,7 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
         {
           maxCostThreshold: options.maxCostThreshold,
           model: options.model,
+          logAiInteractions: options.logAiInteractions,
         },
         modelConfig.temperature?.planningTemperature,
       );
@@ -193,6 +195,7 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
         model: options.model,
         contextWindow: options.contextWindow,
         maxTokens: options.maxTokens,
+        logAiInteractions: options.logAiInteractions,
       });
     } else {
       generatedCode = await generateAIResponse(
@@ -200,13 +203,17 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
         {
           maxCostThreshold: options.maxCostThreshold,
           model: options.model,
+          logAiInteractions: options.logAiInteractions,
         },
         modelConfig.temperature?.codegenTemperature,
       );
     }
     spinner.succeed('AI Code Modifications generated successfully');
 
-    const parsedResponse = parseAICodegenResponse(generatedCode);
+    const parsedResponse = parseAICodegenResponse(
+      generatedCode,
+      options.logAiInteractions,
+    );
 
     if (options.dryRun) {
       spinner.info(

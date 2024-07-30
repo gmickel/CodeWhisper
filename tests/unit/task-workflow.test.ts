@@ -76,8 +76,6 @@ describe('runAIAssistedTask', () => {
     const mockGeneratedPlan = 'Generated plan';
     const mockReviewedPlan = 'Reviewed plan';
     const mockGeneratedCode = `
-      <git_branch_name>feature/test-task</git_branch_name>
-      <git_commit_message>Implement test task</git_commit_message>
       <file_list>
       file1.ts
       file2.ts
@@ -96,6 +94,8 @@ describe('runAIAssistedTask', () => {
       </file_content>
       <file_status>modified</file_status>
       </file>
+      <git_branch_name>feature/test-task</git_branch_name>
+      <git_commit_message>Implement test task</git_commit_message>
       <summary>Updated both files</summary>
       <potential_issues>None</potential_issues>
     `;
@@ -161,7 +161,10 @@ describe('runAIAssistedTask', () => {
     expect(generateMarkdown).toHaveBeenCalledTimes(2);
     expect(generateAIResponse).toHaveBeenCalledTimes(2);
     expect(reviewPlan).toHaveBeenCalledWith(mockGeneratedPlan);
-    expect(parseAICodegenResponse).toHaveBeenCalledWith(mockGeneratedCode);
+    expect(parseAICodegenResponse).toHaveBeenCalledWith(
+      mockGeneratedCode,
+      undefined,
+    );
 
     expect(ensureBranch).toHaveBeenCalledWith(
       expect.stringMatching(/[\\\/]test[\\\/]path$/),
