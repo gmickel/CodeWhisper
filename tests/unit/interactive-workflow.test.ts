@@ -88,9 +88,10 @@ describe('runInteractiveMode', () => {
     await runInteractiveMode(mockOptions);
 
     expect(selectFilesPrompt).toHaveBeenCalledWith(
-      path.join('/', 'test', 'path'),
+      expect.stringMatching(/[\\\/]test[\\\/]path$/),
       false,
     );
+
     expect(selectTemplatePrompt).toHaveBeenCalled();
     expect(fs.readFile).toHaveBeenCalledWith(mockTemplatePath, 'utf-8');
     expect(extractTemplateVariables).toHaveBeenCalledWith(mockTemplateContent);
