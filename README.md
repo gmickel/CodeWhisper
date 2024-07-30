@@ -120,6 +120,7 @@ While CodeWhisper excels at performing individual coding tasks and even large fe
 * 🤖 Interactive mode for granular file selection and template customization
 * ⚡ Optimized for large repositories
 * 📝 Detailed logging of AI prompts, responses, and parsing results
+* 🔗 GitHub integration for fetching and working with issues (see [Configuration](#-configuration))
 
 ## 📺 Video
 
@@ -201,6 +202,27 @@ For detailed usage instructions and examples, please refer to [USAGE.md](USAGE.m
 CodeWhisper uses Handlebars templates to generate output. You can use pre-defined templates or create custom ones. For in-depth information on templating, see [TEMPLATES.md](TEMPLATES.md).
 
 ## 🔧 Configuration
+
+### GitHub Integration
+
+To use the GitHub issue integration feature, you need to set the `GITHUB_TOKEN` environment variable with a valid GitHub personal access token.
+
+You can create a fine-grained personal access token in your GitHub account settings. The token needs the following permission:
+
+- "Issues" repository permission with read access
+
+This allows CodeWhisper to list repository issues.
+
+To set up the token:
+
+1. Create a fine-grained personal access token following [GitHub's documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token).
+2. Set the environment variable:
+
+```bash
+export GITHUB_TOKEN=your_github_personal_access_token
+```
+
+> Note: This endpoint can be used without authentication if only public resources are requested. However, using a token is recommended to avoid rate limiting and access private repositories.
 
 For more details on custom templates, extending CodeWhisper, and integrating with other tools, check [CUSTOMIZATION.md](CUSTOMIZATION.md).
 

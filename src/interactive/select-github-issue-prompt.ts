@@ -1,5 +1,6 @@
 import { select } from '@inquirer/prompts';
-import { GitHubAPI, type GitHubIssue } from '../github/github-api';
+import { GitHubAPI } from '../github/github-api';
+import type { GitHubIssue } from '../types';
 import { getGitHubRepoInfo } from '../utils/git-tools';
 
 export async function selectGitHubIssuePrompt(): Promise<GitHubIssue | null> {

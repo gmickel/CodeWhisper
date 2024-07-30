@@ -1,16 +1,11 @@
 import { Octokit } from '@octokit/rest';
-
-export interface GitHubIssue {
-  number: number;
-  title: string;
-  body: string;
-  html_url: string;
-}
+import type { GitHubIssue } from '../types';
 
 export class GitHubAPI {
   private octokit: Octokit;
 
-  constructor(token?: string) {
+  constructor() {
+    const token = process.env.GITHUB_TOKEN;
     this.octokit = new Octokit({ auth: token });
   }
 

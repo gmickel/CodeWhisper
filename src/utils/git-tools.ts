@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import simpleGit, { type SimpleGit } from 'simple-git';
 import { detectLanguage } from '../core/file-worker';
 import type { FileInfo } from '../types';
@@ -60,7 +61,7 @@ export async function ensureBranch(
   let branchName = initialBranchName;
 
   if (options.issueNumber) {
-    branchName = `issue-${options.issueNumber}/${branchName}`;
+    branchName = `/${branchName}-issue-${options.issueNumber}`;
   }
 
   let attempts = 0;
@@ -103,9 +104,13 @@ export async function getGitHubRepoInfo(): Promise<{
     const originRemote = remotes.find((remote) => remote.name === 'origin');
 
     if (!originRemote) {
+      console.warn(
+        chalk.yellow(
+          'No GitHub remote found. Ensure your repository has a GitHub remote named "origin".',
+        ),
+      );
       return null;
     }
-
     const match = originRemote.refs.fetch.match(
       /github\.com[:/]([^/]+)\/([^.]+)\.git/,
     );

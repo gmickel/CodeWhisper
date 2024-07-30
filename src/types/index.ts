@@ -1,3 +1,10 @@
+export interface GitHubIssue {
+  number: number;
+  title: string;
+  body: string;
+  html_url: string;
+}
+
 export interface MarkdownOptions {
   template?: string;
   noCodeblock?: boolean;
@@ -51,6 +58,8 @@ export type AiAssistedTaskOptions = Pick<
   contextWindow?: number;
   maxTokens?: number;
   logAiInteractions?: boolean;
+  githubIssue?: GitHubIssue;
+  issueNumber?: number;
 };
 
 export type ProcessOptions = Pick<

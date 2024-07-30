@@ -32,10 +32,16 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     let instructions = '';
 
     if (options.githubIssue) {
+      if (!process.env.GITHUB_TOKEN) {
+        console.log(
+          chalk.yellow(
+            'GITHUB_TOKEN not set. GitHub issue functionality may be limited.',
+          ),
+        );
+      }
       const selectedIssue = await selectGitHubIssuePrompt();
       if (selectedIssue) {
         taskDescription = `# ${selectedIssue.title}\n\n${selectedIssue.body}`;
-        instructions = `GitHub Issue: ${selectedIssue.html_url}\n\nPlease implement the solution for this issue.`;
         options.issueNumber = selectedIssue.number;
       } else {
         console.log(
