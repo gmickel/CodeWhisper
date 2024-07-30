@@ -24,15 +24,19 @@ FORMAT: Instructions for how to format your response.
 
 ---
 
-# Task
-
 <task>
   {{var_taskDescription}}
 </task>
 
 ---
 
-# Codebase
+<instructions>
+  Follow these instructions:
+
+  {{var_instructions}}
+</instructions>
+
+---
 
 <codebase>
   ## Code Summary
@@ -43,10 +47,6 @@ FORMAT: Instructions for how to format your response.
   {{#each files}}
   ### {{relativePath this.path}}
 
-  - Language: {{this.language}}
-  - Size: {{this.size}} bytes
-  - Last modified: {{this.modified}}
-
   {{#codeblock this.content this.language}}{{/codeblock}}
 
   {{/each}}
@@ -55,25 +55,11 @@ FORMAT: Instructions for how to format your response.
 
 ---
 
-# Instructions
-
-<instructions>
-  Follow these instructions:
-
-  {{var_instructions}}
-</instructions>
-
----
-
-# Implementation Plan
-
 <implementation_plan>
   {{var_plan}}
 </implementation_plan>
 
 ---
-
-# Format
 
 <format>
 
@@ -89,6 +75,21 @@ FORMAT: Instructions for how to format your response.
     FILE_PATH_2
     ...
   </file_list>
+  <git_branch_name>
+    __GIT_BRANCH_NAME__
+  </git_branch_name>
+
+  <git_commit_message>
+    __GIT_COMMIT_MESSAGE__
+  </git_commit_message>
+
+  <summary>
+    __BRIEF_SUMMARY_OF_CHANGES__
+  </summary>
+
+  <potential_issues>
+    __LIST_OF_POTENTIAL_ISSUES_OR_TRADE_OFFS__
+  </potential_issues>
 
   Then, for each file:
   <file>
@@ -151,6 +152,7 @@ FORMAT: Instructions for how to format your response.
   </file>
 
   Ensure that:
+  - Everything specified in the plan is implemented.
   - All new or modified file contains the full code.
   - Regardless of the plan, all new or modified files must be 100% complete.
   - The content includes all necessary imports, function definitions, and exports.
@@ -159,22 +161,5 @@ FORMAT: Instructions for how to format your response.
   - Necessary comments for clarity are included if needed.
   - Pseudocode is translated into actual code.
   - You complete all necessary work.
-
-  Also provide:
-  <git_branch_name>
-    __GIT_BRANCH_NAME__
-  </git_branch_name>
-
-  <git_commit_message>
-    __GIT_COMMIT_MESSAGE__
-  </git_commit_message>
-
-  <summary>
-    __BRIEF_SUMMARY_OF_CHANGES__
-  </summary>
-
-  <potential_issues>
-    __LIST_OF_POTENTIAL_ISSUES_OR_TRADE_OFFS__
-  </potential_issues>
 
 </format>

@@ -12,6 +12,9 @@ export function parseAICodegenResponse(response: string): AIParsedResponse {
   };
 
   try {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('AI-generated response:', response);
+    }
     // Parse file list
     const fileListMatch = response.match(/<file_list>([\s\S]*?)<\/file_list>/);
     result.fileList = fileListMatch
@@ -55,10 +58,6 @@ export function parseAICodegenResponse(response: string): AIParsedResponse {
       });
     }
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log('AI-generated response:', result);
-    }
-
     // Parse other fields
     result.gitBranchName = ensureValidBranchName(
       parseField(response, 'git_branch_name'),
@@ -74,6 +73,10 @@ export function parseAICodegenResponse(response: string): AIParsedResponse {
   } catch (error) {
     console.error('Error parsing AI response:', error);
     result.gitCommitMessage = 'Error: Malformed response';
+  }
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log('parsed response:', result);
   }
 
   return result;
