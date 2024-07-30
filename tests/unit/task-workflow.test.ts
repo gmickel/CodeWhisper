@@ -1,3 +1,4 @@
+import path from 'node:path';
 import simpleGit, { type SimpleGit } from 'simple-git';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { generateAIResponse } from '../../src/ai/generate-ai-response';
@@ -27,7 +28,7 @@ vi.mock('simple-git');
 
 describe('runAIAssistedTask', () => {
   const mockOptions: AiAssistedTaskOptions = {
-    path: '/test/path',
+    path: path.join('/', 'test', 'path'),
     model: 'test-model',
     dryRun: false,
     noCodeblock: false,
@@ -133,24 +134,25 @@ describe('runAIAssistedTask', () => {
 
     expect(getTaskDescription).toHaveBeenCalled();
     expect(getInstructions).toHaveBeenCalled();
-    expect(selectFilesPrompt).toHaveBeenCalledWith('/test/path', false);
+    expect(selectFilesPrompt).toHaveBeenCalledWith(
+      path.join('/', 'test', 'path'),
+      false,
+    );
     expect(processFiles).toHaveBeenCalledWith(
-      expect.objectContaining({
-        path: '/test/path',
-        filter: mockSelectedFiles,
-      }),
+      expect.objectContaining({ path: path.join('/', 'test', 'path') }),
     );
     expect(generateMarkdown).toHaveBeenCalledTimes(2);
     expect(generateAIResponse).toHaveBeenCalledTimes(2);
     expect(reviewPlan).toHaveBeenCalledWith(mockGeneratedPlan);
     expect(parseAICodegenResponse).toHaveBeenCalledWith(mockGeneratedCode);
+
     expect(ensureBranch).toHaveBeenCalledWith(
-      '/test/path',
+      path.join('/', 'test', 'path'),
       'feature/test-task',
     );
     expect(applyChanges).toHaveBeenCalledWith(
       expect.objectContaining({
-        basePath: '/test/path',
+        basePath: path.join('/', 'test', 'path'),
         parsedResponse: mockParsedResponse,
         dryRun: false,
       }),

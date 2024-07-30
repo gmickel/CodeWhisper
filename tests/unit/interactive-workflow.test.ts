@@ -1,3 +1,4 @@
+import path from 'node:path';
 import fs, { type PathOrFileDescriptor } from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { processFiles } from '../../src/core/file-processor';
@@ -25,7 +26,7 @@ vi.mock('fs-extra');
 
 describe('runInteractiveMode', () => {
   const mockOptions: InteractiveModeOptions = {
-    path: '/test/path',
+    path: path.join('/', 'test', 'path'),
     noCodeblock: false,
     invert: false,
   };
@@ -40,11 +41,11 @@ describe('runInteractiveMode', () => {
 
   it('should execute the happy path successfully', async () => {
     const mockSelectedFiles = ['file1.ts', 'file2.ts'];
-    const mockTemplatePath = '/test/template/path.hbs';
+    const mockTemplatePath = path.join('/', 'test', 'template', 'path.hbs');
     const mockTemplateContent = '{{var_test}}';
     const mockVariables = [{ name: 'test', isMultiline: false }];
     const mockCustomData = { test: 'value' };
-    const mockOutputPath = '/test/output/path.md';
+    const mockOutputPath = path.join('/', 'test', 'output', 'path.md');
     const mockProcessedFiles = [
       {
         path: 'file1.ts',
@@ -86,15 +87,20 @@ describe('runInteractiveMode', () => {
 
     await runInteractiveMode(mockOptions);
 
-    expect(selectFilesPrompt).toHaveBeenCalledWith('/test/path', false);
+    expect(selectFilesPrompt).toHaveBeenCalledWith(
+      path.join('/', 'test', 'path'),
+      false,
+    );
     expect(selectTemplatePrompt).toHaveBeenCalled();
     expect(fs.readFile).toHaveBeenCalledWith(mockTemplatePath, 'utf-8');
     expect(extractTemplateVariables).toHaveBeenCalledWith(mockTemplateContent);
     expect(collectVariables).toHaveBeenCalled();
-    expect(outputPathPrompt).toHaveBeenCalledWith('/test/path');
+    expect(outputPathPrompt).toHaveBeenCalledWith(
+      path.join('/', 'test', 'path'),
+    );
     expect(processFiles).toHaveBeenCalledWith(
       expect.objectContaining({
-        path: '/test/path',
+        path: path.join('/', 'test', 'path'),
         filter: mockSelectedFiles,
       }),
     );
@@ -103,7 +109,7 @@ describe('runInteractiveMode', () => {
       mockTemplateContent,
       expect.objectContaining({
         noCodeblock: false,
-        basePath: '/test/path',
+        basePath: path.join('/', 'test', 'path'),
         customData: mockCustomData,
       }),
     );
@@ -121,14 +127,16 @@ describe('runInteractiveMode', () => {
       ...mockOptions,
       template: 'custom-template',
     };
-    const mockTemplatePath = '/test/custom/template.hbs';
+    const mockTemplatePath = path.join('/', 'test', 'custom', 'template.hbs');
 
     vi.mocked(getTemplatePath).mockReturnValue(mockTemplatePath);
     vi.mocked(selectFilesPrompt).mockResolvedValue([]);
     vi.mocked(fs.readFile).mockResolvedValue();
     vi.mocked(extractTemplateVariables).mockReturnValue([]);
     vi.mocked(collectVariables).mockResolvedValue({});
-    vi.mocked(outputPathPrompt).mockResolvedValue('/test/output.md');
+    vi.mocked(outputPathPrompt).mockResolvedValue(
+      path.join('/', 'test', 'output.md'),
+    );
     vi.mocked(processFiles).mockResolvedValue([]);
     vi.mocked(generateMarkdown).mockResolvedValue('');
 
@@ -141,21 +149,23 @@ describe('runInteractiveMode', () => {
   it('should handle custom template path', async () => {
     const optionsWithCustomTemplate = {
       ...mockOptions,
-      customTemplate: '/path/to/custom/template.hbs',
+      customTemplate: path.join('/', 'path', 'to', 'custom', 'template.hbs'),
     };
 
     vi.mocked(selectFilesPrompt).mockResolvedValue([]);
     vi.mocked(fs.readFile).mockResolvedValue();
     vi.mocked(extractTemplateVariables).mockReturnValue([]);
     vi.mocked(collectVariables).mockResolvedValue({});
-    vi.mocked(outputPathPrompt).mockResolvedValue('/test/output.md');
+    vi.mocked(outputPathPrompt).mockResolvedValue(
+      path.join('/', 'test', 'output.md'),
+    );
     vi.mocked(processFiles).mockResolvedValue([]);
     vi.mocked(generateMarkdown).mockResolvedValue('');
 
     await runInteractiveMode(optionsWithCustomTemplate);
 
     expect(fs.readFile).toHaveBeenCalledWith(
-      '/path/to/custom/template.hbs',
+      path.join('/', 'path', 'to', 'custom', 'template.hbs'),
       'utf-8',
     );
     expect(selectTemplatePrompt).not.toHaveBeenCalled();
@@ -168,11 +178,15 @@ describe('runInteractiveMode', () => {
     };
 
     vi.mocked(selectFilesPrompt).mockResolvedValue([]);
-    vi.mocked(selectTemplatePrompt).mockResolvedValue('/test/template.hbs');
+    vi.mocked(selectTemplatePrompt).mockResolvedValue(
+      path.join('/', 'test', 'template.hbs'),
+    );
     vi.mocked(fs.readFile).mockResolvedValue();
     vi.mocked(extractTemplateVariables).mockReturnValue([]);
     vi.mocked(collectVariables).mockResolvedValue({});
-    vi.mocked(outputPathPrompt).mockResolvedValue('/test/output.md');
+    vi.mocked(outputPathPrompt).mockResolvedValue(
+      path.join('/', 'test', 'output.md'),
+    );
     vi.mocked(processFiles).mockResolvedValue([]);
     vi.mocked(generateMarkdown).mockResolvedValue('Generated Markdown');
 
