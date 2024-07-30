@@ -21,8 +21,8 @@ importers:
         specifier: 5.3.5
         version: 5.3.5
       ai:
-        specifier: 3.2.38
-        version: 3.2.38(react@18.3.1)(sswr@2.1.0(svelte@4.2.18))(svelte@4.2.18)(vue@3.4.34(typescript@5.5.4))(zod@3.23.8)
+        specifier: 3.2.39
+        version: 3.2.39(react@18.3.1)(sswr@2.1.0(svelte@4.2.18))(svelte@4.2.18)(vue@3.4.34(typescript@5.5.4))(zod@3.23.8)
       chalk:
         specifier: 5.3.0
         version: 5.3.0
@@ -75,7 +75,7 @@ importers:
         specifier: 2.0.1
         version: 2.0.1
       winston:
-        specifier: ^3.13.1
+        specifier: 3.13.1
         version: 3.13.1
     devDependencies:
       '@biomejs/biome':
@@ -194,8 +194,8 @@ packages:
       solid-js:
         optional: true
 
-  '@ai-sdk/svelte@0.0.25':
-    resolution: {integrity: sha512-uNPc7KNy+6/FY436Jys4rP2LnouxNTTPqZp4jLg5s9i4+D8n2ImuKTrrHlJjTB8UiMsWmkRWU+Tqh8BptEExbw==}
+  '@ai-sdk/svelte@0.0.26':
+    resolution: {integrity: sha512-47cckuaAQQ5t8/O6jvQLclVi6xxiOemQPD4sGgExVPwLyXT/SxPrO7UepQmtUq+5lmh6Hf/k70rpnL/lVO150w==}
     engines: {node: '>=18'}
     peerDependencies:
       svelte: ^3.0.0 || ^4.0.0
@@ -1063,8 +1063,8 @@ packages:
     resolution: {integrity: sha512-gOsf2YwSlleG6IjRYG2A7k0HmBMEo6qVNk9Bp/EaLgAJT5ngH6PXbqa4ItvnEwCm/velL5jAnQgsHsWnjhGmvw==}
     engines: {node: '>=18'}
 
-  ai@3.2.38:
-    resolution: {integrity: sha512-FxDgUG/3pKri2GMS+l24Bhk1M01B2LYXNW8nh8R+Ssf+CUnrh2kuThHmWbM2slOs/EBTWFbQ9Z53bC6TWY1yZg==}
+  ai@3.2.39:
+    resolution: {integrity: sha512-agc1zGWJ+dSlWn0joMESsCEpTRGdpuW23INIInbUk7pBzpSpflkYW6J5moYMr+5aAbAN35LgHSbc9LTx/9a1UA==}
     engines: {node: '>=18'}
     peerDependencies:
       openai: ^4.42.0
@@ -3258,7 +3258,7 @@ snapshots:
     transitivePeerDependencies:
       - zod
 
-  '@ai-sdk/svelte@0.0.25(svelte@4.2.18)(zod@3.23.8)':
+  '@ai-sdk/svelte@0.0.26(svelte@4.2.18)(zod@3.23.8)':
     dependencies:
       '@ai-sdk/provider-utils': 1.0.5(zod@3.23.8)
       '@ai-sdk/ui-utils': 0.0.21(zod@3.23.8)
@@ -4109,13 +4109,13 @@ snapshots:
       clean-stack: 5.2.0
       indent-string: 5.0.0
 
-  ai@3.2.38(react@18.3.1)(sswr@2.1.0(svelte@4.2.18))(svelte@4.2.18)(vue@3.4.34(typescript@5.5.4))(zod@3.23.8):
+  ai@3.2.39(react@18.3.1)(sswr@2.1.0(svelte@4.2.18))(svelte@4.2.18)(vue@3.4.34(typescript@5.5.4))(zod@3.23.8):
     dependencies:
       '@ai-sdk/provider': 0.0.14
       '@ai-sdk/provider-utils': 1.0.5(zod@3.23.8)
       '@ai-sdk/react': 0.0.31(react@18.3.1)(zod@3.23.8)
       '@ai-sdk/solid': 0.0.24(zod@3.23.8)
-      '@ai-sdk/svelte': 0.0.25(svelte@4.2.18)(zod@3.23.8)
+      '@ai-sdk/svelte': 0.0.26(svelte@4.2.18)(zod@3.23.8)
       '@ai-sdk/ui-utils': 0.0.21(zod@3.23.8)
       '@ai-sdk/vue': 0.0.25(vue@3.4.34(typescript@5.5.4))(zod@3.23.8)
       '@opentelemetry/api': 1.9.0
