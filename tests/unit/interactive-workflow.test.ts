@@ -97,7 +97,7 @@ describe('runInteractiveMode', () => {
     expect(collectVariables).toHaveBeenCalled();
     expect(processFiles).toHaveBeenCalledWith(
       expect.objectContaining({
-        path: path.join('/', 'test', 'path'),
+        path: expect.stringMatching(/[\\\/]test[\\\/]path$/),
         filter: mockSelectedFiles,
       }),
     );

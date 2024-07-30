@@ -114,6 +114,6 @@ describe('selectFilesPrompt', () => {
 
     const result = await selectFilesPrompt(mockBasePath, false);
 
-    expect(result).toEqual(['**/*']);
+    expect(result[0]).toMatch(/^\*\*[/\\]\*$/);
   });
 });

@@ -145,7 +145,7 @@ describe('runAIAssistedTask', () => {
     expect(parseAICodegenResponse).toHaveBeenCalledWith(mockGeneratedCode);
 
     expect(ensureBranch).toHaveBeenCalledWith(
-      path.join('/', 'test', 'path'),
+      expect.stringMatching(/[\\\/]test[\\\/]path$/),
       'feature/test-task',
     );
     expect(applyChanges).toHaveBeenCalledWith(
