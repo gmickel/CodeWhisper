@@ -7,6 +7,10 @@ export const MODEL_CONFIGS: ModelSpecs = {
     modelName: 'Claude 3.5 Sonnet',
     pricing: { inputCost: 3, outputCost: 15 },
     modelFamily: 'claude',
+    temperature: {
+      planningTemperature: 0.5,
+      codegenTemperature: 0.3,
+    },
   },
   'claude-3-opus-20240229': {
     contextWindow: 200000,
@@ -14,6 +18,10 @@ export const MODEL_CONFIGS: ModelSpecs = {
     modelName: 'Claude 3 Opus',
     pricing: { inputCost: 15, outputCost: 75 },
     modelFamily: 'claude',
+    temperature: {
+      planningTemperature: 0.5,
+      codegenTemperature: 0.3,
+    },
   },
   'claude-3-sonnet-20240229': {
     contextWindow: 200000,
@@ -21,6 +29,10 @@ export const MODEL_CONFIGS: ModelSpecs = {
     modelName: 'Claude 3 Sonnet',
     pricing: { inputCost: 3, outputCost: 15 },
     modelFamily: 'claude',
+    temperature: {
+      planningTemperature: 0.5,
+      codegenTemperature: 0.3,
+    },
   },
   'claude-3-haiku-20240307': {
     contextWindow: 200000,
@@ -28,6 +40,10 @@ export const MODEL_CONFIGS: ModelSpecs = {
     modelName: 'Claude 3 Haiku',
     pricing: { inputCost: 0.25, outputCost: 1.25 },
     modelFamily: 'claude',
+    temperature: {
+      planningTemperature: 0.5,
+      codegenTemperature: 0.3,
+    },
   },
   'gpt-4o': {
     contextWindow: 128000,
@@ -35,6 +51,10 @@ export const MODEL_CONFIGS: ModelSpecs = {
     modelName: 'GPT 4 Omni',
     pricing: { inputCost: 5, outputCost: 15 },
     modelFamily: 'openai',
+    temperature: {
+      planningTemperature: 0.5,
+      codegenTemperature: 0.2,
+    },
   },
   'gpt-4o-mini': {
     contextWindow: 128000,
@@ -42,6 +62,10 @@ export const MODEL_CONFIGS: ModelSpecs = {
     modelName: 'GPT 4 Omni Mini',
     pricing: { inputCost: 0.15, outputCost: 0.6 },
     modelFamily: 'openai',
+    temperature: {
+      planningTemperature: 0.5,
+      codegenTemperature: 0.2,
+    },
   },
   'llama-3.1-70b-versatile': {
     contextWindow: 131072,

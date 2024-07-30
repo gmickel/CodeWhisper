@@ -18,6 +18,7 @@ import {
 import { generateAIResponse } from './generate-ai-response';
 import { getInstructions } from './get-instructions';
 import { getTaskDescription } from './get-task-description';
+import { getModelConfig } from './model-config';
 import { parseAICodegenResponse } from './parse-ai-codegen-response';
 import { reviewPlan } from './plan-review';
 
@@ -110,6 +111,9 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     );
     spinner.succeed('Plan prompt generated successfully');
 
+    const modelKey = options.model;
+    const modelConfig = getModelConfig(modelKey);
+
     spinner.start('Generating AI plan...');
     let generatedPlan: string;
     if (options.model.includes('ollama')) {
@@ -120,10 +124,14 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
         maxTokens: options.maxTokens,
       });
     } else {
-      generatedPlan = await generateAIResponse(planPrompt, {
-        maxCostThreshold: options.maxCostThreshold,
-        model: options.model,
-      });
+      generatedPlan = await generateAIResponse(
+        planPrompt,
+        {
+          maxCostThreshold: options.maxCostThreshold,
+          model: options.model,
+        },
+        modelConfig.temperature?.planningTemperature,
+      );
     }
 
     spinner.succeed('AI plan generated successfully');
@@ -187,10 +195,14 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
         maxTokens: options.maxTokens,
       });
     } else {
-      generatedCode = await generateAIResponse(codeGenPrompt, {
-        maxCostThreshold: options.maxCostThreshold,
-        model: options.model,
-      });
+      generatedCode = await generateAIResponse(
+        codeGenPrompt,
+        {
+          maxCostThreshold: options.maxCostThreshold,
+          model: options.model,
+        },
+        modelConfig.temperature?.codegenTemperature,
+      );
     }
     spinner.succeed('AI Code Modifications generated successfully');
 

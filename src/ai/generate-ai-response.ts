@@ -67,6 +67,7 @@ let totalCost = 0;
 export async function generateAIResponse(
   prompt: string,
   options: GenerateAIResponseOptions,
+  temperature?: number,
 ): Promise<string> {
   const modelKey = options.model;
   let modelConfig = getModelConfig(modelKey);
@@ -77,6 +78,8 @@ export async function generateAIResponse(
 
   const modelFamily = getModelFamily(modelKey);
   const familyConfig = modelFamilies[modelFamily];
+
+  const taskTemperature = temperature ?? 0.5;
 
   let client: ReturnType<
     typeof createAnthropic | typeof createOpenAI | typeof createOllama
@@ -148,6 +151,7 @@ export async function generateAIResponse(
           ? client(modelKey.split(':')[1] || 'llama3.1:8b')
           : client(modelKey),
       maxTokens: modelConfig.maxOutput,
+      temperature: taskTemperature,
       prompt: processedPrompt,
     });
 

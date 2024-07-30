@@ -86,6 +86,10 @@ describe('Token Management', () => {
         modelName: 'Claude 3.5 Sonnet',
         pricing: { inputCost: 3, outputCost: 15 },
         modelFamily: 'claude',
+        temperature: {
+          planningTemperature: 0.5,
+          codegenTemperature: 0.3,
+        },
       });
     });
 
@@ -97,6 +101,10 @@ describe('Token Management', () => {
         modelName: 'GPT 4 Omni',
         pricing: { inputCost: 5, outputCost: 15 },
         modelFamily: 'openai',
+        temperature: {
+          planningTemperature: 0.5,
+          codegenTemperature: 0.2,
+        },
       });
     });
 
