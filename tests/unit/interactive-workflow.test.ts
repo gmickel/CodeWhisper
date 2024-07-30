@@ -106,7 +106,7 @@ describe('runInteractiveMode', () => {
       mockTemplateContent,
       expect.objectContaining({
         noCodeblock: false,
-        basePath: path.join('/', 'test', 'path'),
+        basePath: expect.stringMatching(/[\\\/]test[\\\/]path$/),
         customData: mockCustomData,
       }),
     );

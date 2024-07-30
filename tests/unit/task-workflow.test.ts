@@ -150,7 +150,7 @@ describe('runAIAssistedTask', () => {
     );
     expect(applyChanges).toHaveBeenCalledWith(
       expect.objectContaining({
-        basePath: path.join('/', 'test', 'path'),
+        basePath: expect.stringMatching(/[\\\/]test[\\\/]path$/),
         parsedResponse: mockParsedResponse,
         dryRun: false,
       }),
