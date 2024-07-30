@@ -1,4 +1,3 @@
-import path from 'node:path';
 import { select } from '@inquirer/prompts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { selectTemplatePrompt } from '../../src/interactive/select-template-prompt';

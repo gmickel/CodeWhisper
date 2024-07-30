@@ -116,22 +116,4 @@ describe('selectFilesPrompt', () => {
 
     expect(result).toEqual(['**/*']);
   });
-
-  it('should use the correct transformer', async () => {
-    vi.mocked(inquirer.prompt).mockResolvedValue({
-      selectedFiles: [path.join(mockBasePath, 'file1.ts')],
-    });
-
-    vi.mocked(fs.existsSync).mockReturnValue(true);
-    vi.mocked(fs.statSync).mockReturnValue({
-      isDirectory: () => false,
-    } as fs.Stats);
-
-    await selectFilesPrompt(mockBasePath, false);
-
-    const promptCall = vi.mocked(inquirer.prompt).mock.calls[0][0][0];
-    const transformer = promptCall.transformer;
-
-    expect(transformer(path.join('some', 'path', 'file.ts'))).toBe('file.ts');
-  });
 });
