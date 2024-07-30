@@ -1,7 +1,12 @@
 import type { AIParsedResponse } from '../types';
 import { ensureValidBranchName } from '../utils/git-tools';
+import getLogger from '../utils/logger';
 
-export function parseAICodegenResponse(response: string): AIParsedResponse {
+export function parseAICodegenResponse(
+  response: string,
+  logAiInteractions = false,
+): AIParsedResponse {
+  const logger = getLogger(logAiInteractions);
   const result: AIParsedResponse = {
     fileList: [],
     files: [],
@@ -12,9 +17,6 @@ export function parseAICodegenResponse(response: string): AIParsedResponse {
   };
 
   try {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('AI-generated response:', response);
-    }
     // Parse file list
     const fileListMatch = response.match(/<file_list>([\s\S]*?)<\/file_list>/);
     result.fileList = fileListMatch
@@ -75,9 +77,7 @@ export function parseAICodegenResponse(response: string): AIParsedResponse {
     result.gitCommitMessage = 'Error: Malformed response';
   }
 
-  if (process.env.NODE_ENV === 'development') {
-    console.log('parsed response:', result);
-  }
+  logger.info('Parsed AI Codegen Response', { parsedResponse: result });
 
   return result;
 }

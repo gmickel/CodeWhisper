@@ -50,6 +50,7 @@ export type AiAssistedTaskOptions = Pick<
   model: string;
   contextWindow?: number;
   maxTokens?: number;
+  logAiInteractions?: boolean;
 };
 
 export type ProcessOptions = Pick<
@@ -99,6 +100,7 @@ export interface GenerateAIResponseOptions {
   model: string;
   contextWindow?: number;
   maxTokens?: number;
+  logAiInteractions?: boolean;
 }
 
 export interface ApplyChangesOptions {

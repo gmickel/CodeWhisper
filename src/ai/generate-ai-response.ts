@@ -5,6 +5,7 @@ import chalk from 'chalk';
 import dotenv from 'dotenv';
 import { createOllama } from 'ollama-ai-provider';
 import type { GenerateAIResponseOptions, ModelFamily } from '../types';
+import getLogger from '../utils/logger';
 import { calculateCost, estimateCost } from './cost-calculation';
 import { getModelConfig, getModelFamily } from './model-config';
 import { estimateTokenCount, truncateToContextLimit } from './token-management';
@@ -69,6 +70,7 @@ export async function generateAIResponse(
   options: GenerateAIResponseOptions,
   temperature?: number,
 ): Promise<string> {
+  const logger = getLogger(options.logAiInteractions || false);
   const modelKey = options.model;
   let modelConfig = getModelConfig(modelKey);
 
@@ -144,6 +146,8 @@ export async function generateAIResponse(
     processedPrompt = truncateToContextLimit(processedPrompt, modelKey);
   }
 
+  logger.info('AI Prompt', { processedPrompt });
+
   try {
     const result = await generateText({
       model:
@@ -154,6 +158,8 @@ export async function generateAIResponse(
       temperature: taskTemperature,
       prompt: processedPrompt,
     });
+
+    logger.info('AI Response', { response: result.text });
 
     const actualCost = calculateCost(modelKey, {
       inputTokens: result.usage.promptTokens,

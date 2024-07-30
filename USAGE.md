@@ -46,6 +46,7 @@ Options:
 * `--no-respect-gitignore`: Do not respect entries in .gitignore
 * `--invert`: Selected files will be excluded
 * `--dry-run`: Perform a dry run without making actual changes. Saves changes to a file so you can apply them after review using apply-task
+* `--log-ai-interactions`: Enable logging of AI prompts, responses, and parsing results to a file (default: false)
 * `-max, --max-cost-threshold <number>`: Set a maximum cost threshold for AI operations in USD (e.g., 0.5 for $0.50)
 * `--auto-commit`: Automatically commit changes
 * `-t, --task <task>`: Short task title
@@ -262,6 +263,14 @@ codewhisper generate --model llm
 ```bash
 codewhisper generate --model ollama:llama3.1:70b --context-window 131072 --max-tokens 8192
 ```
+
+22. Run an AI-assisted task with detailed logging:
+
+```bash
+codewhisper task -m claude-3-5-sonnet-20240620 --log-ai-interactions -t "Implement error handling" -d "Add comprehensive error handling to all API endpoints"
+```
+
+This will generate a log file (codewhisper-`<date>`.log) in the current directory, containing all AI prompts, responses, and parsing results.
 
 ## CI/CD Integration
 

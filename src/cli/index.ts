@@ -123,6 +123,11 @@ export function cli(_args: string[]) {
       false,
     )
     .option(
+      '--log-ai-interactions',
+      'Enable logging of AI prompts, responses, and parsing results',
+      false,
+    )
+    .option(
       '-max --max-cost-threshold <number>',
       'Set a maximum cost threshold for AI operations in USD (e.g., 0.5 for $0.50)',
       Number.parseFloat,
