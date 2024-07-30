@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/gmickel/CodeWhisper/compare/v1.6.0...v1.6.1) (2024-07-30)
+
+
+### Bug Fixes
+
+* Improve Code Generation Prompt ([#37](https://github.com/gmickel/CodeWhisper/issues/37)) ([a7fe4b7](https://github.com/gmickel/CodeWhisper/commit/a7fe4b7b3ec761f261e5e2fddfd51160ba412ebb))
+
 # [1.6.0](https://github.com/gmickel/CodeWhisper/compare/v1.5.2...v1.6.0) (2024-07-30)
 
 
