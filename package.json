@@ -80,11 +80,11 @@
     "prepare": "lefthook install"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "0.0.33",
+    "@ai-sdk/anthropic": "0.0.34",
     "@ai-sdk/openai": "0.0.40",
-    "@anthropic-ai/sdk": "0.24.3",
-    "@inquirer/prompts": "5.3.4",
-    "ai": "3.2.37",
+    "@anthropic-ai/sdk": "0.25.0",
+    "@inquirer/prompts": "5.3.5",
+    "ai": "3.2.38",
     "chalk": "5.3.0",
     "commander": "12.1.0",
     "dotenv": "16.4.5",
