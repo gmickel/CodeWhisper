@@ -8,5 +8,6 @@ export async function outputPathPrompt(basePath: string): Promise<string> {
     message: 'Enter the output file path (or "" for console/stdout output):',
     default: defaultPath,
   });
-  return outputPath.trim() === '' ? 'stdout' : outputPath;
+  const trimmedPath = outputPath.trim();
+  return trimmedPath === '' ? 'stdout' : trimmedPath;
 }

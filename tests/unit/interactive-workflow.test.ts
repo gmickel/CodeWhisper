@@ -87,9 +87,8 @@ describe('runInteractiveMode', () => {
 
     await runInteractiveMode(mockOptions);
 
-    expect(selectFilesPrompt).toHaveBeenCalledWith(
+    expect(outputPathPrompt).toHaveBeenCalledWith(
       expect.stringMatching(/[\\\/]test[\\\/]path$/),
-      false,
     );
 
     expect(selectTemplatePrompt).toHaveBeenCalled();
