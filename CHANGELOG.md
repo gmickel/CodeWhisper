@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/gmickel/CodeWhisper/compare/v1.6.2...v1.7.0) (2024-07-30)
+
+
+### Features
+
+* Add GitHub Issue Integration to CodeWhisper ([#41](https://github.com/gmickel/CodeWhisper/issues/41)) ([aa4385c](https://github.com/gmickel/CodeWhisper/commit/aa4385c615ae72e02517f2fa62ba6499ed362140))
+
 ## [1.6.2](https://github.com/gmickel/CodeWhisper/compare/v1.6.1...v1.6.2) (2024-07-30)
 
 
