@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/gmickel/CodeWhisper/compare/v1.6.1...v1.6.2) (2024-07-30)
+
+
+### Bug Fixes
+
+* Add --log-ai-interactions option for detailed AI interaction logging ([#38](https://github.com/gmickel/CodeWhisper/issues/38)) ([dcac714](https://github.com/gmickel/CodeWhisper/commit/dcac71489742a74ef80ab7aac703ff9af4a6e9e6))
+
 ## [1.6.1](https://github.com/gmickel/CodeWhisper/compare/v1.6.0...v1.6.1) (2024-07-30)
 
 
