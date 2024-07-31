@@ -1,7 +1,7 @@
 export interface GitHubIssue {
   number: number;
   title: string;
-  body: string;
+  body: string | null;
   html_url: string;
 }
 

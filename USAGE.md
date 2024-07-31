@@ -34,7 +34,7 @@ codewhisper task [options]
 
 Options:
 * `-p, --path <path>`: Path to the codebase (default: current directory)
-* `-m, --model <modelId>`: Specify the AI model to use (default: claude-3-5-sonnet-20240620)
+* `-m, --model <modelId>`: Specify the AI model to use (if not specified, CodeWhisper will prompt you to select a model from the list of available models)
 * `-g, --gitignore <path>`: Path to .gitignore file (default: .gitignore)
 * `-f, --filter <patterns...>`: File patterns to include (use glob patterns, e.g., "src/**/*.js")
 * `-e, --exclude <patterns...>`: File patterns to exclude (use glob patterns, e.g., "**/*.test.js")
@@ -53,6 +53,12 @@ Options:
 * `-t, --task <task>`: Short task title
 * `-d, --description <description>`: Detailed task description
 * `-i, --instructions <instructions>`: Additional instructions for the task
+
+#### Model Selection
+
+CodeWhisper will prompt you to select a model from the list of available models when you run the `task` command. You can also specify a model directly using the `-m` or `--model` option.
+
+> Note: Ollama models can only be used if they are selected directly using the `-m` or `--model` option. E.g. `codewhisper task -m ollama:llama3.1:70b --context-window 131072 --max-tokens 8192`
 
 #### GitHub Issue Integration
 

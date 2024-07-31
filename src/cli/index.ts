@@ -75,11 +75,7 @@ export function cli(_args: string[]) {
     .command('task')
     .description('Start an AI-assisted coding task')
     .option('-p, --path <path>', 'Path to the codebase', '.')
-    .option(
-      '-m, --model <modelId>',
-      'Specify the AI model to use',
-      'claude-3-5-sonnet-20240620',
-    )
+    .option('-m, --model <modelId>', 'Specify the AI model to use')
     .option('-t, --task <task>', 'Short task title')
     .option('-d, --description <description>', 'Detailed task description')
     .option(
@@ -142,14 +138,6 @@ export function cli(_args: string[]) {
     .option('--github-issue', 'Use GitHub issue for task input', false)
     .action(async (options) => {
       try {
-        const modelConfig = getModelConfig(options.model);
-        if (!modelConfig) {
-          console.error(
-            `Invalid model ID: ${options.model}. Use 'list-models' command to see available models.`,
-          );
-          return;
-        }
-        console.log(`Using model: ${modelConfig.modelName}`);
         await runAIAssistedTask(options);
       } catch (error) {
         console.error(chalk.red('Error in AI-assisted task:'), error);
