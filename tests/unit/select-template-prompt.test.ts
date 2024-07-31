@@ -1,15 +1,19 @@
-import { select } from '@inquirer/prompts';
+import { search } from '@inquirer/prompts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { selectTemplatePrompt } from '../../src/interactive/select-template-prompt';
 import { getAvailableTemplates } from '../../src/utils/template-utils';
 
 // Mock the modules
 vi.mock('@inquirer/prompts', () => ({
-  select: vi.fn(),
+  search: vi.fn(),
 }));
 
 vi.mock('../../src/utils/template-utils', () => ({
   getAvailableTemplates: vi.fn(),
+}));
+
+vi.mock('fs-extra', () => ({
+  readFile: vi.fn(),
 }));
 
 describe('selectTemplatePrompt', () => {
@@ -28,33 +32,34 @@ describe('selectTemplatePrompt', () => {
     ];
 
     vi.mocked(getAvailableTemplates).mockResolvedValue(mockTemplates);
-    vi.mocked(select).mockResolvedValue('/path/to/template1.hbs');
+    vi.mocked(search).mockResolvedValue('/path/to/template1.hbs');
 
     const result = await selectTemplatePrompt();
 
     expect(result).toBe('/path/to/template1.hbs');
     expect(getAvailableTemplates).toHaveBeenCalled();
-    expect(select).toHaveBeenCalledWith({
-      message: 'Select a template:',
-      choices: [
-        { value: '/path/to/template1.hbs', name: 'Template 1' },
-        { value: '/path/to/template2.hbs', name: 'Template 2' },
-      ],
-    });
+    expect(search).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Select a template:',
+        source: expect.any(Function),
+      }),
+    );
   });
 
   it('should handle empty template list', async () => {
     vi.mocked(getAvailableTemplates).mockResolvedValue([]);
-    vi.mocked(select).mockResolvedValue('');
+    vi.mocked(search).mockResolvedValue('');
 
     const result = await selectTemplatePrompt();
 
     expect(result).toBe('');
     expect(getAvailableTemplates).toHaveBeenCalled();
-    expect(select).toHaveBeenCalledWith({
-      message: 'Select a template:',
-      choices: [],
-    });
+    expect(search).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Select a template:',
+        source: expect.any(Function),
+      }),
+    );
   });
 
   it('should handle relative paths', async () => {
@@ -64,18 +69,17 @@ describe('selectTemplatePrompt', () => {
     ];
 
     vi.mocked(getAvailableTemplates).mockResolvedValue(mockTemplates);
-    vi.mocked(select).mockResolvedValue('templates/template2.hbs');
+    vi.mocked(search).mockResolvedValue('templates/template2.hbs');
 
     const result = await selectTemplatePrompt();
 
     expect(result).toBe('templates/template2.hbs');
-    expect(select).toHaveBeenCalledWith({
-      message: 'Select a template:',
-      choices: [
-        { value: 'templates/template1.hbs', name: 'Template 1' },
-        { value: 'templates/template2.hbs', name: 'Template 2' },
-      ],
-    });
+    expect(search).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Select a template:',
+        source: expect.any(Function),
+      }),
+    );
   });
 
   it('should handle errors from getAvailableTemplates', async () => {
@@ -87,7 +91,7 @@ describe('selectTemplatePrompt', () => {
       'Failed to get templates',
     );
     expect(getAvailableTemplates).toHaveBeenCalled();
-    expect(select).not.toHaveBeenCalled();
+    expect(search).not.toHaveBeenCalled();
   });
 
   it('should handle different path formats', async () => {
@@ -97,17 +101,16 @@ describe('selectTemplatePrompt', () => {
     ];
 
     vi.mocked(getAvailableTemplates).mockResolvedValue(mockTemplates);
-    vi.mocked(select).mockResolvedValue('C:\\path\\to\\template2.hbs');
+    vi.mocked(search).mockResolvedValue('C:\\path\\to\\template2.hbs');
 
     const result = await selectTemplatePrompt();
 
     expect(result).toBe('C:\\path\\to\\template2.hbs');
-    expect(select).toHaveBeenCalledWith({
-      message: 'Select a template:',
-      choices: [
-        { value: '/path/to/template1.hbs', name: 'Template 1' },
-        { value: 'C:\\path\\to\\template2.hbs', name: 'Template 2' },
-      ],
-    });
+    expect(search).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Select a template:',
+        source: expect.any(Function),
+      }),
+    );
   });
 });

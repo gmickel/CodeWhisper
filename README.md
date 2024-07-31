@@ -153,11 +153,11 @@ codewhisper interactive
 codewhisper list-models
 
 # Start an AI-assisted coding task
+# CodeWhisper will prompt you to select a model from the list of available models
+codewhisper task
 
-codewhisper task -m <model>
 
-e.g.
-
+# You can also specify a model directly
 # Claude-3.5 Sonnet
 codewhisper task -m claude-3-5-sonnet-20240620
 

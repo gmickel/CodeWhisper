@@ -8,6 +8,7 @@ import { generateMarkdown } from '../core/markdown-generator';
 import { applyChanges } from '../git/apply-changes';
 import { selectFilesPrompt } from '../interactive/select-files-prompt';
 import { selectGitHubIssuePrompt } from '../interactive/select-github-issue-prompt';
+import { selectModelPrompt } from '../interactive/select-model-prompt';
 import type { AiAssistedTaskOptions, MarkdownOptions } from '../types';
 import {
   DEFAULT_CACHE_PATH,
@@ -31,6 +32,30 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
   const spinner = ora();
   try {
     const basePath = path.resolve(options.path ?? '.');
+
+    // Model selection
+    let modelKey = options.model;
+
+    if (modelKey) {
+      const modelConfig = getModelConfig(options.model);
+      if (!modelConfig) {
+        console.log(chalk.red(`Invalid model ID: ${options.model}.`));
+        console.log(chalk.yellow('Displaying model selection list...'));
+      } else {
+        console.log(chalk.blue(`Using model: ${modelConfig.modelName}`));
+      }
+    }
+
+    if (!modelKey) {
+      try {
+        modelKey = await selectModelPrompt();
+        const modelConfig = getModelConfig(modelKey);
+        console.log(chalk.blue(`Using model: ${modelConfig.modelName}`));
+      } catch (error) {
+        console.error(chalk.red('Error selecting model:'), error);
+        process.exit(1);
+      }
+    }
 
     let taskDescription = '';
     let instructions = '';
@@ -167,15 +192,14 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     );
     spinner.succeed('Plan prompt generated successfully');
 
-    const modelKey = options.model;
     const modelConfig = getModelConfig(modelKey);
 
     spinner.start('Generating AI plan...');
     let generatedPlan: string;
-    if (options.model.includes('ollama')) {
+    if (modelKey.includes('ollama')) {
       generatedPlan = await generateAIResponse(planPrompt, {
         maxCostThreshold: options.maxCostThreshold,
-        model: options.model,
+        model: modelKey,
         contextWindow: options.contextWindow,
         maxTokens: options.maxTokens,
         logAiInteractions: options.logAiInteractions,
@@ -185,7 +209,7 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
         planPrompt,
         {
           maxCostThreshold: options.maxCostThreshold,
-          model: options.model,
+          model: modelKey,
           logAiInteractions: options.logAiInteractions,
         },
         modelConfig.temperature?.planningTemperature,
@@ -245,10 +269,10 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
 
     spinner.start('Generating AI Code Modifications...');
     let generatedCode: string;
-    if (options.model.includes('ollama')) {
+    if (modelKey.includes('ollama')) {
       generatedCode = await generateAIResponse(codeGenPrompt, {
         maxCostThreshold: options.maxCostThreshold,
-        model: options.model,
+        model: modelKey,
         contextWindow: options.contextWindow,
         maxTokens: options.maxTokens,
         logAiInteractions: options.logAiInteractions,
@@ -258,7 +282,7 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
         codeGenPrompt,
         {
           maxCostThreshold: options.maxCostThreshold,
-          model: options.model,
+          model: modelKey,
           logAiInteractions: options.logAiInteractions,
         },
         modelConfig.temperature?.codegenTemperature,
