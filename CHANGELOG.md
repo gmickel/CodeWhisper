@@ -1,3 +1,10 @@
+## [1.7.2](https://github.com/gmickel/CodeWhisper/compare/v1.7.1...v1.7.2) (2024-07-31)
+
+
+### Bug Fixes
+
+* update keywords ([f2c5dc3](https://github.com/gmickel/CodeWhisper/commit/f2c5dc364a1f055221a7d3e71bf4ad874b67f02c))
+
 ## [1.7.1](https://github.com/gmickel/CodeWhisper/compare/v1.7.0...v1.7.1) (2024-07-31)
 
 
