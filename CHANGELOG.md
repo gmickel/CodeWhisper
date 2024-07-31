@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/gmickel/CodeWhisper/compare/v1.7.0...v1.7.1) (2024-07-31)
+
+
+### Bug Fixes
+
+* branch name sanitization ([#44](https://github.com/gmickel/CodeWhisper/issues/44)) ([41cc7cf](https://github.com/gmickel/CodeWhisper/commit/41cc7cf24f411d99480bf154c501bb4a5759b77a))
+
 # [1.7.0](https://github.com/gmickel/CodeWhisper/compare/v1.6.2...v1.7.0) (2024-07-30)
 
 
