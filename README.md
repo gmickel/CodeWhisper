@@ -124,6 +124,8 @@ While CodeWhisper excels at performing individual coding tasks and even large fe
 
 ## 📺 Video
 
+Both videos feature CodeWhisper using Claude 3.5 Sonnet for the plan and code generation steps.
+
 ### Code Generation workflow
 
 https://github.com/user-attachments/assets/64922cf6-658e-4036-a251-cfc458a14801
@@ -150,6 +152,7 @@ codewhisper interactive
 codewhisper list-models
 
 # Start an AI-assisted coding task
+
 codewhisper task -m <model>
 
 e.g.
@@ -162,6 +165,8 @@ codewhisper task -m ollama:llama3.1:70b --context-window 131072 --max-tokens 819
 ```
 
 > Note: If you are using CodeWhisper's LLM integration with `codewhisper task` you will need to set the respective environment variable for the model you want to use (e.g. `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key` ).
+
+> Note: The best models to use are currently Claude 3.5 Sonnet and GPT-4o.
 
 For more detailed instructions, see the [Installation](#-installation) and [Usage](#-usage) sections.
 
