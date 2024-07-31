@@ -156,6 +156,9 @@ dist
 ehthumbs.db
 Thumbs.db
 
+# Vim configurations
+.vim
+
 todos.md
 codewhisper.md
 testing

@@ -105,12 +105,12 @@ export async function createBranchAndCommit(
   await git.commit(commitMessage);
 }
 
-export async function getGitHubRepoInfo(): Promise<{
+export async function getGitHubRepoInfo(basePath: string): Promise<{
   owner: string;
   repo: string;
 } | null> {
   try {
-    const git: SimpleGit = simpleGit();
+    const git: SimpleGit = simpleGit(basePath);
     const remotes = await git.getRemotes(true);
     const originRemote = remotes.find((remote) => remote.name === 'origin');
 

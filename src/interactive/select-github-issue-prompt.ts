@@ -3,8 +3,10 @@ import { GitHubAPI } from '../github/github-api';
 import type { GitHubIssue } from '../types';
 import { getGitHubRepoInfo } from '../utils/git-tools';
 
-export async function selectGitHubIssuePrompt(): Promise<GitHubIssue | null> {
-  const repoInfo = await getGitHubRepoInfo();
+export async function selectGitHubIssuePrompt(
+  basePath: string,
+): Promise<GitHubIssue | null> {
+  const repoInfo = await getGitHubRepoInfo(basePath);
   if (!repoInfo) {
     console.error('Unable to detect GitHub repository information.');
     return null;
