@@ -30,7 +30,18 @@
     "productivity",
     "code-to-prompt",
     "ai-code-analysis",
-    "automated-documentation"
+    "automated-documentation",
+    "code-assistant",
+    "ai-code-assistant",
+    "ai-code-generator",
+    "ai-code-generation",
+    "devtools",
+    "automated-code-review",
+    "automated-code-analysis",
+    "automated-code-generation",
+    "code-assistance",
+    "code-generator",
+    "code-generation"
   ],
   "sideEffects": false,
   "exports": {
