@@ -11,7 +11,7 @@ import { runAIAssistedTask } from '../ai/task-workflow';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
 import { runInteractiveMode } from '../interactive/interactive-workflow';
-import { DEFAULT_CACHE_PATH } from '../utils/cache-utils';
+import { DEFAULT_CACHE_PATH, clearCache } from '../utils/cache-utils';
 import { handleEditorAndOutput } from '../utils/editor-utils';
 import {
   collectVariables,
@@ -80,6 +80,12 @@ export function cli(_args: string[]) {
       'Specify the AI model to use',
       'claude-3-5-sonnet-20240620',
     )
+    .option('-t, --task <task>', 'Short task title')
+    .option('-d, --description <description>', 'Detailed task description')
+    .option(
+      '-i, --instructions <instructions>',
+      'Additional instructions for the task',
+    )
     .option(
       '-c, --context-window <number>',
       'Specify the context window for the AI model. Only applicable for Ollama models.',
@@ -133,12 +139,6 @@ export function cli(_args: string[]) {
       Number.parseFloat,
     )
     .option('--auto-commit', 'Automatically commit changes', false)
-    .option('-t, --task <task>', 'Short task title')
-    .option('-d, --description <description>', 'Detailed task description')
-    .option(
-      '-i, --instructions <instructions>',
-      'Additional instructions for the task',
-    )
     .option('--github-issue', 'Use GitHub issue for task input', false)
     .action(async (options) => {
       try {
@@ -320,6 +320,14 @@ export function cli(_args: string[]) {
         console.error(chalk.red('Error in interactive mode:'), error);
         process.exit(1);
       }
+    });
+
+  program
+    .command('clear-cache')
+    .description('Clear the cache')
+    .option('-p, --path <path>', 'Path to the cache file', DEFAULT_CACHE_PATH)
+    .action(async (options) => {
+      await clearCache(options.path);
     });
 
   program

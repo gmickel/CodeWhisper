@@ -1,5 +1,6 @@
 import os from 'node:os';
 import path from 'node:path';
+import chalk from 'chalk';
 import fs from 'fs-extra';
 
 export const DEFAULT_CACHE_PATH = path.join(
@@ -32,5 +33,22 @@ export async function setCachedValue(
     await fs.writeJSON(cacheFile, cache);
   } catch (error) {
     console.warn('Failed to cache value:', error);
+  }
+}
+
+export async function clearCache(cachePath?: string): Promise<void> {
+  const cacheFile = cachePath ?? DEFAULT_CACHE_PATH;
+  try {
+    await fs.remove(cacheFile);
+    console.log(
+      chalk.green(`Cache cleared successfully (cachefile: ${cacheFile})`),
+    );
+  } catch (error) {
+    console.error(chalk.red('Error clearing cache:'), error);
+    console.log(
+      chalk.blue(
+        `You can clear the cache manually by deleting the file: ${cacheFile}`,
+      ),
+    );
   }
 }

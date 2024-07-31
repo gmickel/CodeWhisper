@@ -197,8 +197,14 @@ codewhisper interactive
 # Begin an AI-assisted coding task
 codewhisper task
 
+# Apply a previously AI-generated task
+codewhisper apply-task <file>
+
 # List available templates
 codewhisper list-templates
+
+# Export templates to the current or specified directory
+codewhisper export-templates -d ./my-templates
 ```
 
 For detailed usage instructions and examples, please refer to [USAGE.md](USAGE.md).
