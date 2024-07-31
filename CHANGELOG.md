@@ -1,3 +1,10 @@
+## [1.7.7](https://github.com/gmickel/CodeWhisper/compare/v1.7.6...v1.7.7) (2024-07-31)
+
+
+### Bug Fixes
+
+* basePath not used for github-issues flag ([#60](https://github.com/gmickel/CodeWhisper/issues/60)) ([ffba718](https://github.com/gmickel/CodeWhisper/commit/ffba71816b9dddf1e9051f896db43b7883054e2f))
+
 ## [1.7.6](https://github.com/gmickel/CodeWhisper/compare/v1.7.5...v1.7.6) (2024-07-31)
 
 
