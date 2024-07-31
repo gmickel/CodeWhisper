@@ -85,7 +85,7 @@ describe('ensureBranch', () => {
 
     await expect(
       ensureBranch(mockBasePath, 'feature/new-branch'),
-    ).rejects.toThrow('Branch creation failed');
+    ).rejects.toThrow('Failed to create branch feature/new-branch');
     expect(mockGit.branchLocal).toHaveBeenCalledTimes(1);
     expect(mockGit.checkoutLocalBranch).toHaveBeenCalledWith(
       'feature/new-branch',
