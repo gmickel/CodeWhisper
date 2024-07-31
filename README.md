@@ -167,9 +167,48 @@ codewhisper task -m ollama:llama3.1:70b --context-window 131072 --max-tokens 819
 
 > Note: If you are using CodeWhisper's LLM integration with `codewhisper task` you will need to set the respective environment variable for the model you want to use (e.g. `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key` ).
 
-> Note: The best models to use are currently Claude 3.5 Sonnet and GPT-4o.
-
 For more detailed instructions, see the [Installation](#-installation) and [Usage](#-usage) sections.
+
+### Supported Models and Current Recommendations
+
+While CodeWhisper supports a variety of providers and models, my current recommendations are based on extensive testing and real-world usage. Here's an overview of the current status:
+
+#### Recommended Models
+
+1. **Claude-3.5-Sonnet (Anthropic)**
+   - Highest recommendation
+   - Generates exceptional quality plans and results
+   - Optimal performance for comprehensive task implementation
+
+2. **GPT-4o (OpenAI)**
+   - Excellent performance
+   - Produces high-quality plans and good results
+   - Nearly on par with Claude-3.5-Sonnet
+
+3. **GPT-4o-mini (OpenAI)**
+   - Strong performance
+   - Generates good quality plans and results
+
+#### Experimental Support
+
+- **Groq as a provider**
+  - We're eager to test Llama 3.1 405B on Groq
+  - Current rate limits are too restrictive for thorough testing
+  - Awaiting access to paid plans and the larger Llama 3.1 model for further evaluation
+
+#### Local Models (via Ollama)
+
+Currently not recommended for complex tasks. Models tested include:
+- Llama 3.1 (8B to 70B variants)
+- DeepSeek Coder V2
+- Mistral Nemo
+- Mistral Large
+
+These models currently struggle to follow instructions accurately for comprehensive task implementation. However, I am actively working on:
+
+1. Improving the workflow for smaller local models
+2. Developing an evaluation pipeline for consistent performance measurement
+3. Fine-tuning prompts to better suit the capabilities of local models
 
 ## 📦 Installation
 
