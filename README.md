@@ -234,7 +234,7 @@ For more details on custom templates, extending CodeWhisper, and integrating wit
 
 ## 📚 API
 
-CodeWhisper can be used programmatically in your Node.js projects. For detailed API documentation and examples, please refer to [LIBRARY_USAGE.md](LIBRARY_USAGE.md).
+CodeWhisper can be used programmatically in your Node.js projects. For detailed API documentation and examples, please refer to [USAGE.md](USAGE.md).
 
 ## 🤝 Contributing
 
