@@ -27,10 +27,11 @@ Blazingly fast codebase-to-LLM context bridge and AI-powered code generation wor
 
 CodeWhisper is a powerful tool that bridges the gap between your codebase and Large Language Models (LLMs). It serves two primary functions:
 
-1.  **Blazing Fast Codebase to Prompt Generator**: Quickly transform your entire codebase into context-rich prompts for LLMs.
-2.  **Fully Customizable AI-Powered Code Generation Workflow**: Leverage AI to assist in various coding tasks, from planning to implementation.
+1. **AI-Powered End-to-End Task Implementation**: Tackle complex, codebase-spanning tasks with ease. CodeWhisper doesn't just suggest snippets; it plans, generates, and applies comprehensive code changes across your entire project, from backend logic to frontend integration.
 
-Whether you're tackling complex refactoring, conducting thorough code reviews, or seeking AI-driven architectural insights, CodeWhisper equips your AI tools with the comprehensive understanding they need. It's not just about coding assistance – it's about enabling AI to be a true collaborator in your software development process.
+2. **Precision-Guided Context Curation for LLMs**: Harness the power of human insight to feed AI exactly what it needs. Quickly transform carefully selected parts of your codebase into rich, relevant context for LLMs, ensuring more accurate and project-aligned results.
+
+Whether you're implementing comprehensive features, tackling complex refactoring, conducting thorough code reviews, or seeking AI-driven architectural insights, CodeWhisper equips your AI tools with the comprehensive understanding they need. It's not just about coding assistance – it's about enabling AI to be a true collaborator in your software development process.
 
 ![CodeWhisper](https://raw.githubusercontent.com/gmickel/CodeWhisper/main/assets/worker_sm.jpg)
 
