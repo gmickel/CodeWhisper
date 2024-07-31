@@ -9,7 +9,11 @@ import { applyChanges } from '../git/apply-changes';
 import { selectFilesPrompt } from '../interactive/select-files-prompt';
 import { selectGitHubIssuePrompt } from '../interactive/select-github-issue-prompt';
 import type { AiAssistedTaskOptions, MarkdownOptions } from '../types';
-import { DEFAULT_CACHE_PATH } from '../utils/cache-utils';
+import {
+  DEFAULT_CACHE_PATH,
+  getCachedValue,
+  setCachedValue,
+} from '../utils/cache-utils';
 import { ensureBranch } from '../utils/git-tools';
 import {
   collectVariables,
@@ -57,8 +61,22 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
         taskDescription =
           `# ${options.task || 'Task'}\n\n${options.description || ''}`.trim();
       } else {
+        const cachedTaskDescription = await getCachedValue(
+          'taskDescription',
+          options.cachePath,
+        );
+        if (cachedTaskDescription) {
+          console.log(chalk.yellow('Using cached task description.'));
+        }
         taskDescription =
-          (await getTaskDescription()) ?? 'No task description provided.';
+          (await getTaskDescription(
+            cachedTaskDescription as string | undefined,
+          )) ?? 'No task description provided.';
+        await setCachedValue(
+          'taskDescription',
+          taskDescription,
+          options.cachePath,
+        );
       }
     }
 
@@ -66,7 +84,17 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
       if (options.instructions) {
         instructions = options.instructions;
       } else {
-        instructions = (await getInstructions()) ?? 'No instructions provided.';
+        const cachedInstructions = await getCachedValue(
+          'instructions',
+          options.cachePath,
+        );
+        if (cachedInstructions) {
+          console.log(chalk.yellow('Using cached instructions.'));
+        }
+        instructions =
+          (await getInstructions(cachedInstructions as string | undefined)) ??
+          'No instructions provided.';
+        await setCachedValue('instructions', instructions, options.cachePath);
       }
     }
 

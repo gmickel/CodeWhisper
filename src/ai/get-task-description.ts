@@ -1,9 +1,13 @@
 import { editor } from '@inquirer/prompts';
 
-export async function getTaskDescription(): Promise<string> {
+export async function getTaskDescription(
+  cachedValue?: string,
+): Promise<string> {
   return editor({
     message: 'Describe your task:',
-    default: `# Title
+    default:
+      cachedValue ||
+      `# Title
 Provide a title for your task here
 
 ## Description
