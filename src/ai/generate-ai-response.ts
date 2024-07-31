@@ -178,6 +178,15 @@ export async function generateAIResponse(
       chalk.magenta(`Total cost so far: $${totalCost.toFixed(2)} USD`),
     );
 
+    // Subtract 20 tokens for the response itself (to account for potential token count differences)
+    if (result.usage.completionTokens >= modelConfig.maxOutput - 20) {
+      console.log(
+        chalk.bold.red(
+          'WARNING: Maximum output length reached. Some files may be missing from the parsed response. The files that are included should be fine.',
+        ),
+      );
+    }
+
     return result.text;
   } catch (error) {
     console.error(chalk.red('Error generating AI response:'), error);

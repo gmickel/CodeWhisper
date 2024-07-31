@@ -29,7 +29,7 @@ export function parseAICodegenResponse(
 
     // Parse individual files
     const fileRegex =
-      /<file>[\s\S]*?<file_path>(.*?)<\/file_path>[\s\S]*?<file_content language="(.*?)">([\s\S]*?)<\/file_content>[\s\S]*?<file_status>(.*?)<\/file_status>(?:[\s\S]*?<explanation>([\s\S]*?)<\/explanation>)?[\s\S]*?<\/file>/g;
+      /<file>[\s\S]*?<file_path>(.*?)<\/file_path>[\s\S]*?<file_content language="(.*?)">([\s\S]*?)<\/file_content>[\s\S]*?<file_status>(.*?)<\/file_status>(?:[\s\S]*?<explanation>([\s\S]*?)<\/explanation>)?[\s\S]*?<\/file>/gs;
     let match: RegExpExecArray | null;
     while (true) {
       match = fileRegex.exec(response);
@@ -44,7 +44,7 @@ export function parseAICodegenResponse(
       });
     }
 
-    // Handle deleted files (which don't have content)
+    // Handle deleted files
     const deletedFileRegex =
       /<file>[\s\S]*?<file_path>(.*?)<\/file_path>[\s\S]*?<file_status>deleted<\/file_status>[\s\S]*?<\/file>/g;
     let deletedMatch: RegExpExecArray | null;
