@@ -1,3 +1,10 @@
+## [1.7.5](https://github.com/gmickel/CodeWhisper/compare/v1.7.4...v1.7.5) (2024-07-31)
+
+
+### Bug Fixes
+
+* potential parsing issues ([#55](https://github.com/gmickel/CodeWhisper/issues/55)) ([7978961](https://github.com/gmickel/CodeWhisper/commit/7978961e81e8fdc8ea152f2519c9abe746580ae2))
+
 ## [1.7.4](https://github.com/gmickel/CodeWhisper/compare/v1.7.3...v1.7.4) (2024-07-31)
 
 
