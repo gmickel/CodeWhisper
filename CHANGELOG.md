@@ -1,3 +1,10 @@
+## [1.7.6](https://github.com/gmickel/CodeWhisper/compare/v1.7.5...v1.7.6) (2024-07-31)
+
+
+### Bug Fixes
+
+* improve model, issue and template selection ux ([#59](https://github.com/gmickel/CodeWhisper/issues/59)) ([9e9a092](https://github.com/gmickel/CodeWhisper/commit/9e9a0925fd3d069a11e88292087d375905b38593))
+
 ## [1.7.5](https://github.com/gmickel/CodeWhisper/compare/v1.7.4...v1.7.5) (2024-07-31)
 
 
