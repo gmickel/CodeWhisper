@@ -22,6 +22,7 @@ export async function selectGitHubIssuePrompt(): Promise<GitHubIssue | null> {
     }
 
     const selectedIssueNumber = await select({
+      pageSize: 10,
       message: 'Select a GitHub issue:',
       choices: issues.map((issue) => ({
         name: `#${issue.number} - ${issue.title}`,

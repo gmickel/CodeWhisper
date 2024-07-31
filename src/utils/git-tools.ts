@@ -57,23 +57,34 @@ export async function ensureBranch(
   const suffix = options.suffix || '-ai-';
   const maxAttempts = options.maxAttempts || 100;
 
-  const branches = await git.branchLocal();
-  let branchName = initialBranchName;
+  // Remove leading slash if present
+  let branchName = initialBranchName.replace(/^\//, '');
 
   if (options.issueNumber) {
-    branchName = `/${branchName}-issue-${options.issueNumber}`;
+    // Construct branch name without leading slash
+    branchName = `${branchName}-issue-${options.issueNumber}`;
   }
 
+  // Ensure the branch name is valid
+  branchName = ensureValidBranchName(branchName);
+
+  const branches = await git.branchLocal();
   let attempts = 0;
 
   while (attempts < maxAttempts) {
     if (!branches.all.includes(branchName)) {
-      await git.checkoutLocalBranch(branchName);
-      return branchName;
+      try {
+        await git.checkoutLocalBranch(branchName);
+        return branchName;
+      } catch (error) {
+        console.error(`Failed to create branch ${branchName}:`, error);
+        throw new Error(`Failed to create branch ${branchName}`);
+      }
     }
 
     attempts++;
     branchName = `${initialBranchName}${suffix}${attempts}`;
+    branchName = ensureValidBranchName(branchName);
   }
 
   throw new Error(

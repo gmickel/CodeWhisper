@@ -184,6 +184,18 @@ console.log('Hello, World!');
     expect(result.gitBranchName).toBe('invalid/branch/name----------');
   });
 
+  it('should sanitize invalid branch names with a leading slash', () => {
+    const mockResponse = `
+<file_list></file_list>
+<git_branch_name>/feature/invalid-branch-name-issue-123</git_branch_name>
+<git_commit_message>Some commit message</git_commit_message>
+`;
+
+    const result = parseAICodegenResponse(mockResponse);
+
+    expect(result.gitBranchName).toBe('feature/invalid-branch-name-issue-123');
+  });
+
   it('should provide a default branch name when sanitized name is empty', () => {
     const mockResponse = `
 <file_list></file_list>
