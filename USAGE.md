@@ -22,6 +22,7 @@ CodeWhisper offers the following main commands:
 * `list-models`: List available AI models
 * `list-templates`: List available templates
 * `export-templates`: Export templates to the current or specified directory
+* `clear-cache`: Clear the cache
 
 ## Detailed Command Usage
 
@@ -164,6 +165,17 @@ codewhisper export-templates [options]
 
 Options:
 * `-d, --dir <directory>`: Target directory for exported templates (default: current directory)
+
+### `clear-cache` : Clear Codewhisper's Cache
+
+```bash
+codewhisper clear-cache [options]
+```
+
+This command clears the cache file which is used to store information about processed files as well as previous task and instruction inputs.
+
+Options:
+* `-p, --path <path>`: Path to the cache file (default: default-os-temporary-files-dir/codewhisper-cache.json)
 
 ## Usage Examples
 

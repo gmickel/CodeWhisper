@@ -325,7 +325,7 @@ export function cli(_args: string[]) {
   program
     .command('clear-cache')
     .description('Clear the cache')
-    .option('--path <path>', 'Path to the cache file', DEFAULT_CACHE_PATH)
+    .option('-p, --path <path>', 'Path to the cache file', DEFAULT_CACHE_PATH)
     .action(async (options) => {
       await clearCache(options.path);
     });
