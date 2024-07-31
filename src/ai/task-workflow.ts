@@ -68,7 +68,7 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
           ),
         );
       }
-      const selectedIssue = await selectGitHubIssuePrompt();
+      const selectedIssue = await selectGitHubIssuePrompt(basePath);
       if (selectedIssue) {
         taskDescription = `# ${selectedIssue.title}\n\n${selectedIssue.body}`;
         options.issueNumber = selectedIssue.number;
