@@ -1,3 +1,10 @@
+## [1.7.4](https://github.com/gmickel/CodeWhisper/compare/v1.7.3...v1.7.4) (2024-07-31)
+
+
+### Bug Fixes
+
+* caching of task and instructions ([#51](https://github.com/gmickel/CodeWhisper/issues/51)) ([5a93bb5](https://github.com/gmickel/CodeWhisper/commit/5a93bb515216bd9d34d243fd2f848b38c7441190))
+
 ## [1.7.3](https://github.com/gmickel/CodeWhisper/compare/v1.7.2...v1.7.3) (2024-07-31)
 
 
