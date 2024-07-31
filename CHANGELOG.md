@@ -1,3 +1,10 @@
+## [1.7.3](https://github.com/gmickel/CodeWhisper/compare/v1.7.2...v1.7.3) (2024-07-31)
+
+
+### Bug Fixes
+
+* update docs ([83c7386](https://github.com/gmickel/CodeWhisper/commit/83c7386a9cc771a9265e7eec689d6030f6437640))
+
 ## [1.7.2](https://github.com/gmickel/CodeWhisper/compare/v1.7.1...v1.7.2) (2024-07-31)
 
 
