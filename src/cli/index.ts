@@ -77,7 +77,7 @@ export function cli(_args: string[]) {
     .option('-p, --path <path>', 'Path to the codebase', '.')
     .option('-m, --model <modelId>', 'Specify the AI model to use')
     .option(
-      '--diff',
+      '-df, --diff',
       'Use the new diff mode for AI-generated code modifications',
       false,
     )
