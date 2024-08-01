@@ -181,6 +181,117 @@ describe('runAIAssistedTask', () => {
     );
   });
 
+  it('should handle diff-based updates when --diff flag is used', async () => {
+    const diffOptions = { ...mockOptions, diff: true };
+
+    const mockTaskDescription = 'Test diff-based task';
+    const mockInstructions = 'Test diff-based instructions';
+    const mockSelectedFiles = ['file1.ts'];
+    const mockProcessedFiles = [
+      {
+        path: 'file1.ts',
+        content: 'original content',
+        language: 'typescript',
+        size: 100,
+        created: new Date(),
+        modified: new Date(),
+        extension: 'ts',
+      },
+    ];
+    const mockGeneratedPlan = 'Generated diff-based plan';
+    const mockReviewedPlan = 'Reviewed diff-based plan';
+    const mockGeneratedCode = `
+      <file_list>
+      file1.ts
+      </file_list>
+      <file>
+      <file_path>file1.ts</file_path>
+      <file_status>modified</file_status>
+      <file_content language="typescript">
+      --- file1.ts
+      +++ file1.ts
+      @@ -1 +1 @@
+      -original content
+      +updated content
+      </file_content>
+      </file>
+      <git_branch_name>feature/diff-task</git_branch_name>
+      <git_commit_message>Implement diff-based task</git_commit_message>
+      <summary>Updated file using diff</summary>
+      <potential_issues>None</potential_issues>
+    `;
+
+    const mockParsedResponse = {
+      gitBranchName: 'feature/diff-task',
+      gitCommitMessage: 'Implement diff-based task',
+      fileList: ['file1.ts'],
+      files: [
+        {
+          path: 'file1.ts',
+          language: 'typescript',
+          status: 'modified',
+          diff: {
+            oldFileName: 'file1.ts',
+            newFileName: 'file1.ts',
+            hunks: [
+              {
+                oldStart: 1,
+                oldLines: 1,
+                newStart: 1,
+                newLines: 1,
+                lines: ['-original content', '+updated content'],
+              },
+            ],
+          },
+        },
+      ],
+      summary: 'Updated file using diff',
+      potentialIssues: 'None',
+    };
+
+    const mockModelConfig: ModelSpec = {
+      contextWindow: 100000,
+      maxOutput: 4096,
+      modelName: 'Claude 3.5 Sonnet',
+      pricing: { inputCost: 3, outputCost: 15 },
+      modelFamily: 'claude',
+      temperature: {
+        planningTemperature: 0.5,
+        codegenTemperature: 0.3,
+      },
+    };
+
+    vi.mocked(getTaskDescription).mockResolvedValue(mockTaskDescription);
+    vi.mocked(getInstructions).mockResolvedValue(mockInstructions);
+    vi.mocked(selectFilesPrompt).mockResolvedValue(mockSelectedFiles);
+    vi.mocked(processFiles).mockResolvedValue(mockProcessedFiles);
+    vi.mocked(generateMarkdown).mockResolvedValue('Generated markdown');
+    vi.mocked(generateAIResponse).mockResolvedValueOnce(mockGeneratedPlan);
+    vi.mocked(reviewPlan).mockResolvedValue(mockReviewedPlan);
+    vi.mocked(generateAIResponse).mockResolvedValueOnce(mockGeneratedCode);
+    vi.mocked(parseAICodegenResponse).mockReturnValue(
+      mockParsedResponse as unknown as AIParsedResponse,
+    );
+    vi.mocked(ensureBranch).mockResolvedValue('feature/diff-task');
+    vi.mocked(applyChanges).mockResolvedValue();
+    vi.mocked(getModelConfig).mockReturnValue(mockModelConfig);
+
+    await runAIAssistedTask(diffOptions);
+
+    expect(parseAICodegenResponse).toHaveBeenCalledWith(
+      mockGeneratedCode,
+      undefined,
+      true,
+    );
+    expect(applyChanges).toHaveBeenCalledWith(
+      expect.objectContaining({
+        basePath: expect.stringMatching(/[\\\/]test[\\\/]path$/),
+        parsedResponse: mockParsedResponse,
+        dryRun: false,
+      }),
+    );
+  });
+
   it('should handle auto-commit option correctly', async () => {
     const autoCommitOptions = { ...mockOptions, autoCommit: true };
     const mockGit = {
