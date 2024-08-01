@@ -111,6 +111,7 @@ While CodeWhisper excels at performing individual coding tasks and even large fe
 
 * 🧠 AI-powered task planning and code generation
 * 🔄 Full git integration for version control of AI-generated changes
+* 🔄 Support for diff-based code modifications to handle larger edits within output token limits
 * 🌍 Support for various models and LLM providers, such as Anthropic, OpenAI, and Groq
 * 🔐 Support for local models via Ollama
 * 🚀 Blazingly fast code processing with concurrent workers
@@ -160,6 +161,8 @@ codewhisper list-models
 # CodeWhisper will prompt you to select a model from the list of available models
 codewhisper task
 
+# To use the new diff-based code modifications, you can use the following command:
+codewhisper task --diff
 
 # You can also specify a model directly
 # Claude-3.5 Sonnet
@@ -192,6 +195,7 @@ While CodeWhisper supports a variety of providers and models, my current recomme
 3. **GPT-4o-mini (OpenAI)**
    - Strong performance
    - Generates good quality plans and results
+   - Has a long max output length of 16384 tokens which can be used for complex tasks
 
 #### Experimental Support
 

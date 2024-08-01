@@ -76,6 +76,11 @@ export function cli(_args: string[]) {
     .description('Start an AI-assisted coding task')
     .option('-p, --path <path>', 'Path to the codebase', '.')
     .option('-m, --model <modelId>', 'Specify the AI model to use')
+    .option(
+      '---diff',
+      'Use the new diff mode for AI-generated code modifications',
+      false,
+    )
     .option('-t, --task <task>', 'Short task title')
     .option('-d, --description <description>', 'Detailed task description')
     .option(

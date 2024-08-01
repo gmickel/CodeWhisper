@@ -293,6 +293,7 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     const parsedResponse = parseAICodegenResponse(
       generatedCode,
       options.logAiInteractions,
+      options.diff,
     );
 
     if (options.dryRun) {

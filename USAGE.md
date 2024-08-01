@@ -35,6 +35,7 @@ codewhisper task [options]
 Options:
 * `-p, --path <path>`: Path to the codebase (default: current directory)
 * `-m, --model <modelId>`: Specify the AI model to use (if not specified, CodeWhisper will prompt you to select a model from the list of available models)
+* `--diff`: Use diff format for file updates instead of full file content
 * `-g, --gitignore <path>`: Path to .gitignore file (default: .gitignore)
 * `-f, --filter <patterns...>`: File patterns to include (use glob patterns, e.g., "src/**/*.js")
 * `-e, --exclude <patterns...>`: File patterns to exclude (use glob patterns, e.g., "**/*.test.js")
@@ -319,10 +320,18 @@ codewhisper generate --model ollama:llama3.1:70b --context-window 131072 --max-t
 22. Run an AI-assisted task with detailed logging:
 
 ```bash
+# This will generate a log file (codewhisper-`<date>`.log) in the current directory, containing all AI prompts, responses, and parsing results.
+
 codewhisper task -m claude-3-5-sonnet-20240620 --log-ai-interactions -t "Implement error handling" -d "Add comprehensive error handling to all API endpoints"
 ```
 
-This will generate a log file (codewhisper-`<date>`.log) in the current directory, containing all AI prompts, responses, and parsing results.
+23. Run an AI-assisted task using diff-based updates:
+
+```bash
+# This command will use diff-based updates for modified files, which can help handle larger edits within token limits.
+
+codewhisper task --diff -m claude-3-5-sonnet-20240620 -t "Refactor authentication logic" -d "Update the user authentication system to use JWT tokens"
+```
 
 ## CI/CD Integration
 

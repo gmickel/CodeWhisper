@@ -164,6 +164,7 @@ describe('runAIAssistedTask', () => {
     expect(parseAICodegenResponse).toHaveBeenCalledWith(
       mockGeneratedCode,
       undefined,
+      undefined,
     );
 
     expect(ensureBranch).toHaveBeenCalledWith(
