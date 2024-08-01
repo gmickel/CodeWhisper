@@ -33,6 +33,10 @@ CodeWhisper is a powerful tool that bridges the gap between your codebase and La
 
 Whether you're implementing comprehensive features, tackling complex refactoring, conducting thorough code reviews, or seeking AI-driven architectural insights, CodeWhisper equips your AI tools with the comprehensive understanding they need. It's not just about coding assistance – it's about enabling AI to be a true collaborator in your software development process.
 
+### 💬 Join the Community
+
+Join the [CodeWhisper Discord](https://discord.com/invite/82mjJkwABQ) to connect with fellow users and developers, share insights, discuss features, and get support for leveraging CodeWhisper in your coding workflow.
+
 ![CodeWhisper](https://raw.githubusercontent.com/gmickel/CodeWhisper/main/assets/worker_sm.jpg)
 
 ## 🤔 Why CodeWhisper?
