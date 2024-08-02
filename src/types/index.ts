@@ -63,6 +63,7 @@ export type AiAssistedTaskOptions = Pick<
   githubIssue?: GitHubIssue;
   issueNumber?: number;
   diff?: boolean;
+  context?: string[];
 };
 
 export type ProcessOptions = Pick<

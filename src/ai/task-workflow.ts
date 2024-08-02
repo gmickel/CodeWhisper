@@ -125,11 +125,20 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
 
     const userFilters = options.filter || [];
 
-    const selectedFiles = await selectFilesPrompt(
-      basePath,
-      options.invert ?? false,
-    );
-
+    let selectedFiles: string[];
+    if (options.context && options.context.length > 0) {
+      selectedFiles = options.context.map((item) => {
+        const relativePath = path.relative(basePath, item);
+        return fs.statSync(path.join(basePath, item)).isDirectory()
+          ? path.join(relativePath, '**/*')
+          : relativePath;
+      });
+    } else {
+      selectedFiles = await selectFilesPrompt(
+        basePath,
+        options.invert ?? false,
+      );
+    }
     // Combine user filters with selected files
     const combinedFilters = [...new Set([...userFilters, ...selectedFiles])];
 
