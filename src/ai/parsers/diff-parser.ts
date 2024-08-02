@@ -1,4 +1,4 @@
-import { type ParsedDiff, parsePatch } from 'diff';
+import { parsePatch } from 'diff';
 import type { AIFileInfo } from '../../types';
 
 export function parseDiffFiles(response: string): AIFileInfo[] {
@@ -7,9 +7,8 @@ export function parseDiffFiles(response: string): AIFileInfo[] {
   const fileRegex =
     /<file>[\s\S]*?<file_path>(.*?)<\/file_path>[\s\S]*?<file_status>(.*?)<\/file_status>[\s\S]*?<file_content language="(.*?)">([\s\S]*?)<\/file_content>(?:[\s\S]*?<explanation>([\s\S]*?)<\/explanation>)?[\s\S]*?<\/file>/gs;
   let match: RegExpExecArray | null;
-  while (true) {
-    match = fileRegex.exec(response);
-    if (match === null) break;
+  // biome-ignore lint/suspicious/noAssignInExpressions: avoid potential infinite loop
+  while ((match = fileRegex.exec(response)) !== null) {
     const [, path, status, language, content, explanation] = match;
     const fileInfo: AIFileInfo = {
       path: path.trim(),
@@ -20,22 +19,25 @@ export function parseDiffFiles(response: string): AIFileInfo[] {
 
     if (status.trim() === 'modified') {
       try {
-        const parsedDiff = parsePatch(content.trim())[0] as ParsedDiff;
-        // Simplify the diff object to match our expected structure
-        fileInfo.diff = {
-          oldFileName: parsedDiff.oldFileName,
-          newFileName: parsedDiff.newFileName,
-          hunks: parsedDiff.hunks.map((hunk) => ({
-            oldStart: hunk.oldStart,
-            oldLines: hunk.oldLines,
-            newStart: hunk.newStart,
-            newLines: hunk.newLines,
-            lines: hunk.lines,
-          })),
-        };
+        const parsedDiff = parsePatch(content.trim());
+        if (parsedDiff.length > 0) {
+          const diff = parsedDiff[0];
+          fileInfo.diff = {
+            oldFileName: diff.oldFileName || path,
+            newFileName: diff.newFileName || path,
+            hunks: diff.hunks.map((hunk) => ({
+              oldStart: hunk.oldStart,
+              oldLines: hunk.oldLines,
+              newStart: hunk.newStart,
+              newLines: hunk.newLines,
+              lines: hunk.lines,
+            })),
+          };
+        } else {
+          console.error(`No valid diff found for ${path}`);
+        }
       } catch (error) {
         console.error(`Error parsing diff for ${path}:`, error);
-        continue;
       }
     } else if (status.trim() === 'new') {
       fileInfo.content = content.trim();
@@ -48,9 +50,8 @@ export function parseDiffFiles(response: string): AIFileInfo[] {
   const deletedFileRegex =
     /<file>[\s\S]*?<file_path>(.*?)<\/file_path>[\s\S]*?<file_status>deleted<\/file_status>[\s\S]*?<\/file>/g;
   let deletedMatch: RegExpExecArray | null;
-  while (true) {
-    deletedMatch = deletedFileRegex.exec(response);
-    if (deletedMatch === null) break;
+  // biome-ignore lint/suspicious/noAssignInExpressions: Avoid potential infinite loop
+  while ((deletedMatch = deletedFileRegex.exec(response)) !== null) {
     const [, path] = deletedMatch;
     files.push({
       path: path.trim(),
