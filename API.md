@@ -107,9 +107,11 @@ async function performAITask() {
         await runAIAssistedTask({
             path: '/path/to/project',
             task: 'Implement user authentication',
-            description: 'Add user login and registration functionality using JWT',
+            description: 'Add user login and registration functionality using JWT', // detailed task description
+            instructions: 'Use bcrypt for password hashing...', // additional instructions, pass an empty string to skip
+            context: ['src/api/auth.js', 'src/utils/auth.js'], // specify files or directories to include in the task context
             model: 'claude-3-5-sonnet-20240620',
-            dryRun: true,
+            dryRun: true, // Set to false to actually apply changes
         });
         console.log('AI-assisted task completed successfully!');
     } catch (error) {

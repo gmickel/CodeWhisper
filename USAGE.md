@@ -35,12 +35,18 @@ codewhisper task [options]
 Options:
 * `-p, --path <path>`: Path to the codebase (default: current directory)
 * `-m, --model <modelId>`: Specify the AI model to use (if not specified, CodeWhisper will prompt you to select a model from the list of available models)
-* `--diff`: Use diff format for file updates instead of full file content
+* `-t, --task <task>`: Short task title
+* `-d, --description <description>`: Detailed task description
+* `-i, --instructions <instructions>`: Additional instructions for the task
+* `-c, --context <paths...>`: Specify files or directories to include in the task context. Can be file paths, directory paths, or glob patterns. Multiple entries should be space-separated.
+* `-df, --diff`: Use diff format for file updates instead of full file content
 * `-g, --gitignore <path>`: Path to .gitignore file (default: .gitignore)
 * `-f, --filter <patterns...>`: File patterns to include (use glob patterns, e.g., "src/**/*.js")
 * `-e, --exclude <patterns...>`: File patterns to exclude (use glob patterns, e.g., "**/*.test.js")
 * `-s, --suppress-comments`: Strip comments from the code
 * `-l, --line-numbers`: Add line numbers to code blocks
+* `-cw, --context-window <number>`: Specify the context window for the AI model. Only applicable for Ollama models.
+* `-mt, --max-tokens <number>`: Specify the max output tokens for the AI model. Only applicable for Ollama models.
 * `--case-sensitive`: Use case-sensitive pattern matching
 * `--custom-ignores <patterns...>`: Additional patterns to ignore
 * `--cache-path <path>`: Custom path for the cache file
@@ -51,9 +57,6 @@ Options:
 * `--log-ai-interactions`: Enable logging of AI prompts, responses, and parsing results to a file (default: false)
 * `-max, --max-cost-threshold <number>`: Set a maximum cost threshold for AI operations in USD (e.g., 0.5 for $0.50)
 * `--auto-commit`: Automatically commit changes
-* `-t, --task <task>`: Short task title
-* `-d, --description <description>`: Detailed task description
-* `-i, --instructions <instructions>`: Additional instructions for the task
 
 #### Model Selection
 
@@ -322,7 +325,7 @@ codewhisper generate --model ollama:llama3.1:70b --context-window 131072 --max-t
 ```bash
 # This will generate a log file (codewhisper-`<date>`.log) in the current directory, containing all AI prompts, responses, and parsing results.
 
-codewhisper task -m claude-3-5-sonnet-20240620 --log-ai-interactions -t "Implement error handling" -d "Add comprehensive error handling to all API endpoints"
+codewhisper task -m claude-3-5-sonnet-20240620 --log-ai-interactions -t "Implement error handling" -d "Add comprehensive error handling to all API endpoints" -i "some instructions"
 ```
 
 23. Run an AI-assisted task using diff-based updates:
@@ -330,7 +333,7 @@ codewhisper task -m claude-3-5-sonnet-20240620 --log-ai-interactions -t "Impleme
 ```bash
 # This command will use diff-based updates for modified files, which can help handle larger edits within token limits.
 
-codewhisper task --diff -m claude-3-5-sonnet-20240620 -t "Refactor authentication logic" -d "Update the user authentication system to use JWT tokens"
+codewhisper task --diff -m claude-3-5-sonnet-20240620 -t "Refactor authentication logic" -d "Update the user authentication system to use JWT tokens" -i "some instructions"
 ```
 
 ## CI/CD Integration
