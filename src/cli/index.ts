@@ -76,6 +76,10 @@ export function cli(_args: string[]) {
     .description('Start an AI-assisted coding task')
     .option('-p, --path <path>', 'Path to the codebase', '.')
     .option('-m, --model <modelId>', 'Specify the AI model to use')
+    .option(
+      '-c, --context <paths...>',
+      'Specify files or directories to include in the task context. Can be file paths, directory paths, or glob patterns. Multiple entries should be space-separated.',
+    )
     .option('-t, --task <task>', 'Short task title')
     .option('-d, --description <description>', 'Detailed task description')
     .option(
@@ -83,7 +87,12 @@ export function cli(_args: string[]) {
       'Additional instructions for the task',
     )
     .option(
-      '-c, --context-window <number>',
+      '-df, --diff',
+      'Use the new diff mode for AI-generated code modifications',
+      false,
+    )
+    .option(
+      '-cw, --context-window <number>',
       'Specify the context window for the AI model. Only applicable for Ollama models.',
       parseOptionStringToInt,
       undefined,

@@ -1,3 +1,5 @@
+import type { ParsedDiff } from 'diff';
+
 export interface GitHubIssue {
   number: number;
   title: string;
@@ -60,6 +62,8 @@ export type AiAssistedTaskOptions = Pick<
   logAiInteractions?: boolean;
   githubIssue?: GitHubIssue;
   issueNumber?: number;
+  diff?: boolean;
+  context?: string[];
 };
 
 export type ProcessOptions = Pick<
@@ -90,7 +94,8 @@ export interface FileInfo {
 export interface AIFileInfo {
   path: string;
   language: string;
-  content: string;
+  content?: string;
+  diff?: ParsedDiff;
   status: 'new' | 'modified' | 'deleted';
   explanation?: string;
 }

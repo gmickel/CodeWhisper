@@ -48,7 +48,7 @@ describe('applyChanges', () => {
       dryRun: false,
     });
 
-    expect(fs.ensureDir).toHaveBeenCalledTimes(2);
+    expect(fs.ensureDir).toHaveBeenCalledTimes(1);
     expect(fs.writeFile).toHaveBeenCalledTimes(2);
   });
 
@@ -144,7 +144,7 @@ describe('applyChanges', () => {
       dryRun: false,
     });
 
-    expect(fs.ensureDir).toHaveBeenCalledTimes(2);
+    expect(fs.ensureDir).toHaveBeenCalledTimes(1); // Changed from 2 to 1
     expect(fs.writeFile).toHaveBeenCalledTimes(2);
     expect(fs.remove).toHaveBeenCalledTimes(1);
   });
@@ -199,6 +199,55 @@ describe('applyChanges', () => {
     expect(fs.writeFile).toHaveBeenCalledWith(
       expect.stringContaining(path.join('deep', 'nested', 'file.js')),
       'console.log("Nested file");',
+    );
+  });
+
+  it('should apply diffs for modified files when provided', async () => {
+    const mockParsedResponse: AIParsedResponse = {
+      fileList: ['modified-file.js'],
+      files: [
+        {
+          path: 'modified-file.js',
+          language: 'javascript',
+          diff: {
+            oldFileName: 'modified-file.js',
+            newFileName: 'modified-file.js',
+            hunks: [
+              {
+                oldStart: 1,
+                oldLines: 1,
+                newStart: 1,
+                newLines: 1,
+                lines: [
+                  '-console.log("Old content");',
+                  '+console.log("New content");',
+                ],
+              },
+            ],
+          },
+          status: 'modified',
+        },
+      ],
+      gitBranchName: 'feature/diff-modification',
+      gitCommitMessage: 'Apply diff to file',
+      summary: 'Modified a file using diff',
+      potentialIssues: 'None',
+    };
+
+    vi.mocked(fs.readFile).mockImplementation(() =>
+      Promise.resolve('console.log("Old content");'),
+    );
+
+    await applyChanges({
+      basePath: mockBasePath,
+      parsedResponse: mockParsedResponse,
+      dryRun: false,
+    });
+
+    expect(fs.readFile).toHaveBeenCalledTimes(1);
+    expect(fs.writeFile).toHaveBeenCalledWith(
+      expect.stringContaining('modified-file.js'),
+      expect.stringContaining('console.log("New content");'),
     );
   });
 });

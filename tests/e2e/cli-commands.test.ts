@@ -3,16 +3,41 @@ import os from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import fs from 'fs-extra';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import simpleGit from 'simple-git';
+import { vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { generateAIResponse } from '../../src/ai/generate-ai-response';
+import { reviewPlan } from '../../src/ai/plan-review';
+import { cli } from '../../src/cli/index';
 import { normalizePath } from '../../src/utils/normalize-path';
 
 const execAsync = promisify(exec);
 
-describe('CLI Commands', () => {
-  const cliPath = path.resolve(__dirname, '..', '..', 'src', 'cli', 'index.ts');
+vi.mock('../../src/ai/generate-ai-response');
+vi.mock('../../src/ai/plan-review');
+
+const isCI = process.env.CI === 'true';
+
+async function runCommand(command: string) {
+  try {
+    const { stdout, stderr } = await execAsync(command, {
+      env: { ...process.env, NODE_ENV: 'test' },
+      cwd: path.resolve(__dirname, '../..'),
+    });
+    if (stderr) console.error('Command stderr:', stderr);
+    return stdout;
+  } catch (error) {
+    console.error('Command execution failed:', error);
+    throw error;
+  }
+}
+
+const cliPath = path.resolve(__dirname, '..', '..', 'src', 'cli', 'index.ts');
+
+describe.sequential('CodeWhisper generate E2E Tests', () => {
   const testProjectPath = path.join(
     os.tmpdir(),
-    'codewhisper-cli-test-project',
+    'codewhisper-generate-test-project',
   );
   const outputPath = path.join(testProjectPath, 'output.md');
   const tempGitignorePath = path.join(testProjectPath, '.gitignore');
@@ -55,20 +80,6 @@ describe('CLI Commands', () => {
   afterAll(async () => {
     await fs.remove(testProjectPath);
   });
-
-  async function runCommand(command: string) {
-    try {
-      const { stdout, stderr } = await execAsync(command, {
-        env: { ...process.env, NODE_ENV: 'test' },
-        cwd: path.resolve(__dirname, '../..'),
-      });
-      if (stderr) console.error('Command stderr:', stderr);
-      return stdout;
-    } catch (error) {
-      console.error('Command execution failed:', error);
-      throw error;
-    }
-  }
 
   it('should generate markdown respecting .gitignore by default', async () => {
     const command = `pnpm exec esno ${normalizePath(cliPath)} generate -p "${normalizePath(testProjectPath)}" -o "${normalizePath(outputPath)}"`;
@@ -229,4 +240,137 @@ describe('CLI Commands', () => {
     expect(outputWithoutLineNumbers).not.toContain('1 const x = 1;');
     expect(outputWithoutLineNumbers).toContain('const x = 1;');
   }, 60000);
+});
+
+describe.sequential('CodeWhisper Task E2E Tests', async () => {
+  const testProjectRoot = path.join(os.tmpdir(), 'codewhisper-test-projects');
+  const taskProjectPath = path.join(testProjectRoot, 'task-test-project');
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
+  beforeAll(async () => {
+    await fs.ensureDir(taskProjectPath);
+    await fs.writeFile(
+      path.join(taskProjectPath, 'main.js'),
+      'console.log("Hello World");',
+    );
+    await fs.writeFile(
+      path.join(taskProjectPath, 'utils.js'),
+      'function add(a, b) { return a + b; }',
+    );
+
+    const git = simpleGit(taskProjectPath);
+    await git.init();
+    await git.addConfig('user.name', 'Test User', false, 'local');
+    await git.addConfig('user.email', 'test@example.com', false, 'local');
+    await git.add('.');
+    await git.commit('Initial commit');
+  });
+
+  afterAll(async () => {
+    await fs.remove(taskProjectPath);
+  });
+
+  it.skipIf(isCI)(
+    'should execute a CodeWhisper task and apply changes',
+    async () => {
+      // Mock AI responses
+      vi.mocked(generateAIResponse)
+        .mockResolvedValueOnce('Generated plan') // For planning step
+        .mockResolvedValueOnce(`
+        <file_list>
+        main.js
+        utils.js
+        </file_list>
+        <file>
+        <file_path>main.js</file_path>
+        <file_content language="javascript">
+        console.log("Hello, CodeWhisper!");
+        </file_content>
+        <file_status>modified</file_status>
+        </file>
+        <file>
+        <file_path>utils.js</file_path>
+        <file_content language="javascript">
+        function add(a, b) { return a + b; }
+        function subtract(a, b) { return a - b; }
+        </file_content>
+        <file_status>modified</file_status>
+        </file>
+        <git_branch_name>feature/codewhisper-task</git_branch_name>
+        <git_commit_message>Implement CodeWhisper task changes</git_commit_message>
+        <summary>Updated main.js and added subtract function to utils.js</summary>
+        <potential_issues>None</potential_issues>
+      `); // For code generation step
+
+      // Mock the reviewPlan function
+      vi.mocked(reviewPlan).mockResolvedValue('Reviewed plan');
+
+      const mainJsPath = path.relative(
+        taskProjectPath,
+        path.join(taskProjectPath, 'main.js'),
+      );
+      const utilsJsPath = path.relative(
+        taskProjectPath,
+        path.join(taskProjectPath, 'utils.js'),
+      );
+
+      // Run the CLI command
+      process.argv = [
+        'node',
+        'codewhisper',
+        'task',
+        '-p',
+        taskProjectPath,
+        '-m',
+        'claude-3-5-sonnet-20240620',
+        '-t',
+        'Update greeting and add subtract function',
+        '-d',
+        'Modify main.js to use a different greeting and add a subtract function to utils.js',
+        '-i',
+        'No further instructions',
+        '--auto-commit',
+        '-c',
+        mainJsPath,
+        utilsJsPath,
+      ];
+
+      await cli(process.argv.slice(2));
+
+      // Add a small delay to ensure all async operations complete
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Verify changes were applied
+      const [mainContent, utilsContent] = await Promise.all([
+        fs.readFile(path.join(taskProjectPath, 'main.js'), 'utf-8'),
+        fs.readFile(path.join(taskProjectPath, 'utils.js'), 'utf-8'),
+      ]);
+
+      expect(mainContent).toContain('Hello, CodeWhisper!');
+      expect(utilsContent).toContain('function subtract(a, b)');
+
+      // Verify git operations
+      const simpleGit = (await import('simple-git')).default;
+      const git = simpleGit(taskProjectPath);
+
+      const [branches, lastCommit] = await Promise.all([
+        git.branch(),
+        git.log({ maxCount: 1 }),
+      ]);
+
+      expect(branches.all).toContain('feature/codewhisper-task');
+
+      expect(lastCommit.latest?.message).toBe(
+        'Implement CodeWhisper task changes',
+      );
+
+      // Verify that mocks were called
+      expect(generateAIResponse).toHaveBeenCalledTimes(2);
+      expect(reviewPlan).toHaveBeenCalledTimes(1);
+    },
+    60000,
+  );
 });

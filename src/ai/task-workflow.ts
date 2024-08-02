@@ -125,11 +125,20 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
 
     const userFilters = options.filter || [];
 
-    const selectedFiles = await selectFilesPrompt(
-      basePath,
-      options.invert ?? false,
-    );
-
+    let selectedFiles: string[];
+    if (options.context && options.context.length > 0) {
+      selectedFiles = options.context.map((item) => {
+        const relativePath = path.relative(basePath, item);
+        return fs.statSync(path.join(basePath, item)).isDirectory()
+          ? path.join(relativePath, '**/*')
+          : relativePath;
+      });
+    } else {
+      selectedFiles = await selectFilesPrompt(
+        basePath,
+        options.invert ?? false,
+      );
+    }
     // Combine user filters with selected files
     const combinedFilters = [...new Set([...userFilters, ...selectedFiles])];
 
@@ -220,7 +229,14 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
 
     const reviewedPlan = await reviewPlan(generatedPlan);
 
-    const codegenTemplatePath = getTemplatePath('codegen-prompt');
+    let codegenTemplatePath: string;
+
+    if (options.diff) {
+      codegenTemplatePath = getTemplatePath('codegen-diff-prompt');
+    } else {
+      codegenTemplatePath = getTemplatePath('codegen-prompt');
+    }
+
     const codegenTemplateContent = await fs.readFile(
       codegenTemplatePath,
       'utf-8',
@@ -293,6 +309,7 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     const parsedResponse = parseAICodegenResponse(
       generatedCode,
       options.logAiInteractions,
+      options.diff,
     );
 
     if (options.dryRun) {
