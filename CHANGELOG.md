@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/gmickel/CodeWhisper/compare/v1.7.7...v1.8.0) (2024-08-02)
+
+
+### Features
+
+* add diff-based code modifications ([#63](https://github.com/gmickel/CodeWhisper/issues/63)) ([e1cc33a](https://github.com/gmickel/CodeWhisper/commit/e1cc33a8ca11a4c1e5df64c519cf74d7049733e7))
+
 ## [1.7.7](https://github.com/gmickel/CodeWhisper/compare/v1.7.6...v1.7.7) (2024-07-31)
 
 
