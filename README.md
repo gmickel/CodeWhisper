@@ -161,7 +161,7 @@ codewhisper list-models
 # CodeWhisper will prompt you to select a model from the list of available models
 codewhisper task
 
-# To use the new diff-based code modifications, you can use the following command:
+# To use the new experimental diff-based code modifications, you can use the following command:
 codewhisper task --diff
 
 # You can also specify a model directly
