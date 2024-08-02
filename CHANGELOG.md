@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/gmickel/CodeWhisper/compare/v1.8.0...v1.9.0) (2024-08-02)
+
+
+### Features
+
+* Implement `codewhisper task --undo` command with improved branch handling ([#64](https://github.com/gmickel/CodeWhisper/issues/64)) ([bca70e9](https://github.com/gmickel/CodeWhisper/commit/bca70e92e99ac452f16721a272e65431cd48ac74))
+
 # [1.8.0](https://github.com/gmickel/CodeWhisper/compare/v1.7.7...v1.8.0) (2024-08-02)
 
 
