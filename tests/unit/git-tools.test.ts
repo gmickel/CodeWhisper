@@ -1,9 +1,14 @@
+import { confirm } from '@inquirer/prompts';
 import simpleGit from 'simple-git';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { undoTaskChanges } from '../../src/git/undo-task-changes';
 import { ensureBranch } from '../../src/utils/git-tools';
-import { findDefaultBranch, findParentBranch } from '../../src/utils/git-tools';
+import { findDefaultBranch } from '../../src/utils/git-tools';
 
 vi.mock('simple-git');
+vi.mock('@inquirer/prompts', () => ({
+  confirm: vi.fn(),
+}));
 
 describe('Git utility functions', () => {
   const mockBasePath = '/mock/base/path';
@@ -15,6 +20,12 @@ describe('Git utility functions', () => {
       branchLocal: vi.fn(),
       checkoutLocalBranch: vi.fn(),
       raw: vi.fn(),
+      revparse: vi.fn(),
+      status: vi.fn(),
+      reset: vi.fn(),
+      clean: vi.fn(),
+      checkout: vi.fn(),
+      deleteLocalBranch: vi.fn(),
     };
     vi.mocked(simpleGit).mockReturnValue(mockGit);
   });
@@ -140,54 +151,6 @@ describe('Git utility functions', () => {
     });
   });
 
-  describe('findParentBranch', () => {
-    it('should find the parent branch', async () => {
-      const showBranchOutput = `
-* [feature] Feature commit
-[main] Main commit
---
-*+ [feature] Feature commit
-+ [main] Main commit
-    `;
-      mockGit.raw.mockResolvedValue(showBranchOutput);
-
-      const result = await findParentBranch(mockGit, 'feature');
-
-      expect(result).toBe('main');
-      expect(mockGit.raw).toHaveBeenCalledWith(['show-branch', '-a']);
-    });
-
-    it('should return null if parent branch is not found', async () => {
-      const showBranchOutput = `
-* [feature] Feature commit
-    `;
-      mockGit.raw.mockResolvedValue(showBranchOutput);
-
-      const result = await findParentBranch(mockGit, 'feature');
-
-      expect(result).toBeNull();
-    });
-
-    it('should return null if current branch is not found', async () => {
-      const showBranchOutput = `
-* [main] Main commit
-    `;
-      mockGit.raw.mockResolvedValue(showBranchOutput);
-
-      const result = await findParentBranch(mockGit, 'feature');
-
-      expect(result).toBeNull();
-    });
-
-    it('should handle errors and return null', async () => {
-      mockGit.raw.mockRejectedValue(new Error('Git error'));
-
-      const result = await findParentBranch(mockGit, 'feature');
-
-      expect(result).toBeNull();
-    });
-  });
-
   describe('findDefaultBranch', () => {
     it('should return "main" if it exists', async () => {
       mockGit.branchLocal.mockResolvedValue({
@@ -223,6 +186,77 @@ describe('Git utility functions', () => {
       const result = await findDefaultBranch(mockGit);
 
       expect(result).toBeUndefined();
+    });
+  });
+
+  describe('undoTaskChanges', () => {
+    beforeEach(() => {
+      vi.mocked(confirm).mockReset();
+    });
+
+    it('should discard changes and switch to original branch', async () => {
+      mockGit.revparse.mockResolvedValue('feature-branch');
+      mockGit.raw.mockResolvedValue(
+        'HEAD@{1}: checkout: moving from main to feature-branch',
+      );
+      mockGit.status.mockResolvedValue({ isClean: () => false });
+      vi.mocked(confirm)
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(true);
+
+      await undoTaskChanges({ path: mockBasePath });
+
+      expect(mockGit.reset).toHaveBeenCalledWith(['--hard']);
+      expect(mockGit.clean).toHaveBeenCalledWith('f', ['-d']);
+      expect(mockGit.checkout).toHaveBeenCalledWith('main');
+      expect(mockGit.deleteLocalBranch).toHaveBeenCalledWith(
+        'feature-branch',
+        true,
+      );
+    });
+
+    it('should handle detached HEAD state', async () => {
+      mockGit.revparse.mockResolvedValue('HEAD');
+      mockGit.raw.mockResolvedValue(
+        'HEAD@{1}: checkout: moving from main to 1234abc',
+      );
+      mockGit.status.mockResolvedValue({ isClean: () => true });
+      vi.mocked(confirm).mockResolvedValueOnce(true);
+
+      await undoTaskChanges({ path: mockBasePath });
+
+      expect(mockGit.checkout).toHaveBeenCalledWith('main');
+    });
+
+    it('should do nothing if already on original branch and working directory is clean', async () => {
+      mockGit.revparse.mockResolvedValue('main');
+      mockGit.raw.mockResolvedValue(
+        'HEAD@{1}: checkout: moving from feature-branch to main',
+      );
+      mockGit.status.mockResolvedValue({ isClean: () => true });
+
+      await undoTaskChanges({ path: mockBasePath });
+
+      expect(mockGit.checkout).not.toHaveBeenCalled();
+      expect(mockGit.deleteLocalBranch).not.toHaveBeenCalled();
+    });
+
+    it('should fallback to findDefaultBranch if reflog is empty', async () => {
+      mockGit.revparse.mockResolvedValue('feature-branch');
+      mockGit.raw.mockResolvedValue('');
+      mockGit.status.mockResolvedValue({ isClean: () => true });
+      mockGit.branchLocal.mockResolvedValue({
+        all: ['main', 'feature-branch'],
+      });
+      vi.mocked(confirm).mockResolvedValueOnce(true);
+
+      await undoTaskChanges({ path: mockBasePath });
+
+      expect(mockGit.checkout).toHaveBeenCalledWith('main');
+      expect(mockGit.deleteLocalBranch).toHaveBeenCalledWith(
+        'feature-branch',
+        true,
+      );
     });
   });
 });

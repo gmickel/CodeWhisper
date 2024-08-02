@@ -139,28 +139,23 @@ export async function getGitHubRepoInfo(basePath: string): Promise<{
   }
 }
 
-export async function findParentBranch(
-  git: SimpleGit,
-  currentBranch: string,
-): Promise<string | null> {
+export async function findOriginalBranch(git: SimpleGit): Promise<string> {
   try {
-    const result = await git.raw(['show-branch', '-a']);
+    const result = await git.raw(['reflog', '-n', '2', '--pretty=%D']);
     const lines = result.split('\n');
-    const currentBranchIndex = lines.findIndex((line) =>
-      line.includes(`[${currentBranch}]`),
-    );
-    if (currentBranchIndex === -1) return null;
-
-    for (let i = currentBranchIndex + 1; i < lines.length; i++) {
-      if (!lines[i].includes(`[${currentBranch}]`) && lines[i].includes('+')) {
-        const match = lines[i].match(/\[(.*?)\]/);
-        if (match) return match[1];
+    for (const line of lines) {
+      const match = line.match(
+        /HEAD@\{[0-9]+\}: checkout: moving from ([\w/-]+) to/,
+      );
+      if (match) {
+        return match[1];
       }
     }
-    return null;
+    // If we can't find the original branch, fall back to findDefaultBranch
+    return (await findDefaultBranch(git)) || 'main';
   } catch (error) {
-    console.error('Error finding parent branch:', error);
-    return null;
+    console.error('Error finding original branch:', error);
+    return (await findDefaultBranch(git)) || 'main';
   }
 }
 
