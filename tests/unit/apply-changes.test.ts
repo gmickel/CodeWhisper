@@ -48,7 +48,7 @@ describe('applyChanges', () => {
       dryRun: false,
     });
 
-    expect(fs.ensureDir).toHaveBeenCalledTimes(1); // Changed from 2 to 1
+    expect(fs.ensureDir).toHaveBeenCalledTimes(1);
     expect(fs.writeFile).toHaveBeenCalledTimes(2);
   });
 
