@@ -10,6 +10,7 @@ import { getModelConfig, getModelNames } from '../ai/model-config';
 import { runAIAssistedTask } from '../ai/task-workflow';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
+import { undoTaskChanges } from '../git/undo-task-changes';
 import { runInteractiveMode } from '../interactive/interactive-workflow';
 import { DEFAULT_CACHE_PATH, clearCache } from '../utils/cache-utils';
 import { handleEditorAndOutput } from '../utils/editor-utils';
@@ -145,12 +146,22 @@ export function cli(_args: string[]) {
     )
     .option('--auto-commit', 'Automatically commit changes', false)
     .option('--github-issue', 'Use GitHub issue for task input', false)
+    .option('--undo', 'Undo the last AI-assisted task')
     .action(async (options) => {
-      try {
-        await runAIAssistedTask(options);
-      } catch (error) {
-        console.error(chalk.red('Error in AI-assisted task:'), error);
-        process.exit(1);
+      if (options.undo) {
+        try {
+          await undoTaskChanges({ path: options.path || '.' });
+        } catch (error) {
+          console.error(chalk.red('Error undoing task changes:'), error);
+          process.exit(1);
+        }
+      } else {
+        try {
+          await runAIAssistedTask(options);
+        } catch (error) {
+          console.error(chalk.red('Error in AI-assisted task:'), error);
+          process.exit(1);
+        }
       }
     });
 

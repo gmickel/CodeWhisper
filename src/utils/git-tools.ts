@@ -138,3 +138,37 @@ export async function getGitHubRepoInfo(basePath: string): Promise<{
     return null;
   }
 }
+
+export async function findParentBranch(
+  git: SimpleGit,
+  currentBranch: string,
+): Promise<string | null> {
+  try {
+    const result = await git.raw(['show-branch', '-a']);
+    const lines = result.split('\n');
+    const currentBranchIndex = lines.findIndex((line) =>
+      line.includes(`[${currentBranch}]`),
+    );
+    if (currentBranchIndex === -1) return null;
+
+    for (let i = currentBranchIndex + 1; i < lines.length; i++) {
+      if (!lines[i].includes(`[${currentBranch}]`) && lines[i].includes('+')) {
+        const match = lines[i].match(/\[(.*?)\]/);
+        if (match) return match[1];
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('Error finding parent branch:', error);
+    return null;
+  }
+}
+
+export async function findDefaultBranch(
+  git: SimpleGit,
+): Promise<string | undefined> {
+  const branches = await git.branchLocal();
+  if (branches.all.includes('main')) return 'main';
+  if (branches.all.includes('master')) return 'master';
+  return branches.all[0]; // This will be undefined if the array is empty
+}
