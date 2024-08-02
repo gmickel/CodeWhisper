@@ -229,7 +229,14 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
 
     const reviewedPlan = await reviewPlan(generatedPlan);
 
-    const codegenTemplatePath = getTemplatePath('codegen-prompt');
+    let codegenTemplatePath: string;
+
+    if (options.diff) {
+      codegenTemplatePath = getTemplatePath('codegen-diff-prompt');
+    } else {
+      codegenTemplatePath = getTemplatePath('codegen-prompt');
+    }
+
     const codegenTemplateContent = await fs.readFile(
       codegenTemplatePath,
       'utf-8',
