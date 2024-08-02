@@ -4,25 +4,27 @@ This document provides comprehensive usage instructions and examples for CodeWhi
 
 ## Table of Contents
 
-* [Command Overview](#command-overview)
-* [Detailed Command Usage](#detailed-command-usage)
-* [Usage Examples](#usage-examples)
-* [Advanced Usage Scenarios](#advanced-usage-scenarios)
-* [CI/CD Integration](#cicd-integration)
-* [Troubleshooting](#troubleshooting)
+- [Command Overview](#command-overview)
+- [Detailed Command Usage](#detailed-command-usage)
+- [Usage Examples](#usage-examples)
+- [Advanced Usage Scenarios](#advanced-usage-scenarios)
+- [CI/CD Integration](#cicd-integration)
+- [Troubleshooting](#troubleshooting)
 
 ## Command Overview
 
 CodeWhisper offers the following main commands:
 
-* `task`: Start an AI-assisted coding task
-* `apply-task`: Apply an AI-generated task from a file
-* `interactive`: Start an interactive session to select files and generate output
-* `generate`: Generate a markdown file from your codebase
-* `list-models`: List available AI models
-* `list-templates`: List available templates
-* `export-templates`: Export templates to the current or specified directory
-* `clear-cache`: Clear the cache
+| Command            | Description                                                      |
+| ------------------ | ---------------------------------------------------------------- |
+| `task`             | Start an AI-assisted coding task                                 |
+| `apply-task`       | Apply an AI-generated task from a file                           |
+| `interactive`      | Start an interactive session to select files and generate output |
+| `generate`         | Generate a markdown file from your codebase                      |
+| `list-models`      | List available AI models                                         |
+| `list-templates`   | List available templates                                         |
+| `export-templates` | Export templates to the current or specified directory           |
+| `clear-cache`      | Clear the cache                                                  |
 
 ## Detailed Command Usage
 
@@ -32,31 +34,35 @@ CodeWhisper offers the following main commands:
 codewhisper task [options]
 ```
 
-Options:
-* `-p, --path <path>`: Path to the codebase (default: current directory)
-* `-m, --model <modelId>`: Specify the AI model to use (if not specified, CodeWhisper will prompt you to select a model from the list of available models)
-* `-t, --task <task>`: Short task title
-* `-d, --description <description>`: Detailed task description
-* `-i, --instructions <instructions>`: Additional instructions for the task
-* `-c, --context <paths...>`: Specify files or directories to include in the task context. Can be file paths, directory paths, or glob patterns. Multiple entries should be space-separated.
-* `-df, --diff`: Use diff format for file updates instead of full file content
-* `-g, --gitignore <path>`: Path to .gitignore file (default: .gitignore)
-* `-f, --filter <patterns...>`: File patterns to include (use glob patterns, e.g., "src/**/*.js")
-* `-e, --exclude <patterns...>`: File patterns to exclude (use glob patterns, e.g., "**/*.test.js")
-* `-s, --suppress-comments`: Strip comments from the code
-* `-l, --line-numbers`: Add line numbers to code blocks
-* `-cw, --context-window <number>`: Specify the context window for the AI model. Only applicable for Ollama models.
-* `-mt, --max-tokens <number>`: Specify the max output tokens for the AI model. Only applicable for Ollama models.
-* `--case-sensitive`: Use case-sensitive pattern matching
-* `--custom-ignores <patterns...>`: Additional patterns to ignore
-* `--cache-path <path>`: Custom path for the cache file
-* `--respect-gitignore`: Respect entries in .gitignore (default: true)
-* `--no-respect-gitignore`: Do not respect entries in .gitignore
-* `--invert`: Selected files will be excluded
-* `--dry-run`: Perform a dry run without making actual changes. Saves changes to a file so you can apply them after review using apply-task
-* `--log-ai-interactions`: Enable logging of AI prompts, responses, and parsing results to a file (default: false)
-* `-max, --max-cost-threshold <number>`: Set a maximum cost threshold for AI operations in USD (e.g., 0.5 for $0.50)
-* `--auto-commit`: Automatically commit changes
+#### Options
+
+| Option                                | Description                                                                                                                                                    |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-p, --path <path>`                   | Path to the codebase (default: current directory)                                                                                                              |
+| `-m, --model <modelId>`               | Specify the AI model to use (if not specified, CodeWhisper will prompt you to select a model from the list of available models)                                |
+| `-t, --task <task>`                   | Short task title                                                                                                                                               |
+| `-d, --description <description>`     | Detailed task description                                                                                                                                      |
+| `-i, --instructions <instructions>`   | Additional instructions for the task                                                                                                                           |
+| `-c, --context <paths...>`            | Specify files or directories to include in the task context. Can be file paths, directory paths, or glob patterns. Multiple entries should be space-separated. |
+| `-df, --diff`                         | Use diff format for file updates instead of full file content                                                                                                  |
+| `-g, --gitignore <path>`              | Path to .gitignore file (default: .gitignore)                                                                                                                  |
+| `-f, --filter <patterns...>`          | File patterns to include (use glob patterns, e.g., "src/\*_/_.js")                                                                                             |
+| `-e, --exclude <patterns...>`         | File patterns to exclude (use glob patterns, e.g., "\*_/_.test.js")                                                                                            |
+| `-s, --suppress-comments`             | Strip comments from the code                                                                                                                                   |
+| `-l, --line-numbers`                  | Add line numbers to code blocks                                                                                                                                |
+| `-cw, --context-window <number>`      | Specify the context window for the AI model. Only applicable for Ollama models.                                                                                |
+| `-mt, --max-tokens <number>`          | Specify the max output tokens for the AI model. Only applicable for Ollama models.                                                                             |
+| `--case-sensitive`                    | Use case-sensitive pattern matching                                                                                                                            |
+| `--custom-ignores <patterns...>`      | Additional patterns to ignore                                                                                                                                  |
+| `--cache-path <path>`                 | Custom path for the cache file                                                                                                                                 |
+| `--respect-gitignore`                 | Respect entries in .gitignore (default: true)                                                                                                                  |
+| `--no-respect-gitignore`              | Do not respect entries in .gitignore                                                                                                                           |
+| `--invert`                            | Selected files will be excluded                                                                                                                                |
+| `--dry-run`                           | Perform a dry run without making actual changes. Saves changes to a file so you can apply them after review using apply-task                                   |
+| `--log-ai-interactions`               | Enable logging of AI prompts, responses, and parsing results to a file (default: false)                                                                        |
+| `-max, --max-cost-threshold <number>` | Set a maximum cost threshold for AI operations in USD (e.g., 0.5 for $0.50)                                                                                    |
+| `--auto-commit`                       | Automatically commit changes                                                                                                                                   |
+| `--undo`                              | Undo AI-assisted task changes                                                                                                                                  |
 
 #### Model Selection
 
@@ -69,6 +75,7 @@ CodeWhisper will prompt you to select a model from the list of available models 
 To use the GitHub issue integration feature:
 
 1. Create a GitHub fine-grained personal access token:
+
    - Go to [GitHub's Personal Access Tokens page](https://github.com/settings/tokens?type=beta)
    - Click "Generate new token"
    - Set the token name and expiration
@@ -104,8 +111,9 @@ Note:
 codewhisper apply-task <file> [options]
 ```
 
-Options:
-* `--auto-commit`: Automatically commit changes (default: false)
+#### Options
+
+- `--auto-commit`: Automatically commit changes (default: false)
 
 ### `interactive` : Interactive Mode
 
@@ -113,25 +121,28 @@ Options:
 codewhisper interactive [options]
 ```
 
-Options:
-* `-p, --path <path>`: Path to the codebase (default: current directory)
-* `-pr, --prompt <prompt>`: Custom prompt to append to the output
-* `-t, --template <template>`: Template to use
-* `-g, --gitignore <path>`: Path to .gitignore file (default: .gitignore)
-* `-f, --filter <patterns...>`: File patterns to include (use glob patterns, e.g., "src/**/*.js")
-* `-e, --exclude <patterns...>`: File patterns to exclude (use glob patterns, e.g., "**/*.test.js")
-* `-E, --open-editor`: Open the result in your default editor
-* `-s, --suppress-comments`: Strip comments from the code
-* `-l, --line-numbers`: Add line numbers to code blocks
-* `--case-sensitive`: Use case-sensitive pattern matching
-* `--no-codeblock`: Disable wrapping code inside markdown code blocks
-* `--custom-data <json>`: Custom data to pass to the template (JSON string)
-* `--custom-template <path>`: Path to a custom Handlebars template
-* `--custom-ignores <patterns...>`: Additional patterns to ignore
-* `--cache-path <path>`: Custom path for the cache file
-* `--respect-gitignore`: Respect entries in .gitignore (default: true)
-* `--no-respect-gitignore`: Do not respect entries in .gitignore
-* `--invert`: Selected files will be excluded
+#### Options
+
+| Option                           | Description                                                         |
+| -------------------------------- | ------------------------------------------------------------------- |
+| `-p, --path <path>`              | Path to the codebase (default: current directory)                   |
+| `-pr, --prompt <prompt>`         | Custom prompt to append to the output                               |
+| `-t, --template <template>`      | Template to use                                                     |
+| `-g, --gitignore <path>`         | Path to .gitignore file (default: .gitignore)                       |
+| `-f, --filter <patterns...>`     | File patterns to include (use glob patterns, e.g., "src/\*_/_.js")  |
+| `-e, --exclude <patterns...>`    | File patterns to exclude (use glob patterns, e.g., "\*_/_.test.js") |
+| `-E, --open-editor`              | Open the result in your default editor                              |
+| `-s, --suppress-comments`        | Strip comments from the code                                        |
+| `-l, --line-numbers`             | Add line numbers to code blocks                                     |
+| `--case-sensitive`               | Use case-sensitive pattern matching                                 |
+| `--no-codeblock`                 | Disable wrapping code inside markdown code blocks                   |
+| `--custom-data <json>`           | Custom data to pass to the template (JSON string)                   |
+| `--custom-template <path>`       | Path to a custom Handlebars template                                |
+| `--custom-ignores <patterns...>` | Additional patterns to ignore                                       |
+| `--cache-path <path>`            | Custom path for the cache file                                      |
+| `--respect-gitignore`            | Respect entries in .gitignore (default: true)                       |
+| `--no-respect-gitignore`         | Do not respect entries in .gitignore                                |
+| `--invert`                       | Selected files will be excluded                                     |
 
 ### `generate` : Generate Output
 
@@ -139,25 +150,28 @@ Options:
 codewhisper generate [options]
 ```
 
-Options:
-* `-p, --path <path>`: Path to the codebase (default: current directory)
-* `-pr, --prompt <prompt>`: Custom prompt to append to the output
-* `-o, --output <output>`: Output file name
-* `-E, --open-editor`: Open the result in your default editor
-* `-t, --template <template>`: Template to use (default: "default")
-* `-g, --gitignore <path>`: Path to .gitignore file (default: .gitignore)
-* `-f, --filter <patterns...>`: File patterns to include (use glob patterns, e.g., "src/**/*.js")
-* `-e, --exclude <patterns...>`: File patterns to exclude (use glob patterns, e.g., "**/*.test.js")
-* `-s, --suppress-comments`: Strip comments from the code
-* `-l, --line-numbers`: Add line numbers to code blocks
-* `--case-sensitive`: Use case-sensitive pattern matching
-* `--no-codeblock`: Disable wrapping code inside markdown code blocks
-* `--custom-data <json>`: Custom data to pass to the template (JSON string)
-* `--custom-template <path>`: Path to a custom Handlebars template
-* `--custom-ignores <patterns...>`: Additional patterns to ignore
-* `--cache-path <path>`: Custom path for the cache file
-* `--respect-gitignore`: Respect entries in .gitignore (default: true)
-* `--no-respect-gitignore`: Do not respect entries in .gitignore
+#### Options
+
+| Option                           | Description                                                         |
+| -------------------------------- | ------------------------------------------------------------------- |
+| `-p, --path <path>`              | Path to the codebase (default: current directory)                   |
+| `-pr, --prompt <prompt>`         | Custom prompt to append to the output                               |
+| `-o, --output <output>`          | Output file name                                                    |
+| `-E, --open-editor`              | Open the result in your default editor                              |
+| `-t, --template <template>`      | Template to use (default: "default")                                |
+| `-g, --gitignore <path>`         | Path to .gitignore file (default: .gitignore)                       |
+| `-f, --filter <patterns...>`     | File patterns to include (use glob patterns, e.g., "src/\*_/_.js")  |
+| `-e, --exclude <patterns...>`    | File patterns to exclude (use glob patterns, e.g., "\*_/_.test.js") |
+| `-s, --suppress-comments`        | Strip comments from the code                                        |
+| `-l, --line-numbers`             | Add line numbers to code blocks                                     |
+| `--case-sensitive`               | Use case-sensitive pattern matching                                 |
+| `--no-codeblock`                 | Disable wrapping code inside markdown code blocks                   |
+| `--custom-data <json>`           | Custom data to pass to the template (JSON string)                   |
+| `--custom-template <path>`       | Path to a custom Handlebars template                                |
+| `--custom-ignores <patterns...>` | Additional patterns to ignore                                       |
+| `--cache-path <path>`            | Custom path for the cache file                                      |
+| `--respect-gitignore`            | Respect entries in .gitignore (default: true)                       |
+| `--no-respect-gitignore`         | Do not respect entries in .gitignore                                |
 
 ### `list-templates` : List Available Templates
 
@@ -173,8 +187,9 @@ This command lists all available templates in the templates directory. It doesn'
 codewhisper export-templates [options]
 ```
 
-Options:
-* `-d, --dir <directory>`: Target directory for exported templates (default: current directory)
+#### Options
+
+- `-d, --dir <directory>`: Target directory for exported templates (default: current directory)
 
 ### `clear-cache` : Clear Codewhisper's Cache
 
@@ -184,60 +199,61 @@ codewhisper clear-cache [options]
 
 This command clears the cache file which is used to store information about processed files as well as previous task and instruction inputs.
 
-Options:
-* `-p, --path <path>`: Path to the cache file (default: default-os-temporary-files-dir/codewhisper-cache.json)
+#### Options
+
+- `-p, --path <path>`: Path to the cache file (default: default-os-temporary-files-dir/codewhisper-cache.json)
 
 ## Usage Examples
 
-01. Include only JavaScript and TypeScript files:
+1.  Include only JavaScript and TypeScript files:
 
 ```bash
 codewhisper generate -f "**/*.js" "**/*.ts"
 ```
 
-02. Exclude test files and the `dist` directory:
+2.  Exclude test files and the `dist` directory:
 
 ```bash
 codewhisper generate -e "**/*.test.js" "dist/**/*"
 ```
 
-03. Combine include and exclude patterns:
+3.  Combine include and exclude patterns:
 
 ```bash
 codewhisper generate -f "src/**/*" -e "**/*.test.js" "**/*.spec.js"
 ```
 
-04. Use custom data in a template:
+4.  Use custom data in a template:
 
 ```bash
 codewhisper generate --custom-data '{"projectName": "MyApp", "version": "1.0.0"}' --custom-template my-template.hbs
 ```
 
-05. Generate a diff-based summary:
+5.  Generate a diff-based summary:
 
 ```bash
 codewhisper generate --filter $(git diff --name-only HEAD^)
 ```
 
-06. Analyze a specific subdirectory:
+6.  Analyze a specific subdirectory:
 
 ```bash
 codewhisper generate -p ./src/components -f "**/*.tsx"
 ```
 
-07. Generate a summary with a custom prompt:
+7.  Generate a summary with a custom prompt:
 
 ```bash
 codewhisper generate -pr "Analyze this code for potential security vulnerabilities"
 ```
 
-08. Use interactive mode with inverted (exclude all selected files) selection:
+8.  Use interactive mode with inverted (exclude all selected files) selection:
 
 ```bash
 codewhisper interactive --invert
 ```
 
-09. Generate output with line numbers in code blocks:
+9.  Generate output with line numbers in code blocks:
 
 ```bash
 codewhisper generate -l
@@ -336,6 +352,20 @@ codewhisper task -m claude-3-5-sonnet-20240620 --log-ai-interactions -t "Impleme
 codewhisper task --diff -m claude-3-5-sonnet-20240620 -t "Refactor authentication logic" -d "Update the user authentication system to use JWT tokens" -i "some instructions"
 ```
 
+24. Undo AI-assisted task changes:
+
+```bash
+codewhisper task --undo
+```
+
+This command will:
+
+- Discard uncommitted changes if any
+- Delete the AI-generated branch if not on the main branch
+- Offer to revert the last commit if on the main branch
+
+The command will always ask for confirmation before making any changes.
+
 ## CI/CD Integration
 
 CodeWhisper can be easily integrated into your CI/CD pipeline. Here's an example of how to use CodeWhisper in a GitHub Actions workflow:
@@ -403,19 +433,19 @@ This workflow generates a codebase summary using CodeWhisper and then uses Anthr
 
 Here are some common issues and their solutions:
 
-01. **Issue**: CodeWhisper is not recognizing my custom template.
-   **Solution**: Ensure that your custom template file has a `.hbs` extension and is in the correct directory. Use the `--custom-template` option with the full path to your template file.
+1.  **Issue**: CodeWhisper is not recognizing my custom template.
+    **Solution**: Ensure that your custom template file has a `.hbs` extension and is in the correct directory. Use the `--custom-template` option with the full path to your template file.
 
-02. **Issue**: The generated output is empty or incomplete.
-   **Solution**: Check your file filters and ensure they're not excluding important files. Try running the command with the `--no-respect-gitignore` option to see if `.gitignore` is causing the issue.
+2.  **Issue**: The generated output is empty or incomplete.
+    **Solution**: Check your file filters and ensure they're not excluding important files. Try running the command with the `--no-respect-gitignore` option to see if `.gitignore` is causing the issue.
 
-03. **Issue**: CodeWhisper is running slowly on large codebases.
-   **Solution**: Use more specific file filters to reduce the number of files processed. You can also try increasing the cache size or using a faster storage medium for the cache file.
+3.  **Issue**: CodeWhisper is running slowly on large codebases.
+    **Solution**: Use more specific file filters to reduce the number of files processed. You can also try increasing the cache size or using a faster storage medium for the cache file.
 
-04. **Issue**: AI-assisted tasks are not producing the expected results.
-   **Solution**: Provide more detailed task descriptions and instructions. You can also try using a different AI model or adjusting the prompt in your custom template.
+4.  **Issue**: AI-assisted tasks are not producing the expected results.
+    **Solution**: Provide more detailed task descriptions and instructions. You can also try using a different AI model or adjusting the prompt in your custom template.
 
-05. **Issue**: Error "ANTHROPIC_API_KEY (or OPENAI_API_KEY or GROQ_API_KEY) not set" when running AI-assisted tasks.
-   **Solution**: Ensure you've set the `ANTHROPIC_API_KEY` (or `OPENAI_API_KEY` or `GROQ_API_KEY` ) environment variable with your API key. You can do this by running `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key` before running CodeWhisper.
+5.  **Issue**: Error "ANTHROPIC_API_KEY (or OPENAI_API_KEY or GROQ_API_KEY) not set" when running AI-assisted tasks.
+    **Solution**: Ensure you've set the `ANTHROPIC_API_KEY` (or `OPENAI_API_KEY` or `GROQ_API_KEY` ) environment variable with your API key. You can do this by running `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key` before running CodeWhisper.
 
 For more complex issues or if these solutions don't help, please open an issue on the [CodeWhisper GitHub repository](https://github.com/gmickel/CodeWhisper/issues).

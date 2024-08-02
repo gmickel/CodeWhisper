@@ -152,3 +152,7 @@ export interface ModelTemperature {
   planningTemperature?: number;
   codegenTemperature?: number;
 }
+
+export interface UndoTaskOptions {
+  path?: string;
+}

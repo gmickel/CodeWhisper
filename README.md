@@ -65,7 +65,7 @@ Many AI coding assistants and tools fall short when tackling tasks that demand a
     - Relevant code files
     - Snippets from financial compliance documents
     - Notes on transaction flow architecture
-    CodeWhisper uses this rich context to generate compliant, architecturally sound code modifications.
+      CodeWhisper uses this rich context to generate compliant, architecturally sound code modifications.
 
 3.  **Noise Reduction, Signal Amplification**: By manually curating the context, you eliminate irrelevant information, enabling CodeWhisper to generate more focused and effective code modifications.
 
@@ -82,7 +82,7 @@ Many AI coding assistants and tools fall short when tackling tasks that demand a
     - Your existing API service files
     - Official documentation of the third-party API
     - Example implementations from other projects
-    CodeWhisper will then use this context to generate a fully functional integration, handling authentication, data mapping, and error scenarios.
+      CodeWhisper will then use this context to generate a fully functional integration, handling authentication, data mapping, and error scenarios.
 
 6.  **Git-First Workflow**: CodeWhisper automatically creates new branches before applying any code modifications, ensuring a clean and organized development process.
 
@@ -100,33 +100,33 @@ By leveraging manually curated context and a git-first approach, CodeWhisper tra
 
 While CodeWhisper excels at performing individual coding tasks and even large feature implementations, its true power shines in its flexibility to also tackle scenarios that require understanding the big picture:
 
-* **Refactoring**: Make informed decisions about restructuring your code based on a comprehensive understanding of your project's architecture.
-* **Architectural Insights**: Get AI-driven suggestions for improving your overall code structure and design patterns.
-* **Code Reviews**: Conduct more thorough and context-aware code reviews with AI assistance.
-* **Documentation**: Generate more accurate and comprehensive documentation that takes into account the entire project structure.
+- **Refactoring**: Make informed decisions about restructuring your code based on a comprehensive understanding of your project's architecture.
+- **Architectural Insights**: Get AI-driven suggestions for improving your overall code structure and design patterns.
+- **Code Reviews**: Conduct more thorough and context-aware code reviews with AI assistance.
+- **Documentation**: Generate more accurate and comprehensive documentation that takes into account the entire project structure.
 
 </details>
 
 ## ✨ Key Features
 
-* 🧠 AI-powered task planning and code generation
-* 🔄 Full git integration for version control of AI-generated changes
-* 🔄 Support for diff-based code modifications to handle larger edits within output token limits
-* 🌍 Support for various models and LLM providers, such as Anthropic, OpenAI, and Groq
-* 🔐 Support for local models via Ollama
-* 🚀 Blazingly fast code processing with concurrent workers
-* 🎯 Customizable file filtering and exclusion
-* 📊 Intelligent caching for improved performance
-* 🔧 Extensible template system with interactive variable prompts
-* 🖊️ Support for single-line and multi-line custom variables in templates
-* 💾 Value caching for quick template reuse
-* 🖥️ CLI and programmatic API
-* 🔒 Respects .gitignore and/or custom include and exclude globs
-* 🌈 Full language support for all text-based file types
-* 🤖 Interactive mode for granular file selection and template customization
-* ⚡ Optimized for large repositories
-* 📝 Detailed logging of AI prompts, responses, and parsing results
-* 🔗 GitHub integration for fetching and working with issues (see [Configuration](#-configuration))
+- 🧠 AI-powered task planning and code generation
+- 🔄 Full git integration for version control of AI-generated changes
+- 🔄 Support for diff-based code modifications to handle larger edits within output token limits
+- 🌍 Support for various models and LLM providers, such as Anthropic, OpenAI, and Groq
+- 🔐 Support for local models via Ollama
+- 🚀 Blazingly fast code processing with concurrent workers
+- 🎯 Customizable file filtering and exclusion
+- 📊 Intelligent caching for improved performance
+- 🔧 Extensible template system with interactive variable prompts
+- 🖊️ Support for single-line and multi-line custom variables in templates
+- 💾 Value caching for quick template reuse
+- 🖥️ CLI and programmatic API
+- 🔒 Respects .gitignore and/or custom include and exclude globs
+- 🌈 Full language support for all text-based file types
+- 🤖 Interactive mode for granular file selection and template customization
+- ⚡ Optimized for large repositories
+- 📝 Detailed logging of AI prompts, responses, and parsing results
+- 🔗 GitHub integration for fetching and working with issues (see [Configuration](#-configuration))
 
 ## 📺 Video
 
@@ -170,6 +170,9 @@ codewhisper task -m claude-3-5-sonnet-20240620
 
 # Or use a local Ollama model (not recommended as it will be slow and inaccurate for comprehensive feature implementation tasks)
 codewhisper task -m ollama:llama3.1:70b --context-window 131072 --max-tokens 8192
+
+# To undo changes made by an AI-assisted task, use the --undo option
+codewhisper task --undo
 ```
 
 > Note: If you are using CodeWhisper's LLM integration with `codewhisper task` you will need to set the respective environment variable for the model you want to use (e.g. `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key` ).
@@ -183,11 +186,13 @@ While CodeWhisper supports a variety of providers and models, my current recomme
 #### Recommended Models
 
 1. **Claude-3.5-Sonnet (Anthropic)**
+
    - Highest recommendation
    - Generates exceptional quality plans and results
    - Optimal performance for comprehensive task implementation
 
 2. **GPT-4o (OpenAI)**
+
    - Excellent performance
    - Produces high-quality plans and good results
    - Nearly on par with Claude-3.5-Sonnet
@@ -207,6 +212,7 @@ While CodeWhisper supports a variety of providers and models, my current recomme
 #### Local Models (via Ollama)
 
 Currently not recommended for complex tasks. Models tested include:
+
 - Llama 3.1 (8B to 70B variants)
 - DeepSeek Coder V2
 - Mistral Nemo
@@ -256,6 +262,26 @@ codewhisper export-templates -d ./my-templates
 
 For detailed usage instructions and examples, please refer to [USAGE.md](USAGE.md).
 
+Certainly! Here's the relevant section to be added to the README.md file:
+
+### Undoing AI-Assisted Task Changes
+
+To undo changes made by an AI-assisted task, you can use the `--undo` option with the `task` command:
+
+```bash
+codewhisper task --undo
+```
+
+This command will:
+
+- Discard uncommitted changes if any
+- Delete the AI-generated branch if not on the main branch
+- Offer to revert the last commit if on the main branch
+
+The command will always ask for confirmation before making any changes. It will show you the exact actions it's about to perform, including the full commit message of any commit it's about to revert.
+
+Always review the proposed changes carefully before confirming, as this operation may result in loss of work.
+
 ## 📝 Templates
 
 CodeWhisper uses Handlebars templates to generate output. You can use pre-defined templates or create custom ones. For in-depth information on templating, see [TEMPLATES.md](TEMPLATES.md).
@@ -295,16 +321,16 @@ We welcome contributions to CodeWhisper! Please read our [CONTRIBUTING.md](CONTR
 
 ## 🏎️ Roadmap
 
-* [x] Add AI-assisted task creation and code generation
-* [x] Add GitHub integration for fetching issues and pull requests
-* [ ] Add other integrations for fetching issues and pull requests (GitLab, Jira, Linear, etc.)
-* [x] Finish OpenAI and Groq support
-* [x] Add support for other LLMs
-* [x] Add support for local models via Ollama
-* [ ] Experiment with partial file modifications
-* [ ] Experiment with generateObject with a fixed schema
-* [ ] Run evaluations on generated code
-* [ ] Possibly add agentic behaviors
+- [x] Add AI-assisted task creation and code generation
+- [x] Add GitHub integration for fetching issues and pull requests
+- [ ] Add other integrations for fetching issues and pull requests (GitLab, Jira, Linear, etc.)
+- [x] Finish OpenAI and Groq support
+- [x] Add support for other LLMs
+- [x] Add support for local models via Ollama
+- [ ] Experiment with partial file modifications
+- [ ] Experiment with generateObject with a fixed schema
+- [ ] Run evaluations on generated code
+- [ ] Possibly add agentic behaviors
 
 ## ❓ FAQ
 
@@ -341,10 +367,10 @@ A: CodeWhisper respects `.gitignore` files by default, helping to exclude sensit
 
 ## 👏 Acknowledgments
 
-* [Handlebars](https://handlebarsjs.com/) for templating
-* [Commander.js](https://github.com/tj/commander.js/) for CLI support
-* [fast-glob](https://github.com/mrmlnc/fast-glob) for file matching
-* [Inquirer.js](https://github.com/SBoudrias/Inquirer.js/) for interactive prompts
+- [Handlebars](https://handlebarsjs.com/) for templating
+- [Commander.js](https://github.com/tj/commander.js/) for CLI support
+- [fast-glob](https://github.com/mrmlnc/fast-glob) for file matching
+- [Inquirer.js](https://github.com/SBoudrias/Inquirer.js/) for interactive prompts
 
 ## 📬 Contact
 

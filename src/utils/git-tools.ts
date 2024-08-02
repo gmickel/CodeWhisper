@@ -138,3 +138,32 @@ export async function getGitHubRepoInfo(basePath: string): Promise<{
     return null;
   }
 }
+
+export async function findOriginalBranch(git: SimpleGit): Promise<string> {
+  try {
+    const result = await git.raw(['reflog', '-n', '2', '--pretty=%D']);
+    const lines = result.split('\n');
+    for (const line of lines) {
+      const match = line.match(
+        /HEAD@\{[0-9]+\}: checkout: moving from ([\w/-]+) to/,
+      );
+      if (match) {
+        return match[1];
+      }
+    }
+    // If we can't find the original branch, fall back to findDefaultBranch
+    return (await findDefaultBranch(git)) || 'main';
+  } catch (error) {
+    console.error('Error finding original branch:', error);
+    return (await findDefaultBranch(git)) || 'main';
+  }
+}
+
+export async function findDefaultBranch(
+  git: SimpleGit,
+): Promise<string | undefined> {
+  const branches = await git.branchLocal();
+  if (branches.all.includes('main')) return 'main';
+  if (branches.all.includes('master')) return 'master';
+  return branches.all[0]; // This will be undefined if the array is empty
+}
