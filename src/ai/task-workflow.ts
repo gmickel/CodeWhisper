@@ -38,9 +38,7 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
   const spinner = ora();
   try {
     const basePath = path.resolve(options.path ?? '.');
-    const taskCache = new TaskCache(
-      path.join(basePath, '.codewhisper-task-cache.json'),
-    );
+    const taskCache = new TaskCache(basePath);
 
     const modelKey = await selectModel(options);
     const { taskDescription, instructions } = await getTaskInfo(

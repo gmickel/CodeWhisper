@@ -1,3 +1,4 @@
+import os from 'node:os';
 import path from 'node:path';
 import fs from 'fs-extra';
 import type { TaskData } from '../types';
@@ -6,11 +7,13 @@ export class TaskCache {
   private cacheFile: string;
   private cache: Record<string, TaskData> = {};
 
-  constructor(cacheFilePath: string) {
-    this.cacheFile = cacheFilePath;
+  constructor(projectPath: string) {
+    const cacheDir = path.join(os.homedir(), '.codewhisper');
+    fs.ensureDirSync(cacheDir);
+    const projectHash = Buffer.from(projectPath).toString('base64');
+    this.cacheFile = path.join(cacheDir, `${projectHash}-task-cache.json`);
     this.loadCache();
   }
-
   private loadCache(): void {
     if (fs.existsSync(this.cacheFile)) {
       this.cache = fs.readJSONSync(this.cacheFile);
