@@ -72,7 +72,9 @@ async function applyFileChange(
             const currentContent = await fs.readFile(fullPath, 'utf-8');
             const updatedContent = applyPatch(currentContent, file.diff);
             if (updatedContent === false) {
-              throw new Error(`Failed to apply patch to file: ${file.path}`);
+              throw new Error(
+                `Failed to apply patch to file: ${file.path}\n A common cause is the the file was not sent to the LLM and it hallucinated the content. Try running the task again (task --redo) and selecting the problemtic file.`,
+              );
             }
             await fs.writeFile(fullPath, updatedContent);
           } else if (file.content) {
