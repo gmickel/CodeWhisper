@@ -68,7 +68,7 @@ describe('redoLastTask', () => {
 
     expect(continueTaskWorkflow).toHaveBeenCalledWith(
       expect.objectContaining({ model: 'last-model' }),
-      path.join('/', 'test', 'path'),
+      expect.stringMatching(/[\\\/]test[\\\/]path$/),
       expect.any(Object),
       'Last generated plan',
       'last-model',
@@ -94,7 +94,7 @@ describe('redoLastTask', () => {
     expect(selectModelPrompt).toHaveBeenCalled();
     expect(continueTaskWorkflow).toHaveBeenCalledWith(
       expect.objectContaining({ model: 'new-model' }),
-      path.join('/', 'test', 'path'),
+      expect.stringMatching(/[\\\/]test[\\\/]path$/),
       expect.any(Object),
       'Last generated plan',
       'new-model',
@@ -118,7 +118,7 @@ describe('redoLastTask', () => {
 
     expect(selectFilesPrompt).toHaveBeenCalled();
     expect(mockTaskCache.setTaskData).toHaveBeenCalledWith(
-      path.join('/', 'test', 'path'),
+      expect.stringMatching(/[\\\/]test[\\\/]path$/),
       expect.objectContaining({
         selectedFiles: ['new-file1.ts', 'new-file2.ts'],
       }),
