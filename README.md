@@ -304,6 +304,7 @@ When you use the `--redo` option:
 5. The task will then continue from the review plan stage, where you can then modify the plan to your liking.
 
 This feature is particularly useful when:
+
 - You want to try a different AI model for the same task
 - You need to adjust the file selection for the same task
 - You want to quickly tweak the plan without starting from scratch
@@ -315,10 +316,10 @@ Example workflow:
 1. Run an initial task: `codewhisper task`
 2. Review the code modifications and decide you want to tweak the plan or try a different model
 3. Undo the task: `codewhisper task --undo`
-3. Redo the task: `codewhisper task --redo`
-4. Optionally change the model when prompted
-5. Optionally adjust the file selection
-6. Adjust the plan as needed
+4. Redo the task: `codewhisper task --redo`
+5. Optionally change the model when prompted
+6. Optionally adjust the file selection
+7. Adjust the plan as needed
 
 This feature enhances the flexibility of CodeWhisper's AI-assisted workflow, allowing for quick iterations and experimentation with different models or scopes for your tasks.
 
@@ -367,7 +368,7 @@ We welcome contributions to CodeWhisper! Please read our [CONTRIBUTING.md](CONTR
 - [x] Finish OpenAI and Groq support
 - [x] Add support for other LLMs
 - [x] Add support for local models via Ollama
-- [ ] Experiment with partial file modifications
+- [x] Experiment with partial file modifications
 - [ ] Experiment with generateObject with a fixed schema
 - [ ] Run evaluations on generated code
 - [ ] Possibly add agentic behaviors
