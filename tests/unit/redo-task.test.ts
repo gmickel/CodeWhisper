@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { confirm } from '@inquirer/prompts';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getModelConfig } from '../../src/ai/model-config';
@@ -17,7 +18,7 @@ vi.mock('../../src/ai/task-workflow');
 
 describe('redoLastTask', () => {
   const mockOptions = {
-    path: '/test/path',
+    path: path.join('/', 'test', 'path'),
     model: 'test-model',
   } as AiAssistedTaskOptions;
 
@@ -67,7 +68,7 @@ describe('redoLastTask', () => {
 
     expect(continueTaskWorkflow).toHaveBeenCalledWith(
       expect.objectContaining({ model: 'last-model' }),
-      '/test/path',
+      path.join('/', 'test', 'path'),
       expect.any(Object),
       'Last generated plan',
       'last-model',
@@ -93,7 +94,7 @@ describe('redoLastTask', () => {
     expect(selectModelPrompt).toHaveBeenCalled();
     expect(continueTaskWorkflow).toHaveBeenCalledWith(
       expect.objectContaining({ model: 'new-model' }),
-      '/test/path',
+      path.join('/', 'test', 'path'),
       expect.any(Object),
       'Last generated plan',
       'new-model',
@@ -117,7 +118,7 @@ describe('redoLastTask', () => {
 
     expect(selectFilesPrompt).toHaveBeenCalled();
     expect(mockTaskCache.setTaskData).toHaveBeenCalledWith(
-      '/test/path',
+      path.join('/', 'test', 'path'),
       expect.objectContaining({
         selectedFiles: ['new-file1.ts', 'new-file2.ts'],
       }),
