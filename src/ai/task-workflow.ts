@@ -9,13 +9,19 @@ import { applyChanges } from '../git/apply-changes';
 import { selectFilesPrompt } from '../interactive/select-files-prompt';
 import { selectGitHubIssuePrompt } from '../interactive/select-github-issue-prompt';
 import { selectModelPrompt } from '../interactive/select-model-prompt';
-import type { AiAssistedTaskOptions, MarkdownOptions } from '../types';
+import type {
+  AIParsedResponse,
+  AiAssistedTaskOptions,
+  FileInfo,
+  MarkdownOptions,
+} from '../types';
 import {
   DEFAULT_CACHE_PATH,
   getCachedValue,
   setCachedValue,
 } from '../utils/cache-utils';
 import { ensureBranch } from '../utils/git-tools';
+import { TaskCache } from '../utils/task-cache';
 import {
   collectVariables,
   extractTemplateVariables,
@@ -32,386 +38,508 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
   const spinner = ora();
   try {
     const basePath = path.resolve(options.path ?? '.');
+    const taskCache = new TaskCache(basePath);
 
-    // Model selection
-    let modelKey = options.model;
-
-    if (modelKey) {
-      const modelConfig = getModelConfig(options.model);
-      if (!modelConfig) {
-        console.log(chalk.red(`Invalid model ID: ${options.model}.`));
-        console.log(chalk.yellow('Displaying model selection list...'));
-      } else {
-        console.log(chalk.blue(`Using model: ${modelConfig.modelName}`));
-      }
-    }
-
-    if (!modelKey) {
-      try {
-        modelKey = await selectModelPrompt();
-        const modelConfig = getModelConfig(modelKey);
-        console.log(chalk.blue(`Using model: ${modelConfig.modelName}`));
-      } catch (error) {
-        console.error(chalk.red('Error selecting model:'), error);
-        process.exit(1);
-      }
-    }
-
-    let taskDescription = '';
-    let instructions = '';
-
-    if (options.githubIssue) {
-      if (!process.env.GITHUB_TOKEN) {
-        console.log(
-          chalk.yellow(
-            'GITHUB_TOKEN not set. GitHub issue functionality may be limited.',
-          ),
-        );
-      }
-      const selectedIssue = await selectGitHubIssuePrompt(basePath);
-      if (selectedIssue) {
-        taskDescription = `# ${selectedIssue.title}\n\n${selectedIssue.body}`;
-        options.issueNumber = selectedIssue.number;
-      } else {
-        console.log(
-          chalk.yellow(
-            'No GitHub issue selected. Falling back to manual input.',
-          ),
-        );
-      }
-    }
-
-    if (!taskDescription) {
-      if (options.task || options.description) {
-        taskDescription =
-          `# ${options.task || 'Task'}\n\n${options.description || ''}`.trim();
-      } else {
-        const cachedTaskDescription = await getCachedValue(
-          'taskDescription',
-          options.cachePath,
-        );
-        if (cachedTaskDescription) {
-          console.log(chalk.yellow('Using cached task description.'));
-        }
-        taskDescription =
-          (await getTaskDescription(
-            cachedTaskDescription as string | undefined,
-          )) ?? 'No task description provided.';
-        await setCachedValue(
-          'taskDescription',
-          taskDescription,
-          options.cachePath,
-        );
-      }
-    }
-
-    if (!instructions) {
-      if (options.instructions) {
-        instructions = options.instructions;
-      } else {
-        const cachedInstructions = await getCachedValue(
-          'instructions',
-          options.cachePath,
-        );
-        if (cachedInstructions) {
-          console.log(chalk.yellow('Using cached instructions.'));
-        }
-        instructions =
-          (await getInstructions(cachedInstructions as string | undefined)) ??
-          'No instructions provided.';
-        await setCachedValue('instructions', instructions, options.cachePath);
-      }
-    }
-
-    const userFilters = options.filter || [];
-
-    let selectedFiles: string[];
-    if (options.context && options.context.length > 0) {
-      selectedFiles = options.context.map((item) => {
-        const relativePath = path.relative(basePath, item);
-        return fs.statSync(path.join(basePath, item)).isDirectory()
-          ? path.join(relativePath, '**/*')
-          : relativePath;
-      });
-    } else {
-      selectedFiles = await selectFilesPrompt(
-        basePath,
-        options.invert ?? false,
-      );
-    }
-    // Combine user filters with selected files
-    const combinedFilters = [...new Set([...userFilters, ...selectedFiles])];
-
-    console.log(
-      chalk.cyan(`Files to be ${options.invert ? 'excluded' : 'included'}:`),
+    const modelKey = await selectModel(options);
+    const { taskDescription, instructions } = await getTaskInfo(
+      options,
+      basePath,
     );
-    for (const filter of combinedFilters) {
-      console.log(chalk.cyan(`  ${filter}`));
-    }
+    const selectedFiles = await selectFiles(options, basePath);
 
     const templatePath = getTemplatePath('task-plan-prompt');
-
     const templateContent = await fs.readFile(templatePath, 'utf-8');
-    const variables = extractTemplateVariables(templateContent);
-
-    const dataObj = {
-      var_taskDescription: taskDescription,
-      var_instructions: instructions,
-    };
-
-    let data: string;
-    try {
-      data = JSON.stringify(dataObj);
-    } catch (error) {
-      console.error(
-        chalk.red('Error creating data for task plan prompt:'),
-        error instanceof Error ? error.message : String(error),
-      );
-      process.exit(1);
-    }
-
-    const customData = await collectVariables(
-      data,
-      options.cachePath ?? DEFAULT_CACHE_PATH,
-      variables,
-      templatePath,
+    const customData = await prepareCustomData(
+      templateContent,
+      taskDescription,
+      instructions,
+      options,
     );
 
     spinner.start('Processing files...');
-    const processedFiles = await processFiles({
-      ...options,
-      path: basePath,
-      filter: options.invert ? undefined : combinedFilters,
-      exclude: options.invert ? combinedFilters : options.exclude,
-    });
+    const processedFiles = await processFiles(
+      getProcessOptions(options, basePath, selectedFiles),
+    );
     spinner.succeed('Files processed successfully');
 
-    spinner.start('Generating markdown...');
-    const markdownOptions: MarkdownOptions = {
-      noCodeblock: options.noCodeblock,
-      basePath,
-      customData,
-      lineNumbers: options.lineNumbers,
-    };
-
-    const planPrompt = await generateMarkdown(
+    const planPrompt = await generatePlanPrompt(
       processedFiles,
       templateContent,
-      markdownOptions,
-    );
-    spinner.succeed('Plan prompt generated successfully');
-
-    const modelConfig = getModelConfig(modelKey);
-
-    spinner.start('Generating AI plan...');
-    let generatedPlan: string;
-    if (modelKey.includes('ollama')) {
-      generatedPlan = await generateAIResponse(planPrompt, {
-        maxCostThreshold: options.maxCostThreshold,
-        model: modelKey,
-        contextWindow: options.contextWindow,
-        maxTokens: options.maxTokens,
-        logAiInteractions: options.logAiInteractions,
-      });
-    } else {
-      generatedPlan = await generateAIResponse(
-        planPrompt,
-        {
-          maxCostThreshold: options.maxCostThreshold,
-          model: modelKey,
-          logAiInteractions: options.logAiInteractions,
-        },
-        modelConfig.temperature?.planningTemperature,
-      );
-    }
-
-    spinner.succeed('AI plan generated successfully');
-
-    const reviewedPlan = await reviewPlan(generatedPlan);
-
-    let codegenTemplatePath: string;
-
-    if (options.diff) {
-      codegenTemplatePath = getTemplatePath('codegen-diff-prompt');
-    } else {
-      codegenTemplatePath = getTemplatePath('codegen-prompt');
-    }
-
-    const codegenTemplateContent = await fs.readFile(
-      codegenTemplatePath,
-      'utf-8',
-    );
-
-    const codegenVariables = extractTemplateVariables(codegenTemplateContent);
-
-    const codegenDataObj = {
-      var_taskDescription: taskDescription,
-      var_instructions: instructions,
-      var_plan: reviewedPlan,
-    };
-
-    let codegenData: string;
-    try {
-      codegenData = JSON.stringify(codegenDataObj);
-    } catch (error) {
-      console.error(
-        chalk.red('Error creating data for code generation prompt:'),
-        error instanceof Error ? error.message : String(error),
-      );
-      process.exit(1);
-    }
-
-    const codegenCustomData = await collectVariables(
-      codegenData,
-      options.cachePath ?? DEFAULT_CACHE_PATH,
-      codegenVariables,
-      codegenTemplatePath,
-    );
-
-    spinner.start('Generating Codegen prompt...');
-    const codegenMarkdownOptions: MarkdownOptions = {
-      noCodeblock: options.noCodeblock,
+      customData,
+      options,
       basePath,
-      customData: codegenCustomData,
-      lineNumbers: options.lineNumbers,
-    };
-
-    const codeGenPrompt = await generateMarkdown(
-      processedFiles,
-      codegenTemplateContent,
-      codegenMarkdownOptions,
-    );
-    spinner.succeed('Codegen prompt generated successfully');
-
-    spinner.start('Generating AI Code Modifications...');
-    let generatedCode: string;
-    if (modelKey.includes('ollama')) {
-      generatedCode = await generateAIResponse(codeGenPrompt, {
-        maxCostThreshold: options.maxCostThreshold,
-        model: modelKey,
-        contextWindow: options.contextWindow,
-        maxTokens: options.maxTokens,
-        logAiInteractions: options.logAiInteractions,
-      });
-    } else {
-      generatedCode = await generateAIResponse(
-        codeGenPrompt,
-        {
-          maxCostThreshold: options.maxCostThreshold,
-          model: modelKey,
-          logAiInteractions: options.logAiInteractions,
-        },
-        modelConfig.temperature?.codegenTemperature,
-      );
-    }
-    spinner.succeed('AI Code Modifications generated successfully');
-
-    const parsedResponse = parseAICodegenResponse(
-      generatedCode,
-      options.logAiInteractions,
-      options.diff,
     );
 
-    if (options.dryRun) {
-      spinner.info(
-        chalk.yellow(
-          'Dry Run Mode: Generating output without applying changes',
-        ),
-      );
+    const generatedPlan = await generatePlan(planPrompt, modelKey, options);
 
-      // Save only the generated code modifications
-      const outputPath = path.join(basePath, 'codewhisper-task-output.json');
-      await fs.writeJSON(
-        outputPath,
-        {
-          taskDescription,
-          parsedResponse,
-        },
-        { spaces: 2 },
-      );
-      console.log(chalk.green(`AI-generated output saved to: ${outputPath}`));
-      console.log(chalk.cyan('To apply these changes, run:'));
-      console.log(chalk.cyan(`npx codewhisper apply-task ${outputPath}`));
+    // Cache the task data
+    taskCache.setTaskData(basePath, {
+      selectedFiles,
+      generatedPlan,
+      taskDescription,
+      instructions,
+      model: modelKey,
+    });
 
-      // Detailed console output
-      console.log('\nTask Summary:');
-      console.log(chalk.blue('Task Description:'), taskDescription);
-      console.log(chalk.blue('Branch Name:'), parsedResponse.gitBranchName);
-      console.log(
-        chalk.blue('Commit Message:'),
-        parsedResponse.gitCommitMessage,
-      );
-      console.log(chalk.blue('Files to be changed:'));
-      for (const file of parsedResponse.files) {
-        console.log(`  ${file.status}: ${file.path}`);
-      }
-      console.log(chalk.blue('Summary:'), parsedResponse.summary);
-      console.log(
-        chalk.blue('Potential Issues:'),
-        parsedResponse.potentialIssues,
-      );
-    } else {
-      spinner.start('Applying AI Code Modifications...');
-
-      try {
-        const actualBranchName = await ensureBranch(
-          basePath,
-          parsedResponse.gitBranchName,
-          { issueNumber: options.issueNumber },
-        );
-
-        // Apply changes
-        await applyChanges({ basePath, parsedResponse, dryRun: false });
-
-        if (options.autoCommit) {
-          const git = simpleGit(basePath);
-          await git.add('.');
-          const commitMessage = options.issueNumber
-            ? `${parsedResponse.gitCommitMessage} (Closes #${options.issueNumber})`
-            : parsedResponse.gitCommitMessage;
-          await git.commit(commitMessage);
-          spinner.succeed(
-            `AI Code Modifications applied and committed to branch: ${actualBranchName}`,
-          );
-        } else {
-          spinner.succeed(
-            `AI Code Modifications applied to branch: ${actualBranchName}`,
-          );
-          console.log(
-            chalk.green('Changes have been applied but not committed.'),
-          );
-          console.log(
-            chalk.yellow(
-              'Please review the changes in your IDE before committing.',
-            ),
-          );
-          console.log(
-            chalk.cyan('To commit the changes, use the following commands:'),
-          );
-          console.log(chalk.cyan('  git add .'));
-          console.log(
-            chalk.cyan(
-              `  git commit -m "${parsedResponse.gitCommitMessage}${options.issueNumber ? ` (Closes #${options.issueNumber})` : ''}"`,
-            ),
-          );
-        }
-      } catch (error) {
-        spinner.fail('Error applying AI Code Modifications');
-        console.error(
-          chalk.red('Failed to create branch or apply changes:'),
-          error instanceof Error ? error.message : String(error),
-        );
-        console.log(
-          chalk.yellow('Please check your Git configuration and try again.'),
-        );
-        process.exit(1);
-      }
-    }
-    console.log(chalk.green('AI-assisted task completed! 🎉'));
+    await continueTaskWorkflow(
+      options,
+      basePath,
+      taskCache,
+      generatedPlan,
+      modelKey,
+    );
   } catch (error) {
     spinner.fail('Error in AI-assisted task');
     console.error(
       chalk.red(error instanceof Error ? error.message : String(error)),
+    );
+    process.exit(1);
+  }
+}
+
+async function selectModel(options: AiAssistedTaskOptions): Promise<string> {
+  let modelKey = options.model;
+
+  if (modelKey) {
+    const modelConfig = getModelConfig(modelKey);
+    if (!modelConfig) {
+      console.log(chalk.red(`Invalid model ID: ${modelKey}.`));
+      console.log(chalk.yellow('Displaying model selection list...'));
+      modelKey = '';
+    } else {
+      console.log(chalk.blue(`Using model: ${modelConfig.modelName}`));
+    }
+  }
+
+  if (!modelKey) {
+    try {
+      modelKey = await selectModelPrompt();
+      const modelConfig = getModelConfig(modelKey);
+      console.log(chalk.blue(`Using model: ${modelConfig.modelName}`));
+    } catch (error) {
+      console.error(chalk.red('Error selecting model:'), error);
+      process.exit(1);
+    }
+  }
+
+  return modelKey;
+}
+
+async function getTaskInfo(
+  options: AiAssistedTaskOptions,
+  basePath: string,
+): Promise<{ taskDescription: string; instructions: string }> {
+  let taskDescription = '';
+  let instructions = '';
+
+  if (options.githubIssue) {
+    if (!process.env.GITHUB_TOKEN) {
+      console.log(
+        chalk.yellow(
+          'GITHUB_TOKEN not set. GitHub issue functionality may be limited.',
+        ),
+      );
+    }
+    const selectedIssue = await selectGitHubIssuePrompt(basePath);
+    if (selectedIssue) {
+      taskDescription = `# ${selectedIssue.title}\n\n${selectedIssue.body}`;
+      options.issueNumber = selectedIssue.number;
+    } else {
+      console.log(
+        chalk.yellow('No GitHub issue selected. Falling back to manual input.'),
+      );
+    }
+  }
+
+  if (!taskDescription) {
+    if (options.task || options.description) {
+      taskDescription =
+        `# ${options.task || 'Task'}\n\n${options.description || ''}`.trim();
+    } else {
+      const cachedTaskDescription = await getCachedValue(
+        'taskDescription',
+        options.cachePath,
+      );
+      taskDescription = await getTaskDescription(
+        cachedTaskDescription as string | undefined,
+      );
+      await setCachedValue(
+        'taskDescription',
+        taskDescription,
+        options.cachePath,
+      );
+    }
+  }
+
+  if (!instructions) {
+    if (options.instructions) {
+      instructions = options.instructions;
+    } else {
+      const cachedInstructions = await getCachedValue(
+        'instructions',
+        options.cachePath,
+      );
+      instructions = await getInstructions(
+        cachedInstructions as string | undefined,
+      );
+      await setCachedValue('instructions', instructions, options.cachePath);
+    }
+  }
+
+  return { taskDescription, instructions };
+}
+
+async function selectFiles(
+  options: AiAssistedTaskOptions,
+  basePath: string,
+): Promise<string[]> {
+  const userFilters = options.filter || [];
+
+  let selectedFiles: string[];
+  if (options.context && options.context.length > 0) {
+    selectedFiles = options.context.map((item) => {
+      const relativePath = path.relative(basePath, item);
+      return fs.statSync(path.join(basePath, item)).isDirectory()
+        ? path.join(relativePath, '**/*')
+        : relativePath;
+    });
+  } else {
+    selectedFiles = await selectFilesPrompt(basePath, options.invert ?? false);
+  }
+
+  const combinedFilters = [...new Set([...userFilters, ...selectedFiles])];
+
+  console.log(
+    chalk.cyan(`Files to be ${options.invert ? 'excluded' : 'included'}:`),
+  );
+  for (const filter of combinedFilters) {
+    console.log(chalk.cyan(`  ${filter}`));
+  }
+
+  return combinedFilters;
+}
+
+async function prepareCustomData(
+  templateContent: string,
+  taskDescription: string,
+  instructions: string,
+  options: AiAssistedTaskOptions,
+): Promise<Record<string, string>> {
+  const variables = extractTemplateVariables(templateContent);
+  const dataObj = {
+    var_taskDescription: taskDescription,
+    var_instructions: instructions,
+  };
+  const data = JSON.stringify(dataObj);
+
+  return collectVariables(
+    data,
+    options.cachePath ?? DEFAULT_CACHE_PATH,
+    variables,
+    templateContent,
+  );
+}
+
+function getProcessOptions(
+  options: AiAssistedTaskOptions,
+  basePath: string,
+  selectedFiles: string[],
+): AiAssistedTaskOptions {
+  return {
+    ...options,
+    path: basePath,
+    filter: options.invert ? undefined : selectedFiles,
+    exclude: options.invert ? selectedFiles : options.exclude,
+  };
+}
+
+async function generatePlanPrompt(
+  processedFiles: FileInfo[],
+  templateContent: string,
+  customData: Record<string, string>,
+  options: AiAssistedTaskOptions,
+  basePath: string,
+): Promise<string> {
+  const spinner = ora('Generating markdown...').start();
+  const markdownOptions: MarkdownOptions = {
+    noCodeblock: options.noCodeblock,
+    basePath,
+    customData,
+    lineNumbers: options.lineNumbers,
+  };
+
+  const planPrompt = await generateMarkdown(
+    processedFiles,
+    templateContent,
+    markdownOptions,
+  );
+  spinner.succeed('Plan prompt generated successfully');
+  return planPrompt;
+}
+
+async function generatePlan(
+  planPrompt: string,
+  modelKey: string,
+  options: AiAssistedTaskOptions,
+): Promise<string> {
+  const spinner = ora('Generating AI plan...').start();
+  const modelConfig = getModelConfig(modelKey);
+
+  let generatedPlan: string;
+  if (modelKey.includes('ollama')) {
+    generatedPlan = await generateAIResponse(planPrompt, {
+      maxCostThreshold: options.maxCostThreshold,
+      model: modelKey,
+      contextWindow: options.contextWindow,
+      maxTokens: options.maxTokens,
+      logAiInteractions: options.logAiInteractions,
+    });
+  } else {
+    generatedPlan = await generateAIResponse(
+      planPrompt,
+      {
+        maxCostThreshold: options.maxCostThreshold,
+        model: modelKey,
+        logAiInteractions: options.logAiInteractions,
+      },
+      modelConfig.temperature?.planningTemperature,
+    );
+  }
+
+  spinner.succeed('AI plan generated successfully');
+  return generatedPlan;
+}
+
+export async function continueTaskWorkflow(
+  options: AiAssistedTaskOptions,
+  basePath: string,
+  taskCache: TaskCache,
+  generatedPlan: string,
+  modelKey: string,
+) {
+  const spinner = ora();
+
+  const reviewedPlan = await reviewPlan(generatedPlan);
+
+  const codegenTemplatePath = options.diff
+    ? getTemplatePath('codegen-diff-prompt')
+    : getTemplatePath('codegen-prompt');
+
+  const codegenTemplateContent = await fs.readFile(
+    codegenTemplatePath,
+    'utf-8',
+  );
+  const codegenCustomData = await prepareCodegenCustomData(
+    codegenTemplateContent,
+    taskCache,
+    basePath,
+    reviewedPlan,
+    options,
+  );
+
+  spinner.start('Generating Codegen prompt...');
+  const codeGenPrompt = await generateCodegenPrompt(
+    options,
+    basePath,
+    taskCache,
+    codegenTemplateContent,
+    codegenCustomData,
+  );
+  spinner.succeed('Codegen prompt generated successfully');
+
+  const generatedCode = await generateCode(codeGenPrompt, modelKey, options);
+  const parsedResponse = parseAICodegenResponse(
+    generatedCode,
+    options.logAiInteractions,
+    options.diff,
+  );
+
+  if (options.dryRun) {
+    await handleDryRun(
+      basePath,
+      parsedResponse,
+      taskCache.getLastTaskData(basePath)?.taskDescription || '',
+    );
+  } else {
+    await applyCodeModifications(options, basePath, parsedResponse);
+  }
+
+  spinner.succeed('AI-assisted task completed! 🎉');
+}
+
+async function prepareCodegenCustomData(
+  codegenTemplateContent: string,
+  taskCache: TaskCache,
+  basePath: string,
+  reviewedPlan: string,
+  options: AiAssistedTaskOptions,
+): Promise<Record<string, string>> {
+  const codegenVariables = extractTemplateVariables(codegenTemplateContent);
+  const lastTaskData = taskCache.getLastTaskData(basePath);
+
+  const codegenDataObj = {
+    var_taskDescription: lastTaskData?.taskDescription || '',
+    var_instructions: lastTaskData?.instructions || '',
+    var_plan: reviewedPlan,
+  };
+
+  return collectVariables(
+    JSON.stringify(codegenDataObj),
+    options.cachePath ?? DEFAULT_CACHE_PATH,
+    codegenVariables,
+    codegenTemplateContent,
+  );
+}
+
+async function generateCodegenPrompt(
+  options: AiAssistedTaskOptions,
+  basePath: string,
+  taskCache: TaskCache,
+  codegenTemplateContent: string,
+  codegenCustomData: Record<string, string>,
+): Promise<string> {
+  const codegenMarkdownOptions: MarkdownOptions = {
+    noCodeblock: options.noCodeblock,
+    basePath,
+    customData: codegenCustomData,
+    lineNumbers: options.lineNumbers,
+  };
+
+  const processedFiles = await processFiles({
+    ...options,
+    path: basePath,
+    filter: options.invert
+      ? undefined
+      : taskCache.getLastTaskData(basePath)?.selectedFiles,
+    exclude: options.invert
+      ? taskCache.getLastTaskData(basePath)?.selectedFiles
+      : options.exclude,
+  });
+
+  return generateMarkdown(
+    processedFiles,
+    codegenTemplateContent,
+    codegenMarkdownOptions,
+  );
+}
+
+async function generateCode(
+  codeGenPrompt: string,
+  modelKey: string,
+  options: AiAssistedTaskOptions,
+): Promise<string> {
+  const spinner = ora('Generating AI Code Modifications...').start();
+  const modelConfig = getModelConfig(modelKey);
+
+  let generatedCode: string;
+  if (modelKey.includes('ollama')) {
+    generatedCode = await generateAIResponse(codeGenPrompt, {
+      maxCostThreshold: options.maxCostThreshold,
+      model: modelKey,
+      contextWindow: options.contextWindow,
+      maxTokens: options.maxTokens,
+      logAiInteractions: options.logAiInteractions,
+    });
+  } else {
+    generatedCode = await generateAIResponse(
+      codeGenPrompt,
+      {
+        maxCostThreshold: options.maxCostThreshold,
+        model: modelKey,
+        logAiInteractions: options.logAiInteractions,
+      },
+      modelConfig.temperature?.codegenTemperature,
+    );
+  }
+  spinner.succeed('AI Code Modifications generated successfully');
+  return generatedCode;
+}
+
+async function handleDryRun(
+  basePath: string,
+  parsedResponse: AIParsedResponse,
+  taskDescription: string,
+) {
+  ora().info(
+    chalk.yellow('Dry Run Mode: Generating output without applying changes'),
+  );
+
+  const outputPath = path.join(basePath, 'codewhisper-task-output.json');
+  await fs.writeJSON(
+    outputPath,
+    { taskDescription, parsedResponse },
+    { spaces: 2 },
+  );
+
+  console.log(chalk.green(`AI-generated output saved to: ${outputPath}`));
+  console.log(chalk.cyan('To apply these changes, run:'));
+  console.log(chalk.cyan(`npx codewhisper apply-task ${outputPath}`));
+
+  console.log('\nTask Summary:');
+  console.log(chalk.blue('Task Description:'), taskDescription);
+  console.log(chalk.blue('Branch Name:'), parsedResponse.gitBranchName);
+  console.log(chalk.blue('Commit Message:'), parsedResponse.gitCommitMessage);
+  console.log(chalk.blue('Files to be changed:'));
+  for (const file of parsedResponse.files) {
+    console.log(`  ${file.status}: ${file.path}`);
+  }
+  console.log(chalk.blue('Summary:'), parsedResponse.summary);
+  console.log(chalk.blue('Potential Issues:'), parsedResponse.potentialIssues);
+}
+
+async function applyCodeModifications(
+  options: AiAssistedTaskOptions,
+  basePath: string,
+  parsedResponse: AIParsedResponse,
+) {
+  const spinner = ora('Applying AI Code Modifications...').start();
+
+  try {
+    const actualBranchName = await ensureBranch(
+      basePath,
+      parsedResponse.gitBranchName,
+      { issueNumber: options.issueNumber },
+    );
+    await applyChanges({ basePath, parsedResponse, dryRun: false });
+
+    if (options.autoCommit) {
+      const git = simpleGit(basePath);
+      await git.add('.');
+      const commitMessage = options.issueNumber
+        ? `${parsedResponse.gitCommitMessage} (Closes #${options.issueNumber})`
+        : parsedResponse.gitCommitMessage;
+      await git.commit(commitMessage);
+      spinner.succeed(
+        `AI Code Modifications applied and committed to branch: ${actualBranchName}`,
+      );
+    } else {
+      spinner.succeed(
+        `AI Code Modifications applied to branch: ${actualBranchName}`,
+      );
+      console.log(chalk.green('Changes have been applied but not committed.'));
+      console.log(
+        chalk.yellow(
+          'Please review the changes in your IDE before committing.',
+        ),
+      );
+      console.log(
+        chalk.cyan('To commit the changes, use the following commands:'),
+      );
+      console.log(chalk.cyan('  git add .'));
+      console.log(
+        chalk.cyan(
+          `  git commit -m "${parsedResponse.gitCommitMessage}${options.issueNumber ? ` (Closes #${options.issueNumber})` : ''}"`,
+        ),
+      );
+    }
+  } catch (error) {
+    spinner.fail('Error applying AI Code Modifications');
+    console.error(
+      chalk.red('Failed to create branch or apply changes:'),
+      error instanceof Error ? error.message : String(error),
+    );
+    console.log(
+      chalk.yellow('Please check your Git configuration and try again.'),
     );
     process.exit(1);
   }

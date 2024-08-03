@@ -12,12 +12,14 @@ import { processFiles } from '../../src/core/file-processor';
 import { generateMarkdown } from '../../src/core/markdown-generator';
 import { applyChanges } from '../../src/git/apply-changes';
 import { selectFilesPrompt } from '../../src/interactive/select-files-prompt';
+import { selectModelPrompt } from '../../src/interactive/select-model-prompt';
 import type {
   AIParsedResponse,
   AiAssistedTaskOptions,
   ModelSpec,
 } from '../../src/types';
 import { ensureBranch } from '../../src/utils/git-tools';
+import { TaskCache } from '../../src/utils/task-cache';
 
 vi.mock('../../src/ai/get-task-description');
 vi.mock('../../src/ai/get-instructions');
@@ -31,11 +33,33 @@ vi.mock('../../src/git/apply-changes');
 vi.mock('../../src/utils/git-tools');
 vi.mock('../../src/ai/model-config');
 vi.mock('simple-git');
+vi.mock('../../src/utils/task-cache');
+vi.mock('../../src/interactive/select-model-prompt');
+vi.mock('../../src/interactive/select-files-prompt');
+
+vi.mock('../../src/ai/model-config', async () => {
+  const actual = await vi.importActual('../../src/ai/model-config');
+  return {
+    ...actual,
+    getModelNames: vi.fn().mockReturnValue(['model1', 'model2']),
+    getModelConfig: vi.fn().mockReturnValue({
+      contextWindow: 100000,
+      maxOutput: 4096,
+      modelName: 'Test Model',
+      pricing: { inputCost: 0.01, outputCost: 0.02 },
+      modelFamily: 'test',
+      temperature: {
+        planningTemperature: 0.7,
+        codegenTemperature: 0.5,
+      },
+    }),
+  };
+});
 
 describe('runAIAssistedTask', () => {
   const mockOptions: AiAssistedTaskOptions = {
     path: path.join('/', 'test', 'path'),
-    model: 'test-model',
+    model: 'claude-3-5-sonnet-20240620',
     dryRun: false,
     noCodeblock: false,
     invert: false,
@@ -510,5 +534,100 @@ describe('runAIAssistedTask', () => {
 
     expect(getTaskDescription).toHaveBeenCalled();
     expect(getInstructions).toHaveBeenCalled();
+  });
+
+  it('should execute the happy path successfully with TaskCache', async () => {
+    const mockTaskDescription = 'Test task description';
+    const mockInstructions = 'Test instructions';
+    const mockSelectedFiles = ['file1.ts', 'file2.ts'];
+    const mockGeneratedPlan = 'Generated plan';
+    const mockReviewedPlan = 'Reviewed plan';
+
+    const mockGeneratedCode = `
+    <file_list>
+    file1.ts
+    file2.ts
+    </file_list>
+    <file>
+    <file_path>file1.ts</file_path>
+    <file_content language="typescript">
+    // Updated content for file1.ts
+    </file_content>
+    <file_status>modified</file_status>
+    </file>
+    <file>
+    <file_path>file2.ts</file_path>
+    <file_content language="typescript">
+    // Updated content for file2.ts
+    </file_content>
+    <file_status>modified</file_status>
+    </file>
+    <git_branch_name>feature/test-task</git_branch_name>
+    <git_commit_message>Implement test task</git_commit_message>
+    <summary>Updated both files</summary>
+    <potential_issues>None</potential_issues>
+  `;
+
+    const mockParsedResponse = {
+      gitBranchName: 'feature/test-task',
+      gitCommitMessage: 'Implement test task',
+      fileList: ['file1.ts', 'file2.ts'],
+      files: [
+        {
+          path: 'file1.ts',
+          content: '// Updated content for file1.ts',
+          language: 'typescript',
+          status: 'modified',
+        },
+        {
+          path: 'file2.ts',
+          content: '// Updated content for file2.ts',
+          language: 'typescript',
+          status: 'modified',
+        },
+      ],
+      summary: 'Updated both files',
+      potentialIssues: 'None',
+    };
+
+    vi.mocked(getTaskDescription).mockResolvedValue(mockTaskDescription);
+    vi.mocked(getInstructions).mockResolvedValue(mockInstructions);
+    vi.mocked(selectFilesPrompt).mockResolvedValue(mockSelectedFiles);
+    vi.mocked(processFiles).mockResolvedValue([]);
+    vi.mocked(generateMarkdown).mockResolvedValue('Generated markdown');
+    vi.mocked(generateAIResponse).mockResolvedValueOnce(mockGeneratedPlan);
+    vi.mocked(reviewPlan).mockResolvedValue(mockReviewedPlan);
+    vi.mocked(generateAIResponse).mockResolvedValueOnce(mockGeneratedCode);
+    vi.mocked(parseAICodegenResponse).mockReturnValue(
+      mockParsedResponse as unknown as AIParsedResponse,
+    );
+    vi.mocked(ensureBranch).mockResolvedValue('feature/test-task');
+    vi.mocked(applyChanges).mockResolvedValue();
+
+    vi.mocked(selectModelPrompt).mockResolvedValue('new-model');
+    vi.mocked(getModelConfig).mockReturnValue({
+      modelName: 'New Model',
+      // biome-ignore lint/suspicious/noExplicitAny: explicit any is fine here
+    } as any);
+
+    const mockTaskCache = {
+      getLastTaskData: vi.fn().mockReturnValue(null),
+      setTaskData: vi.fn(),
+    };
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    vi.mocked(TaskCache).mockImplementation(() => mockTaskCache as any);
+
+    await runAIAssistedTask(mockOptions);
+
+    expect(mockTaskCache.setTaskData).toHaveBeenCalledWith(
+      expect.stringMatching(/[\\\/]test[\\\/]path$/),
+      expect.objectContaining({
+        selectedFiles: mockSelectedFiles,
+        generatedPlan: mockGeneratedPlan,
+        taskDescription: mockTaskDescription,
+        instructions: mockInstructions,
+        model: mockOptions.model,
+      }),
+    );
   });
 });

@@ -63,6 +63,7 @@ codewhisper task [options]
 | `-max, --max-cost-threshold <number>` | Set a maximum cost threshold for AI operations in USD (e.g., 0.5 for $0.50)                                                                                    |
 | `--auto-commit`                       | Automatically commit changes                                                                                                                                   |
 | `--undo`                              | Undo AI-assisted task changes                                                                                                                                  |
+| `--redo`                              | Redo the last task for the specified path with the option to change the generated plan as well as the model and file selection (see below)                 |
 
 #### Model Selection
 
@@ -365,6 +366,37 @@ This command will:
 - Offer to revert the last commit if on the main branch
 
 The command will always ask for confirmation before making any changes.
+
+25. Redo the last task with the option to change the generated plan as well as the model and file selection:
+
+```bash
+codewhisper task --redo
+```
+
+This command will:
+
+- Retrieve the last task data for the current project directory
+- Display the details of the last task, including the task description, instructions, model used, and files included
+- You'll be given the option to change the AI model for code generation
+- You'll also have the opportunity to modify the file selection for the task
+- The task will then continue from the review plan stage, where you can then modify the plan to your liking
+
+This feature is particularly useful when:
+- You want to try a different AI model for the same task
+- You need to adjust the file selection for the same task
+- You want to quickly tweak the plan without starting from scratch
+
+Note: The redo functionality uses a cache stored in your home directory, so it persists across different sessions and is not affected by git operations like branch switching or resetting.
+
+Example workflow:
+
+1. Run an initial task: `codewhisper task`
+2. Review the code modifications and decide you want to tweak the plan or try a different model
+3. Undo the task: `codewhisper task --undo`
+3. Redo the task: `codewhisper task --redo`
+4. Optionally change the model when prompted
+5. Optionally adjust the file selection
+6. Adjust the plan as needed
 
 ## CI/CD Integration
 

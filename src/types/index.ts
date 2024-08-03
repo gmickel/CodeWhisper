@@ -156,3 +156,13 @@ export interface ModelTemperature {
 export interface UndoTaskOptions {
   path?: string;
 }
+
+export interface TaskData {
+  basePath: string;
+  selectedFiles: string[];
+  generatedPlan: string;
+  taskDescription: string;
+  instructions: string;
+  timestamp: number;
+  model: string;
+}
