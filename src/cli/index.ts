@@ -7,6 +7,7 @@ import fs from 'fs-extra';
 import ora from 'ora';
 import { applyTask } from '../ai/apply-task';
 import { getModelConfig, getModelNames } from '../ai/model-config';
+import { redoLastTask } from '../ai/redo-task';
 import { runAIAssistedTask } from '../ai/task-workflow';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
@@ -147,8 +148,16 @@ export function cli(_args: string[]) {
     .option('--auto-commit', 'Automatically commit changes', false)
     .option('--github-issue', 'Use GitHub issue for task input', false)
     .option('--undo', 'Undo the last AI-assisted task')
+    .option('--redo', 'Redo the last task for the specified path', false)
     .action(async (options) => {
-      if (options.undo) {
+      if (options.redo) {
+        try {
+          await redoLastTask(options);
+        } catch (error) {
+          console.error(chalk.red('Error redoing task:'), error);
+          process.exit(1);
+        }
+      } else if (options.undo) {
         try {
           await undoTaskChanges({ path: options.path || '.' });
         } catch (error) {
