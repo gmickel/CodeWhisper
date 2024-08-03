@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/gmickel/CodeWhisper/compare/v1.9.0...v1.10.0) (2024-08-03)
+
+
+### Features
+
+* Add --redo functionality ([#65](https://github.com/gmickel/CodeWhisper/issues/65)) ([60c262a](https://github.com/gmickel/CodeWhisper/commit/60c262afd67e8dcda3967110a1a1fb6a219ec07f))
+
 # [1.9.0](https://github.com/gmickel/CodeWhisper/compare/v1.8.0...v1.9.0) (2024-08-02)
 
 
