@@ -173,6 +173,9 @@ codewhisper task -m ollama:llama3.1:70b --context-window 131072 --max-tokens 819
 
 # To undo changes made by an AI-assisted task, use the --undo option
 codewhisper task --undo
+
+# To redo the last task with the option to change the model, file selection or plan, use the --redo option
+codewhisper task --redo
 ```
 
 > Note: If you are using CodeWhisper's LLM integration with `codewhisper task` you will need to set the respective environment variable for the model you want to use (e.g. `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key` ).
@@ -281,6 +284,43 @@ This command will:
 The command will always ask for confirmation before making any changes. It will show you the exact actions it's about to perform, including the full commit message of any commit it's about to revert.
 
 Always review the proposed changes carefully before confirming, as this operation may result in loss of work.
+
+Here's the updated section for the README.md file that includes information about the new --redo functionality:
+
+### Redoing AI-Assisted Tasks
+
+CodeWhisper now supports redoing AI-assisted tasks from the review plan stage. This feature allows you to restart your last task with the option to modify the generated plan as well as the model and file selection. To use this feature, you can use the `--redo` option with the `task` command:
+
+```bash
+codewhisper task --redo
+```
+
+When you use the `--redo` option:
+
+1. CodeWhisper will retrieve the last task data for the current project directory.
+2. It will display the details of the last task, including the task description, instructions, model used, and files included.
+3. You'll be given the option to change the AI model for code generation.
+4. You'll also have the opportunity to modify the file selection for the task.
+5. The task will then continue from the review plan stage, where you can then modify the plan to your liking.
+
+This feature is particularly useful when:
+- You want to try a different AI model for the same task
+- You need to adjust the file selection for the same task
+- You want to quickly tweak the plan without starting from scratch
+
+Note: The redo functionality uses a cache stored in your home directory, so it persists across different sessions and is not affected by git operations like branch switching or resetting.
+
+Example workflow:
+
+1. Run an initial task: `codewhisper task`
+2. Review the code modifications and decide you want to tweak the plan or try a different model
+3. Undo the task: `codewhisper task --undo`
+3. Redo the task: `codewhisper task --redo`
+4. Optionally change the model when prompted
+5. Optionally adjust the file selection
+6. Adjust the plan as needed
+
+This feature enhances the flexibility of CodeWhisper's AI-assisted workflow, allowing for quick iterations and experimentation with different models or scopes for your tasks.
 
 ## 📝 Templates
 
