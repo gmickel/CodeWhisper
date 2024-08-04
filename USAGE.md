@@ -103,7 +103,7 @@ This will allow you to select from open issues in the current repository.
 4. Use the `--github-issue-filters` flag if you would like to filter by label, assignee, etc:
 
 ```bash
-codewhisper task --github-issue --github-issue-filter assignee:abc,label:p1 -m claude-3-5-sonnet-20240620
+codewhisper task --github-issue --github-issue-filters assignee:abc,label:p1 -m claude-3-5-sonnet-20240620
 ```
 
 Note:
