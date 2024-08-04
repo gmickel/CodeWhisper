@@ -36,34 +36,36 @@ codewhisper task [options]
 
 #### Options
 
-| Option                                | Description                                                                                                                                                    |
-| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `-p, --path <path>`                   | Path to the codebase (default: current directory)                                                                                                              |
-| `-m, --model <modelId>`               | Specify the AI model to use (if not specified, CodeWhisper will prompt you to select a model from the list of available models)                                |
-| `-t, --task <task>`                   | Short task title                                                                                                                                               |
-| `-d, --description <description>`     | Detailed task description                                                                                                                                      |
-| `-i, --instructions <instructions>`   | Additional instructions for the task                                                                                                                           |
-| `-c, --context <paths...>`            | Specify files or directories to include in the task context. Can be file paths, directory paths, or glob patterns. Multiple entries should be space-separated. |
-| `-df, --diff`                         | Use diff format for file updates instead of full file content                                                                                                  |
-| `-g, --gitignore <path>`              | Path to .gitignore file (default: .gitignore)                                                                                                                  |
-| `-f, --filter <patterns...>`          | File patterns to include (use glob patterns, e.g., "src/\*_/_.js")                                                                                             |
-| `-e, --exclude <patterns...>`         | File patterns to exclude (use glob patterns, e.g., "\*_/_.test.js")                                                                                            |
-| `-s, --suppress-comments`             | Strip comments from the code                                                                                                                                   |
-| `-l, --line-numbers`                  | Add line numbers to code blocks                                                                                                                                |
-| `-cw, --context-window <number>`      | Specify the context window for the AI model. Only applicable for Ollama models.                                                                                |
-| `-mt, --max-tokens <number>`          | Specify the max output tokens for the AI model. Only applicable for Ollama models.                                                                             |
-| `--case-sensitive`                    | Use case-sensitive pattern matching                                                                                                                            |
-| `--custom-ignores <patterns...>`      | Additional patterns to ignore                                                                                                                                  |
-| `--cache-path <path>`                 | Custom path for the cache file                                                                                                                                 |
-| `--respect-gitignore`                 | Respect entries in .gitignore (default: true)                                                                                                                  |
-| `--no-respect-gitignore`              | Do not respect entries in .gitignore                                                                                                                           |
-| `--invert`                            | Selected files will be excluded                                                                                                                                |
-| `--dry-run`                           | Perform a dry run without making actual changes. Saves changes to a file so you can apply them after review using apply-task                                   |
-| `--log-ai-interactions`               | Enable logging of AI prompts, responses, and parsing results to a file (default: false)                                                                        |
-| `-max, --max-cost-threshold <number>` | Set a maximum cost threshold for AI operations in USD (e.g., 0.5 for $0.50)                                                                                    |
-| `--auto-commit`                       | Automatically commit changes                                                                                                                                   |
-| `--undo`                              | Undo AI-assisted task changes                                                                                                                                  |
-| `--redo`                              | Redo the last task for the specified path with the option to change the generated plan as well as the model and file selection (see below)                 |
+| Option                                | Description                                                                                                                                                                                                                                                              |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `-p, --path <path>`                   | Path to the codebase (default: current directory)                                                                                                                                                                                                                        |
+| `-m, --model <modelId>`               | Specify the AI model to use (if not specified, CodeWhisper will prompt you to select a model from the list of available models)                                                                                                                                          |
+| `-t, --task <task>`                   | Short task title                                                                                                                                                                                                                                                         |
+| `-d, --description <description>`     | Detailed task description                                                                                                                                                                                                                                                |
+| `-i, --instructions <instructions>`   | Additional instructions for the task                                                                                                                                                                                                                                     |
+| `-c, --context <paths...>`            | Specify files or directories to include in the task context. Can be file paths, directory paths, or glob patterns. Multiple entries should be space-separated.                                                                                                           |
+| `--github-issue`                      | Use GitHub issue for task input                                                                                                                                                                                                                                          |
+| `--github-issue-filters <filters>`    | Use these filters when fetching issues. Format: comma-separated key:value pairs. Example: labels:p1,assignee:abc Note: see "query parameters" at https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues--parameters for all options. |
+| `-df, --diff`                         | Use diff format for file updates instead of full file content                                                                                                                                                                                                            |
+| `-g, --gitignore <path>`              | Path to .gitignore file (default: .gitignore)                                                                                                                                                                                                                            |
+| `-f, --filter <patterns...>`          | File patterns to include (use glob patterns, e.g., "src/\*_/_.js")                                                                                                                                                                                                       |
+| `-e, --exclude <patterns...>`         | File patterns to exclude (use glob patterns, e.g., "\*_/_.test.js")                                                                                                                                                                                                      |
+| `-s, --suppress-comments`             | Strip comments from the code                                                                                                                                                                                                                                             |
+| `-l, --line-numbers`                  | Add line numbers to code blocks                                                                                                                                                                                                                                          |
+| `-cw, --context-window <number>`      | Specify the context window for the AI model. Only applicable for Ollama models.                                                                                                                                                                                          |
+| `-mt, --max-tokens <number>`          | Specify the max output tokens for the AI model. Only applicable for Ollama models.                                                                                                                                                                                       |
+| `--case-sensitive`                    | Use case-sensitive pattern matching                                                                                                                                                                                                                                      |
+| `--custom-ignores <patterns...>`      | Additional patterns to ignore                                                                                                                                                                                                                                            |
+| `--cache-path <path>`                 | Custom path for the cache file                                                                                                                                                                                                                                           |
+| `--respect-gitignore`                 | Respect entries in .gitignore (default: true)                                                                                                                                                                                                                            |
+| `--no-respect-gitignore`              | Do not respect entries in .gitignore                                                                                                                                                                                                                                     |
+| `--invert`                            | Selected files will be excluded                                                                                                                                                                                                                                          |
+| `--dry-run`                           | Perform a dry run without making actual changes. Saves changes to a file so you can apply them after review using apply-task                                                                                                                                             |
+| `--log-ai-interactions`               | Enable logging of AI prompts, responses, and parsing results to a file (default: false)                                                                                                                                                                                  |
+| `-max, --max-cost-threshold <number>` | Set a maximum cost threshold for AI operations in USD (e.g., 0.5 for $0.50)                                                                                                                                                                                              |
+| `--auto-commit`                       | Automatically commit changes                                                                                                                                                                                                                                             |
+| `--undo`                              | Undo AI-assisted task changes                                                                                                                                                                                                                                            |
+| `--redo`                              | Redo the last task for the specified path with the option to change the generated plan as well as the model and file selection (see below)                                                                                                                               |
 
 #### Model Selection
 
@@ -388,6 +390,7 @@ This command will:
 - The task will then continue from the review plan stage, where you can then modify the plan to your liking
 
 This feature is particularly useful when:
+
 - You want to try a different AI model for the same task
 - You need to adjust the file selection for the same task
 - You want to quickly tweak the plan without starting from scratch
@@ -399,10 +402,10 @@ Example workflow:
 1. Run an initial task: `codewhisper task`
 2. Review the code modifications and decide you want to tweak the plan or try a different model
 3. Undo the task: `codewhisper task --undo`
-3. Redo the task: `codewhisper task --redo`
-4. Optionally change the model when prompted
-5. Optionally adjust the file selection
-6. Adjust the plan as needed
+4. Redo the task: `codewhisper task --redo`
+5. Optionally change the model when prompted
+6. Optionally adjust the file selection
+7. Adjust the plan as needed
 
 ## CI/CD Integration
 
