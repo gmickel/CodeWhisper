@@ -38,12 +38,14 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
   const spinner = ora();
   try {
     const basePath = path.resolve(options.path ?? '.');
+    const filters = options.githubIssueFilters ?? '';
     const taskCache = new TaskCache(basePath);
 
     const modelKey = await selectModel(options);
     const { taskDescription, instructions } = await getTaskInfo(
       options,
       basePath,
+      filters,
     );
     const selectedFiles = await selectFiles(options, basePath);
 
@@ -128,6 +130,7 @@ async function selectModel(options: AiAssistedTaskOptions): Promise<string> {
 async function getTaskInfo(
   options: AiAssistedTaskOptions,
   basePath: string,
+  filters: string,
 ): Promise<{ taskDescription: string; instructions: string }> {
   let taskDescription = '';
   let instructions = '';
@@ -140,7 +143,7 @@ async function getTaskInfo(
         ),
       );
     }
-    const selectedIssue = await selectGitHubIssuePrompt(basePath);
+    const selectedIssue = await selectGitHubIssuePrompt(basePath, filters);
     if (selectedIssue) {
       taskDescription = `# ${selectedIssue.title}\n\n${selectedIssue.body}`;
       options.issueNumber = selectedIssue.number;

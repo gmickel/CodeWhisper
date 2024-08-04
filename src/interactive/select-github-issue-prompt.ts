@@ -5,6 +5,7 @@ import { getGitHubRepoInfo } from '../utils/git-tools';
 
 export async function selectGitHubIssuePrompt(
   basePath: string,
+  filters: string,
 ): Promise<GitHubIssue | null> {
   const repoInfo = await getGitHubRepoInfo(basePath);
   if (!repoInfo) {
@@ -16,7 +17,7 @@ export async function selectGitHubIssuePrompt(
   const githubAPI = new GitHubAPI();
 
   try {
-    const issues = await githubAPI.getRepositoryIssues(owner, repo);
+    const issues = await githubAPI.getRepositoryIssues(owner, repo, filters);
 
     if (issues.length === 0) {
       console.log('No open issues found in the repository.');

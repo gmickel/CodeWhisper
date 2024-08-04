@@ -147,6 +147,14 @@ export function cli(_args: string[]) {
     )
     .option('--auto-commit', 'Automatically commit changes', false)
     .option('--github-issue', 'Use GitHub issue for task input', false)
+    .option(
+      '--github-issue-filters <filters>',
+      `Use these filters when fetching issues.
+Format: comma-separated key:value pairs.
+Example: labels:p1,assignee:abc
+Note: see "query parameters" at https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues--parameters for all options.`,
+      '',
+    )
     .option('--undo', 'Undo the last AI-assisted task')
     .option('--redo', 'Redo the last task for the specified path', false)
     .action(async (options) => {
