@@ -397,13 +397,10 @@ A: CodeWhisper respects `.gitignore` files by default, helping to exclude sensit
 
 [MIT](./LICENSE) License © 2024-PRESENT [Gordon Mickel](https://github.com/gmickel)
 
-## Stargazers ⭐
-
-[![Stargazers repo roster for @gmickel/CodeWhisper](https://reporoster.com/stars/gmickel/CodeWhisper)](https://github.com/gmickel/CodeWhisper/stargazers)
-
 ## Contributors 👨‍💻
 
 <!-- readme: collaborators, contributors -start -->
+
 <!-- readme: collaborators, contributors -end -->
 
 ## 👏 Acknowledgments
@@ -418,6 +415,10 @@ A: CodeWhisper respects `.gitignore` files by default, helping to exclude sensit
 Gordon Mickel - [@gmickel](https://twitter.com/gmickel) - gordon@mickel.tech
 
 Project Link: [https://github.com/gmickel/CodeWhisper](https://github.com/gmickel/CodeWhisper)
+
+## Repo Analytics
+
+![Alt](https://repobeats.axiom.co/api/embed/83f4e40f1ecb925370081e5435c61a4a8447c465.svg 'Repobeats analytics image')
 
 ## Project Growth
 
