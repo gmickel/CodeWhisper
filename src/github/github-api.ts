@@ -12,14 +12,14 @@ export class GitHubAPI {
   async getRepositoryIssues(
     owner: string,
     repo: string,
+    filters: string,
   ): Promise<GitHubIssue[]> {
     try {
+      const filterObj = this.parseAndMergeFilters(filters);
       const response = await this.octokit.issues.listForRepo({
         owner,
         repo,
-        state: 'open',
-        sort: 'updated',
-        direction: 'desc',
+        ...filterObj,
       });
 
       return response.data.map((issue) => ({
@@ -32,6 +32,32 @@ export class GitHubAPI {
       console.error('Error fetching GitHub issues:', error);
       throw new Error('Failed to fetch GitHub issues');
     }
+  }
+
+  parseAndMergeFilters(filters: string): Record<string, string> {
+    let filterObj = {
+      state: 'open',
+      sort: 'updated',
+      direction: 'desc',
+    };
+    if (filters) {
+      console.log(filters);
+      const parsedFilters: Record<string, string> = filters.split(',').reduce(
+        (acc, filter) => {
+          const [key, value] = filter.split(':');
+          acc[key] = value;
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
+
+      filterObj = {
+        ...filterObj,
+        ...parsedFilters,
+      };
+    }
+
+    return filterObj;
   }
 
   async getIssueDetails(

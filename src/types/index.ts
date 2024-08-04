@@ -61,6 +61,7 @@ export type AiAssistedTaskOptions = Pick<
   maxTokens?: number;
   logAiInteractions?: boolean;
   githubIssue?: GitHubIssue;
+  githubIssueFilters?: string;
   issueNumber?: number;
   diff?: boolean;
   context?: string[];
