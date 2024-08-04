@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/gmickel/CodeWhisper/compare/v1.10.0...v1.11.0) (2024-08-04)
+
+
+### Features
+
+* Add filters option for github issues ([#67](https://github.com/gmickel/CodeWhisper/issues/67)) ([6667173](https://github.com/gmickel/CodeWhisper/commit/666717369b573bc13ae1eb7992b0cc5ee6ca27dd))
+
 # [1.10.0](https://github.com/gmickel/CodeWhisper/compare/v1.9.0...v1.10.0) (2024-08-03)
 
 
