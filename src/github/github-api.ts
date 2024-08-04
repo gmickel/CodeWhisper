@@ -41,7 +41,6 @@ export class GitHubAPI {
       direction: 'desc',
     };
     if (filters) {
-      console.log(filters);
       const parsedFilters: Record<string, string> = filters.split(',').reduce(
         (acc, filter) => {
           const [key, value] = filter.split(':');
