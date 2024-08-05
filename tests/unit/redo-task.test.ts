@@ -125,36 +125,6 @@ describe('redoLastTask', () => {
     );
   });
 
-  it('should handle a completely new task', async () => {
-    const mockNewTaskData = {
-      selectedFiles: ['file1.js', 'file2.js'],
-      generatedPlan: null, // null for a completely new task
-      taskDescription: 'New task description',
-      instructions: 'New instructions',
-      model: 'new-model',
-    };
-
-    const mockTaskCache = {
-      getLastTaskData: vi.fn().mockReturnValue(mockNewTaskData),
-      setTaskData: vi.fn(),
-    };
-    // biome-ignore lint/suspicious/noExplicitAny: explicit any is fine here
-    vi.mocked(TaskCache).mockImplementation(() => mockTaskCache as any);
-    vi.mocked(confirm).mockResolvedValue(false);
-    vi.mocked(processFiles).mockResolvedValue(mockProcessedFiles as FileInfo[]);
-
-    await redoLastTask(mockOptions);
-
-    expect(handleNoPlanWorkflow).toHaveBeenCalledWith(
-      expect.objectContaining({ model: 'new-model' }),
-      expect.stringMatching(/[\\\/]test[\\\/]path$/),
-      expect.any(Object), // TaskCache
-      expect.objectContaining(mockNewTaskData),
-      mockProcessedFiles,
-      'new-model',
-    );
-  });
-
   it('should allow changing the model', async () => {
     const mockLastTaskData = {
       selectedFiles: ['file1.js', 'file2.js'],

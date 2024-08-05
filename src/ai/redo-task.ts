@@ -94,12 +94,12 @@ export async function redoLastTask(options: AiAssistedTaskOptions) {
       selectedFiles,
     };
 
-    if (
-      updatedTaskData.generatedPlan &&
-      updatedTaskData.generatedPlan.trim() !== ''
-    ) {
+    // Determine whether to use plan or no-plan workflow based on the original task
+    const usePlanWorkflow = lastTaskData.generatedPlan !== '';
+
+    if (usePlanWorkflow) {
       await handlePlanWorkflow(
-        { ...options, model: modelKey },
+        { ...options, model: modelKey, plan: true },
         basePath,
         taskCache,
         updatedTaskData,
@@ -108,7 +108,7 @@ export async function redoLastTask(options: AiAssistedTaskOptions) {
       );
     } else {
       await handleNoPlanWorkflow(
-        { ...options, model: modelKey },
+        { ...options, model: modelKey, plan: false },
         basePath,
         taskCache,
         updatedTaskData,
