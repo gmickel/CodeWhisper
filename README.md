@@ -1,6 +1,6 @@
 # CodeWhisper
 
-Blazingly fast codebase-to-LLM context bridge and AI-powered code generation workflow
+AI-Powered End-to-End Task Implementation & blazingly fast Codebase-to-LLM Context Bridge
 
 [![CI](https://github.com/gmickel/CodeWhisper/actions/workflows/ci.yml/badge.svg)](https://github.com/gmickel/CodeWhisper/actions/workflows/ci.yml)
 [![Known Vulnerabilities](https://snyk.io/test/github/gmickel/CodeWhisper/badge.svg)](https://snyk.io/test/github/gmickel/CodeWhisper)
