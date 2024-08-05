@@ -35,10 +35,13 @@ const templatesDir = getTemplatesDir();
 const program = new Command();
 
 export function cli(_args: string[]) {
+  const packageJson = JSON.parse(
+    fs.readFileSync(new URL('../../package.json', import.meta.url), 'utf8'),
+  );
   program
     .name('codewhisper')
     .description('A powerful tool for converting code to AI-friendly prompts')
-    .version('1.0.0');
+    .version(packageJson.version);
 
   program
     .command('list-models')
