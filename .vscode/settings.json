@@ -21,7 +21,8 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[handlebars]": {
-    "editor.defaultFormatter": "vscode.html-language-features"
+    "editor.formatOnSave": false,
+    "editor.formatOnType": false
   },
   "typescript.tsdk": "node_modules/typescript/lib"
 }
