@@ -126,6 +126,50 @@ FORMAT: Instructions for how to format your response.
 
   EXPLANATION: Provide a brief explanation for any significant design decisions or non-obvious implementations.
 
+  When creating diffs for modified files:
+  - Use '+' at the beginning of the line to indicate added lines, including new imports.
+  - Use '-' at the beginning of the line to indicate removed lines.
+  - Use ' ' (space) at the beginning of the line for unchanged lines (context).
+  - Ensure that new imports are marked with '+' at the beginning of the line.
+  - Include at least 3 lines of unchanged context before and after changes to help with patch application.
+
+  Example of a correct diff format:
+  <file_content language="typescript">
+    --- src/types/index.ts
+    +++ src/types/index.ts
+    @@ -1,4 +1,6 @@
+     import type { ParsedDiff } from 'diff';
+    +import type { LogLevel } from '../utils/logger';
+    +
+     export interface GitHubIssue {
+     number: number;
+     title: string;
+    @@ -40,6 +42,7 @@
+     | 'noCodeblock'
+     > & {
+     dryRun: boolean;
+    + logLevel?: LogLevel;
+     maxCostThreshold?: number;
+     task?: string;
+     description?: string;
+  </file_content>
+
+  Before modifying a file, carefully review its entire content. Ensure that your changes, especially new imports, are
+  placed in the correct location and don't duplicate existing code.
+
+  When generating diffs:
+  1. Start with the original file content.
+  2. Make your changes, keeping track of line numbers.
+  3. Generate the diff by comparing the original and modified versions.
+  4. Include at least 3 lines of unchanged context before and after each change.
+  5. Verify that the diff accurately represents your intended changes.
+
+  After generating each diff:
+  - Verify that all new lines (including imports and blank lines) start with '+'.
+  - Ensure that the line numbers in the diff headers (@@ -old,oldlines +new,newlines @@) are correct and account for
+  added/removed lines.
+  - Check that there are sufficient unchanged context lines around modifications.
+
   Example for a new file:
   <file>
     <file_path>src/components/IssueList.tsx</file_path>
@@ -135,18 +179,18 @@ FORMAT: Instructions for how to format your response.
       import { Issue } from '../types';
 
       interface IssueListProps {
-      issues: Issue[];
+        issues: Issue[];
       }
 
       export const IssueList: React.FC<IssueListProps> = ({ issues }) => {
         return (
-        <ul>
-          {issues.map((issue) => (
-          <li key={issue.id}>{issue.title}</li>
-          ))}
-        </ul>
+          <ul>
+            {issues.map((issue) => (
+              <li key={issue.id}>{issue.title}</li>
+            ))}
+          </ul>
         );
-        };
+      };
     </file_content>
     <explanation>
       Created a new IssueList component to display a list of issues. Used React.FC for type-safety and map function for
@@ -162,22 +206,21 @@ FORMAT: Instructions for how to format your response.
       --- src/components/App.tsx
       +++ src/components/App.tsx
       @@ -1,5 +1,6 @@
-      import React from 'react';
-      import { Header } from './Header';
+       import React from 'react';
+       import { Header } from './Header';
       +import { IssueList } from './IssueList';
 
-      export const App: React.FC = () => {
-      return (
+       export const App: React.FC = () => {
+         return (
       @@ -7,6 +8,7 @@
-      <div>
-        <Header />
-        <main>
-          - {/* TODO: Add issue list */}
-          +
-          <IssueList issues={[]} />
-        </main>
-      </div>
-      );
+           <div>
+             <Header />
+             <main>
+      -        {/* TODO: Add issue list */}
+      +        <IssueList issues={[]} />
+             </main>
+           </div>
+         );
     </file_content>
     <explanation>
       Updated App component to import and use the new IssueList component.
@@ -193,5 +236,14 @@ FORMAT: Instructions for how to format your response.
   - The code is properly formatted and follows the project's coding standards.
   - Necessary comments for clarity are included if needed.
   - You complete all necessary work.
+
+  After completing all changes, review your entire output. Check for:
+  - Consistency in diff formatting across all modified files.
+  - Accuracy of file paths and language specifications.
+  - Completeness of implementations as per the plan.
+  - Potential conflicts or inconsistencies between different file changes.
+
+  Note: The accuracy of the diff format is crucial for successful patch application. Even small errors in formatting can
+  cause the entire patch to fail. Pay extra attention to the correctness of your diff output.
 
 </format>

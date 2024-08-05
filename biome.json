@@ -28,6 +28,6 @@
     "useIgnoreFile": true
   },
   "files": {
-    "ignore": ["tests/fixtures/**"]
+    "ignore": ["tests/fixtures/**", "src/templates/**"]
   }
 }
