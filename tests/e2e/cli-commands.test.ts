@@ -332,6 +332,7 @@ describe.sequential('CodeWhisper Task E2E Tests', async () => {
         'Modify main.js to use a different greeting and add a subtract function to utils.js',
         '-i',
         'No further instructions',
+        '--no-diff',
         '--auto-commit',
         '-c',
         mainJsPath,
