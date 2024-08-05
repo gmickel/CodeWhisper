@@ -95,6 +95,15 @@ export function cli(_args: string[]) {
     )
     .option('--no-diff', 'Use full file content for updates')
     .option(
+      '--plan',
+      'Use the plan mode for AI-generated code modifications',
+      true,
+    )
+    .option(
+      '--no-plan',
+      'Directly provide the code modifications without the intermediate planning step',
+    )
+    .option(
       '-cw, --context-window <number>',
       'Specify the context window for the AI model. Only applicable for Ollama models.',
       parseOptionStringToInt,

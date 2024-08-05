@@ -63,6 +63,7 @@ describe('runAIAssistedTask', () => {
     dryRun: false,
     noCodeblock: false,
     invert: false,
+    plan: true,
   };
 
   beforeEach(() => {
@@ -71,6 +72,139 @@ describe('runAIAssistedTask', () => {
 
   afterEach(() => {
     vi.clearAllMocks();
+  });
+
+  it('should execute the happy path successfully with no planning step', async () => {
+    const mockTaskDescription = 'Test task description';
+    const mockInstructions = 'Test instructions';
+    const mockSelectedFiles = ['file1.ts', 'file2.ts'];
+    const mockProcessedFiles = [
+      {
+        path: 'file1.ts',
+        content: 'content1',
+        language: 'typescript',
+        size: 100,
+        created: new Date(),
+        modified: new Date(),
+        extension: 'ts',
+      },
+      {
+        path: 'file2.ts',
+        content: 'content2',
+        language: 'typescript',
+        size: 200,
+        created: new Date(),
+        modified: new Date(),
+        extension: 'ts',
+      },
+    ];
+    const mockGeneratedCode = `
+      <file_list>
+      file1.ts
+      file2.ts
+      </file_list>
+      <file>
+      <file_path>file1.ts</file_path>
+      <file_content language="typescript">
+      // Updated content for file1.ts
+      </file_content>
+      <file_status>modified</file_status>
+      </file>
+      <file>
+      <file_path>file2.ts</file_path>
+      <file_content language="typescript">
+      // Updated content for file2.ts
+      </file_content>
+      <file_status>modified</file_status>
+      </file>
+      <git_branch_name>feature/test-task</git_branch_name>
+      <git_commit_message>Implement test task</git_commit_message>
+      <summary>Updated both files</summary>
+      <potential_issues>None</potential_issues>
+    `;
+
+    const mockParsedResponse = {
+      gitBranchName: 'feature/test-task',
+      gitCommitMessage: 'Implement test task',
+      fileList: ['file1.ts', 'file2.ts'],
+      files: [
+        {
+          path: 'file1.ts',
+          content: '// Updated content for file1.ts',
+          language: 'typescript',
+          status: 'modified',
+        },
+        {
+          path: 'file2.ts',
+          content: '// Updated content for file2.ts',
+          language: 'typescript',
+          status: 'modified',
+        },
+      ],
+      summary: 'Updated both files',
+      potentialIssues: 'None',
+    };
+
+    const mockModelConfig: ModelSpec = {
+      contextWindow: 100000,
+      maxOutput: 4096,
+      modelName: 'Claude 3.5 Sonnet',
+      pricing: { inputCost: 3, outputCost: 15 },
+      modelFamily: 'claude',
+      temperature: {
+        planningTemperature: 0.5,
+        codegenTemperature: 0.3,
+      },
+    };
+
+    vi.mocked(getTaskDescription).mockResolvedValue(mockTaskDescription);
+    vi.mocked(getInstructions).mockResolvedValue(mockInstructions);
+    vi.mocked(selectFilesPrompt).mockResolvedValue(mockSelectedFiles);
+    vi.mocked(processFiles).mockResolvedValue(mockProcessedFiles);
+    vi.mocked(generateMarkdown).mockResolvedValue('Generated markdown');
+    vi.mocked(generateAIResponse).mockResolvedValueOnce(mockGeneratedCode);
+    vi.mocked(parseAICodegenResponse).mockReturnValue(
+      mockParsedResponse as unknown as AIParsedResponse,
+    );
+    vi.mocked(ensureBranch).mockResolvedValue('feature/test-task');
+    vi.mocked(applyChanges).mockResolvedValue();
+    vi.mocked(getModelConfig).mockReturnValue(mockModelConfig);
+
+    const mockOptionsWithoutPlan = {
+      ...mockOptions,
+      plan: false,
+    };
+
+    await runAIAssistedTask(mockOptionsWithoutPlan);
+
+    expect(getTaskDescription).toHaveBeenCalled();
+    expect(getInstructions).toHaveBeenCalled();
+    expect(processFiles).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: expect.stringMatching(/[\\\/]test[\\\/]path$/),
+      }),
+    );
+    expect(generateMarkdown).toHaveBeenCalledTimes(1);
+    expect(generateAIResponse).toHaveBeenCalledTimes(1);
+    expect(reviewPlan).toHaveBeenCalledTimes(0);
+    expect(parseAICodegenResponse).toHaveBeenCalledWith(
+      mockGeneratedCode,
+      undefined,
+      undefined,
+    );
+
+    expect(ensureBranch).toHaveBeenCalledWith(
+      expect.stringMatching(/[\\\/]test[\\\/]path$/),
+      'feature/test-task',
+      { issueNumber: undefined },
+    );
+    expect(applyChanges).toHaveBeenCalledWith(
+      expect.objectContaining({
+        basePath: expect.stringMatching(/[\\\/]test[\\\/]path$/),
+        parsedResponse: mockParsedResponse,
+        dryRun: false,
+      }),
+    );
   });
 
   it('should execute the happy path successfully', async () => {
