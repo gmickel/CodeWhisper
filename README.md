@@ -179,7 +179,8 @@ codewhisper task -m ollama:llama3.1:70b --context-window 131072 --max-tokens 819
 # To undo changes made by an AI-assisted task, use the --undo option
 codewhisper task --undo
 
-# To redo the last task with the option to change the model, file selection or plan, use the --redo option
+# To redo the last task with the option to change the model, file selection or plan, use the --redo option.
+# Note: CodeWhisper saves the plan, instructions, model and selected files from the last task. Other options (such as --dry-run) need to be specified again.
 codewhisper task --redo
 ```
 

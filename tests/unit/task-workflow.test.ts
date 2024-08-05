@@ -677,30 +677,51 @@ describe('runAIAssistedTask', () => {
     const mockGeneratedPlan = 'Generated plan';
     const mockReviewedPlan = 'Reviewed plan';
 
+    const mockProcessedFiles = [
+      {
+        path: 'file1.ts',
+        content: 'content1',
+        language: 'typescript',
+        size: 100,
+        created: new Date(),
+        modified: new Date(),
+        extension: 'ts',
+      },
+      {
+        path: 'file2.ts',
+        content: 'content2',
+        language: 'typescript',
+        size: 200,
+        created: new Date(),
+        modified: new Date(),
+        extension: 'ts',
+      },
+    ];
+
     const mockGeneratedCode = `
-    <file_list>
-    file1.ts
-    file2.ts
-    </file_list>
-    <file>
-    <file_path>file1.ts</file_path>
-    <file_content language="typescript">
-    // Updated content for file1.ts
-    </file_content>
-    <file_status>modified</file_status>
-    </file>
-    <file>
-    <file_path>file2.ts</file_path>
-    <file_content language="typescript">
-    // Updated content for file2.ts
-    </file_content>
-    <file_status>modified</file_status>
-    </file>
-    <git_branch_name>feature/test-task</git_branch_name>
-    <git_commit_message>Implement test task</git_commit_message>
-    <summary>Updated both files</summary>
-    <potential_issues>None</potential_issues>
-  `;
+      <file_list>
+      file1.ts
+      file2.ts
+      </file_list>
+      <file>
+      <file_path>file1.ts</file_path>
+      <file_content language="typescript">
+      // Updated content for file1.ts
+      </file_content>
+      <file_status>modified</file_status>
+      </file>
+      <file>
+      <file_path>file2.ts</file_path>
+      <file_content language="typescript">
+      // Updated content for file2.ts
+      </file_content>
+      <file_status>modified</file_status>
+      </file>
+      <git_branch_name>feature/test-task</git_branch_name>
+      <git_commit_message>Implement test task</git_commit_message>
+      <summary>Updated both files</summary>
+      <potential_issues>None</potential_issues>
+    `;
 
     const mockParsedResponse = {
       gitBranchName: 'feature/test-task',
@@ -727,7 +748,7 @@ describe('runAIAssistedTask', () => {
     vi.mocked(getTaskDescription).mockResolvedValue(mockTaskDescription);
     vi.mocked(getInstructions).mockResolvedValue(mockInstructions);
     vi.mocked(selectFilesPrompt).mockResolvedValue(mockSelectedFiles);
-    vi.mocked(processFiles).mockResolvedValue([]);
+    vi.mocked(processFiles).mockResolvedValue(mockProcessedFiles);
     vi.mocked(generateMarkdown).mockResolvedValue('Generated markdown');
     vi.mocked(generateAIResponse).mockResolvedValueOnce(mockGeneratedPlan);
     vi.mocked(reviewPlan).mockResolvedValue(mockReviewedPlan);
@@ -738,12 +759,6 @@ describe('runAIAssistedTask', () => {
     vi.mocked(ensureBranch).mockResolvedValue('feature/test-task');
     vi.mocked(applyChanges).mockResolvedValue();
 
-    vi.mocked(selectModelPrompt).mockResolvedValue('new-model');
-    vi.mocked(getModelConfig).mockReturnValue({
-      modelName: 'New Model',
-      // biome-ignore lint/suspicious/noExplicitAny: explicit any is fine here
-    } as any);
-
     const mockTaskCache = {
       getLastTaskData: vi.fn().mockReturnValue(null),
       setTaskData: vi.fn(),
@@ -751,13 +766,60 @@ describe('runAIAssistedTask', () => {
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     vi.mocked(TaskCache).mockImplementation(() => mockTaskCache as any);
 
-    await runAIAssistedTask(mockOptions);
+    vi.mocked(selectModelPrompt).mockResolvedValue(mockOptions.model);
+    vi.mocked(getModelConfig).mockReturnValue({
+      modelName: 'Claude 3.5 Sonnet',
+      contextWindow: 100000,
+      maxOutput: 4096,
+      pricing: { inputCost: 3, outputCost: 15 },
+      modelFamily: 'claude',
+      temperature: {
+        planningTemperature: 0.5,
+        codegenTemperature: 0.3,
+      },
+    } as ModelSpec);
 
+    // Test for plan workflow
+    await runAIAssistedTask({ ...mockOptions, plan: true });
+
+    expect(mockTaskCache.setTaskData).toHaveBeenCalledTimes(1);
     expect(mockTaskCache.setTaskData).toHaveBeenCalledWith(
       expect.stringMatching(/[\\\/]test[\\\/]path$/),
       expect.objectContaining({
         selectedFiles: mockSelectedFiles,
-        generatedPlan: mockGeneratedPlan,
+        generatedPlan: mockReviewedPlan,
+        taskDescription: mockTaskDescription,
+        instructions: mockInstructions,
+        model: mockOptions.model,
+      }),
+    );
+
+    // Reset mocks
+    vi.clearAllMocks();
+
+    // Reset mocks for no-plan workflow
+    vi.mocked(getTaskDescription).mockResolvedValue(mockTaskDescription);
+    vi.mocked(getInstructions).mockResolvedValue(mockInstructions);
+    vi.mocked(selectFilesPrompt).mockResolvedValue(mockSelectedFiles);
+    vi.mocked(processFiles).mockResolvedValue(mockProcessedFiles);
+    vi.mocked(generateMarkdown).mockResolvedValue('Generated markdown');
+    vi.mocked(generateAIResponse).mockResolvedValueOnce(mockGeneratedCode);
+    vi.mocked(parseAICodegenResponse).mockReturnValue(
+      mockParsedResponse as unknown as AIParsedResponse,
+    );
+    vi.mocked(ensureBranch).mockResolvedValue('feature/test-task');
+    vi.mocked(applyChanges).mockResolvedValue();
+    vi.mocked(selectModelPrompt).mockResolvedValue(mockOptions.model);
+
+    // Test for no-plan workflow
+    await runAIAssistedTask({ ...mockOptions, plan: false });
+
+    expect(mockTaskCache.setTaskData).toHaveBeenCalledTimes(1);
+    expect(mockTaskCache.setTaskData).toHaveBeenCalledWith(
+      expect.stringMatching(/[\\\/]test[\\\/]path$/),
+      expect.objectContaining({
+        selectedFiles: mockSelectedFiles,
+        generatedPlan: '',
         taskDescription: mockTaskDescription,
         instructions: mockInstructions,
         model: mockOptions.model,
