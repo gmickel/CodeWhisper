@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/gmickel/CodeWhisper/compare/v1.11.0...v1.12.0) (2024-08-05)
+
+
+### Features
+
+* Improve-docs-and-diff-mode ([#73](https://github.com/gmickel/CodeWhisper/issues/73)) ([0ff9323](https://github.com/gmickel/CodeWhisper/commit/0ff9323001d8a3144a5bfc129dafdb3f8f20f334))
+
 # [1.11.0](https://github.com/gmickel/CodeWhisper/compare/v1.10.0...v1.11.0) (2024-08-04)
 
 
