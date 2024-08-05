@@ -1,4 +1,4 @@
-# Detailed Usage Guide
+# Detailed Usage Guide for CodeWhisper
 
 This document provides comprehensive usage instructions and examples for CodeWhisper.
 
@@ -6,6 +6,13 @@ This document provides comprehensive usage instructions and examples for CodeWhi
 
 - [Command Overview](#command-overview)
 - [Detailed Command Usage](#detailed-command-usage)
+  - [`task`: AI-Assisted Coding Task](#task-ai-assisted-coding-task)
+  - [`apply-task`: Apply AI-Generated Task](#apply-task-apply-ai-generated-task)
+  - [`interactive`: Interactive Mode](#interactive-interactive-mode)
+  - [`generate`: Generate Output](#generate-generate-output)
+  - [`list-templates`: List Available Templates](#list-templates-list-available-templates)
+  - [`export-templates`: Export Templates](#export-templates-export-templates)
+  - [`clear-cache`: Clear CodeWhisper's Cache](#clear-cache-clear-codewhispers-cache)
 - [Usage Examples](#usage-examples)
 - [Advanced Usage Scenarios](#advanced-usage-scenarios)
 - [CI/CD Integration](#cicd-integration)
@@ -28,7 +35,7 @@ CodeWhisper offers the following main commands:
 
 ## Detailed Command Usage
 
-### `task` : AI-Assisted Coding Task
+### `task`: AI-Assisted Coding Task
 
 ```bash
 codewhisper task [options]
@@ -65,13 +72,13 @@ codewhisper task [options]
 | `-max, --max-cost-threshold <number>` | Set a maximum cost threshold for AI operations in USD (e.g., 0.5 for $0.50)                                                                                                                                                                                              |
 | `--auto-commit`                       | Automatically commit changes                                                                                                                                                                                                                                             |
 | `--undo`                              | Undo AI-assisted task changes                                                                                                                                                                                                                                            |
-| `--redo`                              | Redo the last task for the specified path with the option to change the generated plan as well as the model and file selection (see below)                                                                                                                               |
+| `--redo`                              | Redo the last task for the specified path with the option to change the generated plan as well as the model and file selection                                                                                                                                           |
 
 #### Model Selection
 
 CodeWhisper will prompt you to select a model from the list of available models when you run the `task` command. You can also specify a model directly using the `-m` or `--model` option.
 
-> Note: Ollama models can only be used if they are selected directly using the `-m` or `--model` option. E.g. `codewhisper task -m ollama:llama3.1:70b --context-window 131072 --max-tokens 8192`
+> Note: Ollama models can only be used if they are selected directly using the `-m` or `--model` option. E.g., `codewhisper task -m ollama:llama3.1:70b --context-window 131072 --max-tokens 8192`
 
 #### GitHub Issue Integration
 
@@ -96,17 +103,16 @@ To use the GitHub issue integration feature:
 
 3. Use the `--github-issue` flag when running a task:
 
-```bash
-codewhisper task --github-issue -m claude-3-5-sonnet-20240620
-```
+   ```bash
+   codewhisper task --github-issue -m claude-3-5-sonnet-20240620
+   ```
 
-This will allow you to select from open issues in the current repository.
+   This will allow you to select from open issues in the current repository.
 
-4. Use the `--github-issue-filters` flag if you would like to filter by label, assignee, etc:
-
-```bash
-codewhisper task --github-issue --github-issue-filters assignee:abc,label:p1 -m claude-3-5-sonnet-20240620
-```
+4. Use the `--github-issue-filters` flag to filter by label, assignee, etc:
+   ```bash
+   codewhisper task --github-issue --github-issue-filters assignee:abc,label:p1 -m claude-3-5-sonnet-20240620
+   ```
 
 Note:
 
@@ -114,7 +120,7 @@ Note:
 - This feature works with GitHub App user access tokens, GitHub App installation access tokens, and fine-grained personal access tokens.
 - If you're only accessing public repositories, you can use this feature without authentication, but a token is recommended to avoid rate limiting.
 
-### `apply-task` : Apply AI-Generated Task from a previous dry-run
+### `apply-task`: Apply AI-Generated Task
 
 ```bash
 codewhisper apply-task <file> [options]
@@ -122,9 +128,11 @@ codewhisper apply-task <file> [options]
 
 #### Options
 
-- `--auto-commit`: Automatically commit changes (default: false)
+| Option          | Description                                   |
+| --------------- | --------------------------------------------- |
+| `--auto-commit` | Automatically commit changes (default: false) |
 
-### `interactive` : Interactive Mode
+### `interactive`: Interactive Mode
 
 ```bash
 codewhisper interactive [options]
@@ -153,7 +161,7 @@ codewhisper interactive [options]
 | `--no-respect-gitignore`         | Do not respect entries in .gitignore                                |
 | `--invert`                       | Selected files will be excluded                                     |
 
-### `generate` : Generate Output
+### `generate`: Generate Output
 
 ```bash
 codewhisper generate [options]
@@ -182,7 +190,7 @@ codewhisper generate [options]
 | `--respect-gitignore`            | Respect entries in .gitignore (default: true)                       |
 | `--no-respect-gitignore`         | Do not respect entries in .gitignore                                |
 
-### `list-templates` : List Available Templates
+### `list-templates`: List Available Templates
 
 ```bash
 codewhisper list-templates
@@ -190,7 +198,7 @@ codewhisper list-templates
 
 This command lists all available templates in the templates directory. It doesn't take any options.
 
-### `export-templates` : Export Templates
+### `export-templates`: Export Templates
 
 ```bash
 codewhisper export-templates [options]
@@ -198,9 +206,11 @@ codewhisper export-templates [options]
 
 #### Options
 
-- `-d, --dir <directory>`: Target directory for exported templates (default: current directory)
+| Option                  | Description                                                          |
+| ----------------------- | -------------------------------------------------------------------- |
+| `-d, --dir <directory>` | Target directory for exported templates (default: current directory) |
 
-### `clear-cache` : Clear Codewhisper's Cache
+### `clear-cache`: Clear CodeWhisper's Cache
 
 ```bash
 codewhisper clear-cache [options]
@@ -210,202 +220,201 @@ This command clears the cache file which is used to store information about proc
 
 #### Options
 
-- `-p, --path <path>`: Path to the cache file (default: default-os-temporary-files-dir/codewhisper-cache.json)
+| Option              | Description                                                                             |
+| ------------------- | --------------------------------------------------------------------------------------- |
+| `-p, --path <path>` | Path to the cache file (default: default-os-temporary-files-dir/codewhisper-cache.json) |
 
 ## Usage Examples
 
-1.  Include only JavaScript and TypeScript files:
+1. Include only JavaScript and TypeScript files:
 
-```bash
-codewhisper generate -f "**/*.js" "**/*.ts"
-```
+   ```bash
+   codewhisper generate -f "**/*.js" "**/*.ts"
+   ```
 
-2.  Exclude test files and the `dist` directory:
+2. Exclude test files and the `dist` directory:
 
-```bash
-codewhisper generate -e "**/*.test.js" "dist/**/*"
-```
+   ```bash
+   codewhisper generate -e "**/*.test.js" "dist/**/*"
+   ```
 
-3.  Combine include and exclude patterns:
+3. Combine include and exclude patterns:
 
-```bash
-codewhisper generate -f "src/**/*" -e "**/*.test.js" "**/*.spec.js"
-```
+   ```bash
+   codewhisper generate -f "src/**/*" -e "**/*.test.js" "**/*.spec.js"
+   ```
 
-4.  Use custom data in a template:
+4. Use custom data in a template:
 
-```bash
-codewhisper generate --custom-data '{"projectName": "MyApp", "version": "1.0.0"}' --custom-template my-template.hbs
-```
+   ```bash
+   codewhisper generate --custom-data '{"projectName": "MyApp", "version": "1.0.0"}' --custom-template my-template.hbs
+   ```
 
-5.  Generate a diff-based summary:
+5. Generate a diff-based summary:
 
-```bash
-codewhisper generate --filter $(git diff --name-only HEAD^)
-```
+   ```bash
+   codewhisper generate --filter $(git diff --name-only HEAD^)
+   ```
 
-6.  Analyze a specific subdirectory:
+6. Analyze a specific subdirectory:
 
-```bash
-codewhisper generate -p ./src/components -f "**/*.tsx"
-```
+   ```bash
+   codewhisper generate -p ./src/components -f "**/*.tsx"
+   ```
 
-7.  Generate a summary with a custom prompt:
+7. Generate a summary with a custom prompt:
 
-```bash
-codewhisper generate -pr "Analyze this code for potential security vulnerabilities"
-```
+   ```bash
+   codewhisper generate -pr "Analyze this code for potential security vulnerabilities"
+   ```
 
-8.  Use interactive mode with inverted (exclude all selected files) selection:
+8. Use interactive mode with inverted (exclude all selected files) selection:
 
-```bash
-codewhisper interactive --invert
-```
+   ```bash
+   codewhisper interactive --invert
+   ```
 
-9.  Generate output with line numbers in code blocks:
+9. Generate output with line numbers in code blocks:
 
-```bash
-codewhisper generate -l
-```
+   ```bash
+   codewhisper generate -l
+   ```
 
 10. Review changes in a specific branch compared to main:
-
-```bash
-codewhisper generate --filter $(git diff --name-only main...feature-branch) --template deep-code-review
-```
+    ```bash
+    codewhisper generate --filter $(git diff --name-only main...feature-branch) --template deep-code-review
+    ```
 
 ## Advanced Usage Scenarios
 
 11. Generate documentation for a new release:
 
-```bash
-codewhisper generate --filter $(git diff --name-only v1.0.0...v1.1.0) --template generate-project-documentation
-```
+    ```bash
+    codewhisper generate --filter $(git diff --name-only v1.0.0...v1.1.0) --template generate-project-documentation
+    ```
 
 12. Perform a security audit on recent changes:
 
-```bash
-codewhisper generate --filter $(git diff --name-only HEAD~10) --template security-focused-review
-```
+    ```bash
+    codewhisper generate --filter $(git diff --name-only HEAD~10) --template security-focused-review
+    ```
 
 13. Create a code overview for onboarding new team members:
 
-```bash
-codewhisper generate -f "src/**/*" --template codebase-summary -o onboarding-guide.md
-```
+    ```bash
+    codewhisper generate -f "src/**/*" --template codebase-summary -o onboarding-guide.md
+    ```
 
 14. Generate an optimized LLM prompt for code explanation:
 
-```bash
-codewhisper generate --template optimize-llm-prompt --editor --custom-data '{"prompt": "your prompt goes here"}'
-```
+    ```bash
+    codewhisper generate --template optimize-llm-prompt --editor --custom-data '{"prompt": "your prompt goes here"}'
+    ```
 
 15. Start an AI-assisted coding task with a dry run:
 
-```bash
-codewhisper task --dry-run -t "Implement user authentication" -d "Add user login and registration functionality using JWT"
-```
+    ```bash
+    codewhisper task --dry-run -t "Implement user authentication" -d "Add user login and registration functionality using JWT"
+    ```
 
 16. Apply an AI-generated task with automatic commit:
 
-```bash
-codewhisper apply-task ./codewhisper-task-output.json --auto-commit
-```
+    ```bash
+    codewhisper apply-task ./codewhisper-task-output.json --auto-commit
+    ```
 
 17. Analyze code changes between two specific commits:
 
-```bash
-codewhisper generate --filter $(git diff --name-only commit1..commit2) --template deep-code-review
-```
+    ```bash
+    codewhisper generate --filter $(git diff --name-only commit1..commit2) --template deep-code-review
+    ```
 
 18. Generate a code summary for a specific pull request:
 
-```bash
-codewhisper generate --filter $(git diff --name-only main...pull-request-branch) --template codebase-summary
-```
+    ```bash
+    codewhisper generate --filter $(git diff --name-only main...pull-request-branch) --template codebase-summary
+    ```
 
 19. Create a custom template for generating API documentation:
 
-```bash
-codewhisper export-templates
-# Edit the exported template to focus on API documentation
-codewhisper generate --custom-template ./my-templates/api-docs.hbs -f "src/api/**/*"
-```
+    ```bash
+    codewhisper export-templates
+    # Edit the exported template to focus on API documentation
+    codewhisper generate --custom-template ./my-templates/api-docs.hbs -f "src/api/**/*"
+    ```
 
 20. Use CodeWhisper with a different LLM provider:
 
-```bash
-# Assuming you've set up the necessary environment variables for the new LLM provider
-codewhisper generate --model llm
-```
+    ```bash
+    # Assuming you've set up the necessary environment variables for the new LLM provider
+    codewhisper generate --model llm
+    ```
 
 21. Use a local Ollama model:
 
-```bash
-codewhisper generate --model ollama:llama3.1:70b --context-window 131072 --max-tokens 8192
-```
+    ```bash
+    codewhisper generate --model ollama:llama3.1:70b --context-window 131072 --max-tokens 8192
+    ```
 
 22. Run an AI-assisted task with detailed logging:
 
-```bash
-# This will generate a log file (codewhisper-`<date>`.log) in the current directory, containing all AI prompts, responses, and parsing results.
+    ```bash
+    # This will generate a log file (codewhisper-<date>.log) in the current directory, containing all AI prompts, responses, and parsing results.
+    codewhisper task -m claude-3-5-sonnet-20240620 --log-ai-interactions -t "Implement error handling" -d "Add comprehensive error handling to all API endpoints" -i "some instructions"
+    ```
 
-codewhisper task -m claude-3-5-sonnet-20240620 --log-ai-interactions -t "Implement error handling" -d "Add comprehensive error handling to all API endpoints" -i "some instructions"
-```
+23. Run an AI-assisted task using whole-file code modifications:
 
-23. Run an AI-assisted task using diff-based updates:
-
-```bash
-# This command will use diff-based updates for modified files, which can help handle larger edits within token limits.
-
-codewhisper task --diff -m claude-3-5-sonnet-20240620 -t "Refactor authentication logic" -d "Update the user authentication system to use JWT tokens" -i "some instructions"
-```
+    ```bash
+    # This command will use whole-file code modifications for modified files, useful if diff-based updates are not reliable with the model you are using.
+    codewhisper task --no-diff -m claude-3-5-sonnet-20240620 -t "Refactor authentication logic" -d "Update the user authentication system to use JWT tokens" -i "some instructions"
+    ```
 
 24. Undo AI-assisted task changes:
 
-```bash
-codewhisper task --undo
-```
+    ```bash
+    codewhisper task --undo
+    ```
 
-This command will:
+    This command will:
 
-- Discard uncommitted changes if any
-- Delete the AI-generated branch if not on the main branch
-- Offer to revert the last commit if on the main branch
+    - Discard uncommitted changes if any
+    - Delete the AI-generated branch if not on the main branch
+    - Offer to revert the last commit if on the main branch
 
-The command will always ask for confirmation before making any changes.
+    The command will always ask for confirmation before making any changes.
 
 25. Redo the last task with the option to change the generated plan as well as the model and file selection:
 
-```bash
-codewhisper task --redo
-```
+    ```bash
+    codewhisper task --redo
+    ```
 
-This command will:
+    This command will:
 
-- Retrieve the last task data for the current project directory
-- Display the details of the last task, including the task description, instructions, model used, and files included
-- You'll be given the option to change the AI model for code generation
-- You'll also have the opportunity to modify the file selection for the task
-- The task will then continue from the review plan stage, where you can then modify the plan to your liking
+    - Retrieve the last task data for the current project directory
+    - Display the details of the last task, including the task description, instructions, model used, and files included
+    - Give you the option to change the AI model for code generation
+    - Allow you to modify the file selection for the task
+    - Continue from the review plan stage, where you can then modify the plan to your liking
 
-This feature is particularly useful when:
+    This feature is particularly useful when:
 
-- You want to try a different AI model for the same task
-- You need to adjust the file selection for the same task
-- You want to quickly tweak the plan without starting from scratch
+    - You want to try a different AI model for the same task
+    - You need to adjust the file selection for the same task
+    - You want to quickly tweak the plan without starting from scratch
 
-Note: The redo functionality uses a cache stored in your home directory, so it persists across different sessions and is not affected by git operations like branch switching or resetting.
+    Note: The redo functionality uses a cache stored in your home directory, so it persists across different sessions and is not affected by git operations like branch switching or resetting.
 
-Example workflow:
+    Example workflow:
 
-1. Run an initial task: `codewhisper task`
-2. Review the code modifications and decide you want to tweak the plan or try a different model
-3. Undo the task: `codewhisper task --undo`
-4. Redo the task: `codewhisper task --redo`
-5. Optionally change the model when prompted
-6. Optionally adjust the file selection
-7. Adjust the plan as needed
+    1. Run an initial task: `codewhisper task`
+    2. Review the code modifications and decide you want to tweak the plan or try a different model
+    3. Undo the task: `codewhisper task --undo`
+    4. Redo the task: `codewhisper task --redo`
+    5. Optionally change the model when prompted
+    6. Optionally adjust the file selection
+    7. Adjust the plan as needed
 
 ## CI/CD Integration
 
@@ -474,19 +483,22 @@ This workflow generates a codebase summary using CodeWhisper and then uses Anthr
 
 Here are some common issues and their solutions:
 
-1.  **Issue**: CodeWhisper is not recognizing my custom template.
-    **Solution**: Ensure that your custom template file has a `.hbs` extension and is in the correct directory. Use the `--custom-template` option with the full path to your template file.
+1. **Issue**: CodeWhisper is not recognizing my custom template.
+   **Solution**: Ensure that your custom template file has a `.hbs` extension and is in the correct directory. Use the `--custom-template` option with the full path to your template file.
 
-2.  **Issue**: The generated output is empty or incomplete.
-    **Solution**: Check your file filters and ensure they're not excluding important files. Try running the command with the `--no-respect-gitignore` option to see if `.gitignore` is causing the issue.
+2. **Issue**: The generated output is empty or incomplete.
+   **Solution**: Check your file filters and ensure they're not excluding important files. Try running the command with the `--no-respect-gitignore` option to see if `.gitignore` is causing the issue.
 
-3.  **Issue**: CodeWhisper is running slowly on large codebases.
-    **Solution**: Use more specific file filters to reduce the number of files processed. You can also try increasing the cache size or using a faster storage medium for the cache file.
+3. **Issue**: CodeWhisper is running slowly on large codebases.
+   **Solution**: Use more specific file filters to reduce the number of files processed. You can also try increasing the cache size or using a faster storage medium for the cache file.
 
-4.  **Issue**: AI-assisted tasks are not producing the expected results.
-    **Solution**: Provide more detailed task descriptions and instructions. You can also try using a different AI model or adjusting the prompt in your custom template.
+4. **Issue**: AI-assisted tasks are not producing the expected results.
+   **Solution**: Provide more detailed task descriptions and instructions. You can also try using a different AI model or adjusting the prompt in your custom template.
 
-5.  **Issue**: Error "ANTHROPIC_API_KEY (or OPENAI_API_KEY or GROQ_API_KEY) not set" when running AI-assisted tasks.
-    **Solution**: Ensure you've set the `ANTHROPIC_API_KEY` (or `OPENAI_API_KEY` or `GROQ_API_KEY` ) environment variable with your API key. You can do this by running `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key` before running CodeWhisper.
+5. **Issue**: Error "ANTHROPIC_API_KEY (or OPENAI_API_KEY or GROQ_API_KEY) not set" when running AI-assisted tasks.
+   **Solution**: Ensure you've set the `ANTHROPIC_API_KEY` (or `OPENAI_API_KEY` or `GROQ_API_KEY`) environment variable with your API key. You can do this by running `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key` before running CodeWhisper.
+
+6. **Issue**: Diff-based code modifications are not working as expected.
+   **Solution**: Ensure you're using a model that can handle diff-based code modifications. If you're using a model that doesn't support diff-based code modifications, you can try using the `--no-diff` flag to disable them.
 
 For more complex issues or if these solutions don't help, please open an issue on the [CodeWhisper GitHub repository](https://github.com/gmickel/CodeWhisper/issues).
