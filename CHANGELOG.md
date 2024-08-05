@@ -1,3 +1,10 @@
+## [1.13.1](https://github.com/gmickel/CodeWhisper/compare/v1.13.0...v1.13.1) (2024-08-05)
+
+
+### Bug Fixes
+
+* cleanup task-workflow ([#78](https://github.com/gmickel/CodeWhisper/issues/78)) ([baac5ec](https://github.com/gmickel/CodeWhisper/commit/baac5ec4406205b62652cca895cae3975724933c))
+
 # [1.13.0](https://github.com/gmickel/CodeWhisper/compare/v1.12.1...v1.13.0) (2024-08-05)
 
 
