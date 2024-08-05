@@ -19,8 +19,16 @@ export function parseDiffFiles(response: string): AIFileInfo[] {
 
     if (status.trim() === 'modified') {
       try {
-        const parsedDiff = parsePatch(content.trim());
-        if (parsedDiff.length > 0) {
+        // First, try parsing the content as-is
+        let parsedDiff = parsePatch(content);
+
+        // If parsing fails or results in empty hunks, try with normalized content
+        if (parsedDiff.length === 0 || parsedDiff[0].hunks.length === 0) {
+          const normalizedContent = content.trim().replace(/\r\n/g, '\n');
+          parsedDiff = parsePatch(normalizedContent);
+        }
+
+        if (parsedDiff.length > 0 && parsedDiff[0].hunks.length > 0) {
           const diff = parsedDiff[0];
           fileInfo.diff = {
             oldFileName: diff.oldFileName || path,
@@ -42,7 +50,6 @@ export function parseDiffFiles(response: string): AIFileInfo[] {
     } else if (status.trim() === 'new') {
       fileInfo.content = content.trim();
     }
-
     files.push(fileInfo);
   }
 
