@@ -95,7 +95,7 @@
     "@ai-sdk/anthropic": "0.0.34",
     "@ai-sdk/openai": "0.0.40",
     "@anthropic-ai/sdk": "0.25.0",
-    "@inquirer/prompts": "5.3.6",
+    "@inquirer/prompts": "5.3.7",
     "@octokit/rest": "21.0.1",
     "@types/diff": "5.2.1",
     "ai": "3.2.45",
