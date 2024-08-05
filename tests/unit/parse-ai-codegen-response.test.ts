@@ -101,7 +101,6 @@ file-to-delete.js
 file1.js
 file2.ts
 </file_list>
-
 <file>
 <file_path>src/file1.js</file_path>
 <file_status>modified</file_status>
@@ -201,6 +200,100 @@ None identified.
         language: '',
         status: 'deleted',
       });
+    });
+
+    it('should generate correctly formatted diffs in diff mode with only additions', () => {
+      const mockResponse = `
+<file_list>
+src/file1.js
+</file_list>
+<git_branch_name>
+update-console-log
+</git_branch_name>
+<git_commit_message>
+Add console log message
+</git_commit_message>
+<summary>
+Added a console log message to file1.js
+</summary>
+<potential_issues>
+None identified
+</potential_issues>
+<file>
+<file_path>src/file1.js</file_path>
+<file_status>modified</file_status>
+<file_content language="javascript">
+--- src/file1.js
++++ src/file1.js
+@@ -1,3 +1,4 @@
+ import { existingImport } from './existing';
+
++console.log('Hello, World!');
+</file_content>
+<explanation>
+Added a console log message to demonstrate the change.
+</explanation>
+</file>
+  `;
+
+      const result = parseAICodegenResponse(mockResponse, false, true);
+      const diff = result.files[0].diff;
+
+      expect(diff).toBeDefined();
+      if (!diff) return;
+      expect(diff.hunks[0].lines).toEqual([
+        " import { existingImport } from './existing';",
+        '',
+        "+console.log('Hello, World!');",
+      ]);
+    });
+
+    it('should generate correctly formatted diffs in diff mode with additions and removals', () => {
+      const mockResponse = `
+<file_list>
+src/file1.js
+</file_list>
+<git_branch_name>
+update-console-log-message
+</git_branch_name>
+<git_commit_message>
+Update console log message
+</git_commit_message>
+<summary>
+Changed the console log message in file1.js
+</summary>
+<potential_issues>
+None identified
+</potential_issues>
+<file>
+<file_path>src/file1.js</file_path>
+<file_status>modified</file_status>
+<file_content language="javascript">
+--- src/file1.js
++++ src/file1.js
+@@ -1,3 +1,3 @@
+ import { existingImport } from './existing';
+
+-console.log('Old message');
++console.log('Hello, World!');
+</file_content>
+<explanation>
+Updated the console log message to 'Hello, World!'.
+</explanation>
+</file>
+  `;
+
+      const result = parseAICodegenResponse(mockResponse, false, true);
+      const diff = result.files[0].diff;
+
+      expect(diff).toBeDefined();
+      if (!diff) return;
+      expect(diff.hunks[0].lines).toEqual([
+        " import { existingImport } from './existing';",
+        '',
+        "-console.log('Old message');",
+        "+console.log('Hello, World!');",
+      ]);
     });
   });
 
