@@ -166,7 +166,11 @@ Note: see "query parameters" at https://docs.github.com/en/rest/issues/issues?ap
       '',
     )
     .option('--undo', 'Undo the last AI-assisted task')
-    .option('--redo', 'Redo the last task for the specified path', false)
+    .option(
+      '--redo',
+      'Redo the last task for the specified path. Note: CodeWhisper saves the plan, instructions, model and selected files from the last task. Other options need to be specified again.',
+      false,
+    )
     .action(async (options) => {
       if (options.redo) {
         try {
