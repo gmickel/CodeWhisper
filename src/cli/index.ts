@@ -91,8 +91,9 @@ export function cli(_args: string[]) {
     .option(
       '-df, --diff',
       'Use the new diff mode for AI-generated code modifications',
-      false,
+      true,
     )
+    .option('--no-diff', 'Use full file content for updates')
     .option(
       '-cw, --context-window <number>',
       'Specify the context window for the AI model. Only applicable for Ollama models.',
