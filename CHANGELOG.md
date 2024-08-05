@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/gmickel/CodeWhisper/compare/v1.12.1...v1.13.0) (2024-08-05)
+
+
+### Features
+
+* Add --no-plan mode for streamlined code generatio ([#77](https://github.com/gmickel/CodeWhisper/issues/77)) ([2fffd57](https://github.com/gmickel/CodeWhisper/commit/2fffd577af7655cea0f078bfa83b7fef9b35c8fd))
+
 ## [1.12.1](https://github.com/gmickel/CodeWhisper/compare/v1.12.0...v1.12.1) (2024-08-05)
 
 
