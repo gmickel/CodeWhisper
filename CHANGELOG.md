@@ -1,3 +1,10 @@
+## [1.12.1](https://github.com/gmickel/CodeWhisper/compare/v1.12.0...v1.12.1) (2024-08-05)
+
+
+### Bug Fixes
+
+* trigger release ([d9d4efc](https://github.com/gmickel/CodeWhisper/commit/d9d4efcdb25350fe64e7c8ec73a6a491ea5e73cb))
+
 # [1.12.0](https://github.com/gmickel/CodeWhisper/compare/v1.11.0...v1.12.0) (2024-08-05)
 
 
