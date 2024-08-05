@@ -4,12 +4,12 @@ This guide explains how to customize CodeWhisper to fit your specific needs and 
 
 ## Table of Contents
 
-* [Custom Templates](#custom-templates)
-* [Template Variables](#template-variables)
-* [Customizing AI Models](#customizing-ai-models)
-* [Extending CodeWhisper](#extending-codewhisper)
-* [Performance Tuning](#performance-tuning)
-* [Integrating with Other Tools](#integrating-with-other-tools)
+- [Custom Templates](#custom-templates)
+- [Template Variables](#template-variables)
+- [Customizing AI Models](#customizing-ai-models)
+- [Extending CodeWhisper](#extending-codewhisper)
+- [Performance Tuning](#performance-tuning)
+- [Integrating with Other Tools](#integrating-with-other-tools)
 
 ## Custom Templates
 
@@ -17,17 +17,17 @@ To create and use custom templates:
 
 1. Export the built-in templates:
 
-```bash
-codewhisper export-templates -d ./my-templates
-```
+   ```bash
+   codewhisper export-templates -d ./my-templates
+   ```
 
 2. Edit or create new template files in the `./my-templates` directory.
 
 3. Use your custom template:
 
-```bash
-codewhisper generate --custom-template ./my-templates/my-custom-template.hbs
-```
+   ```bash
+   codewhisper generate --custom-template ./my-templates/my-custom-template.hbs
+   ```
 
 ### Example: Creating a Custom Template
 
@@ -68,23 +68,28 @@ codewhisper generate --custom-template ./my-templates/code-stats.hbs --custom-da
 
 ### Best Practices for Template Creation
 
-1. Use clear and descriptive variable names.
-2. Leverage Handlebars helpers for complex logic.
-3. Include comments in your templates for better maintainability.
-4. Consider creating modular templates that can be composed together.
-5. Test your templates with various input data to ensure they handle edge cases.
+| Best Practice        | Description                                                |
+| -------------------- | ---------------------------------------------------------- |
+| Clear variable names | Use descriptive names for variables to enhance readability |
+| Leverage helpers     | Utilize Handlebars helpers for complex logic               |
+| Include comments     | Add comments to explain template structure and logic       |
+| Modular design       | Create reusable template components                        |
+| Thorough testing     | Test templates with various inputs to ensure robustness    |
 
 ## Template Variables
 
 CodeWhisper supports two types of special variable prefixes in templates to enable interactive prompting:
 
-1. `var_`: Used for single-line input prompts.
-2. `multiline_`: Used for multi-line input prompts that open in the user's default text editor.
+| Prefix       | Description                                             | Example                            |
+| ------------ | ------------------------------------------------------- | ---------------------------------- |
+| `var_`       | Single-line input prompts                               | `{{var_projectName}}`              |
+| `multiline_` | Multi-line input prompts (opens in default text editor) | `{{multiline_projectDescription}}` |
 
 Example usage in a template:
 
 ```handlebars
-# {{var_projectName}}
+#
+{{var_projectName}}
 
 ## Description
 
@@ -97,7 +102,7 @@ Example usage in a template:
 
 When using a template with these variables, CodeWhisper will automatically prompt the user for input if the values aren't provided via the `--custom-data` option. This feature makes it easier to create dynamic, interactive templates that can be reused across different projects.
 
-Note: Variable values are cached to speed up repeated use of templates. The cache can be cleared by using a different cache path with the `--cache-path` option.
+> Note: Variable values are cached to speed up repeated use of templates. The cache can be cleared by using a different cache path with the `--cache-path` option.
 
 ### Advanced Variable Usage
 
@@ -105,9 +110,13 @@ You can also use computed values and conditional logic in your templates:
 
 ```handlebars
 {{#if (gt files.length 10)}}
-This is a large project with {{files.length}} files.
+  This is a large project with
+  {{files.length}}
+  files.
 {{else}}
-This is a small project with {{files.length}} files.
+  This is a small project with
+  {{files.length}}
+  files.
 {{/if}}
 ```
 
@@ -155,50 +164,50 @@ To add new features or modify existing ones:
 
 ### Example: Adding a New Command
 
-To add a new command, e.g., `analyze` :
+To add a new command, e.g., `analyze`:
 
 1. Create a new file `src/commands/analyze.ts`:
 
-```typescript
-import { Command } from 'commander';
-import { processFiles } from '../core/file-processor';
-import { generateMarkdown } from '../core/markdown-generator';
+   ```typescript
+   import { Command } from 'commander';
+   import { processFiles } from '../core/file-processor';
+   import { generateMarkdown } from '../core/markdown-generator';
 
-export function registerAnalyzeCommand(program: Command) {
-  program
-    .command('analyze')
-    .description('Analyze code and generate a report')
-    .option('-p, --path <path>', 'Path to analyze', '.')
-    .action(async (options) => {
-      const files = await processFiles(options);
-      const template = `
-# Code Analysis Report
-
-{{#each files}}
-
-## {{relativePath this.path}}
-
-{{fileInfo this}}
-
-{{/each}}
-      `;
-      const output = await generateMarkdown(files, template, options);
-      console.log(output);
-    });
-}
-```
+   export function registerAnalyzeCommand(program: Command) {
+     program
+       .command('analyze')
+       .description('Analyze code and generate a report')
+       .option('-p, --path <path>', 'Path to analyze', '.')
+       .action(async (options) => {
+         const files = await processFiles(options);
+         const template = `
+   # Code Analysis Report
+   
+   {{#each files}}
+   
+   ## {{relativePath this.path}}
+   
+   {{fileInfo this}}
+   
+   {{/each}}
+         `;
+         const output = await generateMarkdown(files, template, options);
+         console.log(output);
+       });
+   }
+   ```
 
 2. Update `src/cli/index.ts` to include your new command:
 
-```typescript
-import { registerAnalyzeCommand } from '../commands/analyze';
+   ```typescript
+   import { registerAnalyzeCommand } from '../commands/analyze';
 
-// ... existing code ...
+   // ... existing code ...
 
-registerAnalyzeCommand(program);
+   registerAnalyzeCommand(program);
 
-// ... existing code ...
-```
+   // ... existing code ...
+   ```
 
 3. Add tests for your new command in `tests/commands/analyze.test.ts`
 
@@ -208,8 +217,10 @@ registerAnalyzeCommand(program);
 
 To optimize CodeWhisper's performance:
 
-1. Use specific file filters to reduce the number of processed files.
-2. Leverage the caching mechanism by using a consistent cache path.
+| Technique             | Description                          | Example                       |
+| --------------------- | ------------------------------------ | ----------------------------- |
+| Specific file filters | Reduce the number of processed files | `--filter "src/**/*.js"`      |
+| Consistent cache path | Leverage the caching mechanism       | `--cache-path /path/to/cache` |
 
 Example:
 
@@ -221,9 +232,11 @@ codewhisper generate --filter "src/**/*.js" --cache-path /path/to/cache
 
 CodeWhisper can be easily integrated with other development tools:
 
-1. Version Control: Use CodeWhisper in pre-commit hooks to generate documentation or perform code analysis.
-2. CI/CD: Incorporate CodeWhisper in your CI/CD pipeline for automated code reviews or documentation generation.
-3. IDE Extensions: Create IDE extensions that leverage CodeWhisper's API for in-editor code analysis and AI assistance.
+| Integration     | Description                               | Example                                            |
+| --------------- | ----------------------------------------- | -------------------------------------------------- |
+| Version Control | Use CodeWhisper in pre-commit hooks       | Generate documentation or perform code analysis    |
+| CI/CD           | Incorporate CodeWhisper in your pipeline  | Automated code reviews or documentation generation |
+| IDE Extensions  | Create extensions using CodeWhisper's API | In-editor code analysis and AI assistance          |
 
 Example Git pre-commit hook:
 
