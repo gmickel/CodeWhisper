@@ -35,7 +35,7 @@ Whether you're implementing comprehensive features, tackling complex refactoring
 
 ### 💬 Join the Community
 
-Join the [CodeWhisper Discord](https://discord.com/invite/82mjJkwABQ) to connect with fellow users and developers, share insights, discuss features, and get support for leveraging CodeWhisper in your coding workflow.
+Connect with fellow users and developers, share insights, discuss features, and get support for leveraging CodeWhisper in your coding workflow by joining our [CodeWhisper Discord](https://discord.com/invite/82mjJkwABQ).
 
 ![CodeWhisper](https://raw.githubusercontent.com/gmickel/CodeWhisper/main/assets/worker_sm.jpg)
 
@@ -50,49 +50,51 @@ Many AI coding assistants and tools fall short when tackling tasks that demand a
 <details>
 <summary>Read more</summary>
 
-1.  **Precision Through Human-Guided Curation**: CodeWhisper trusts you to handpick the most relevant parts of your codebase for any given task. This ensures the AI model receives exactly the context it needs, leading to more accurate and comprehensive task implementation.
+1. **Precision Through Human-Guided Curation**: CodeWhisper trusts you to handpick the most relevant parts of your codebase for any given task. This ensures the AI model receives exactly the context it needs, leading to more accurate and comprehensive task implementation.
 
-    > Example: For a task to "Implement user authentication":
+   > Example: For a task to "Implement user authentication":
+   >
+   > - You select core auth components, user models, and key API endpoints.
+   > - CodeWhisper then generates and applies all necessary code modifications across selected files.
+   > - The result is a fully implemented feature, from backend logic to frontend integration.
 
-    - You select core auth components, user models, and key API endpoints.
-    - CodeWhisper then generates and applies all necessary code modifications across selected files.
-    - The result is a fully implemented feature, from backend logic to frontend integration.
+2. **Project-Specific Knowledge Integration**: Manual curation allows you to include non-code context that automated tools might miss, such as architectural decisions or business logic explanations.
 
-2.  **Project-Specific Knowledge Integration**: Manual curation allows you to include non-code context that automated tools might miss, such as architectural decisions or business logic explanations.
+   > Example: When enhancing your payment system, you can include:
+   >
+   > - Relevant code files
+   > - Snippets from financial compliance documents
+   > - Notes on transaction flow architecture
+   >
+   > CodeWhisper uses this rich context to generate compliant, architecturally sound code modifications.
 
-    > Example: When enhancing your payment system, you can include:
+3. **Noise Reduction, Signal Amplification**: By manually curating the context, you eliminate irrelevant information, enabling CodeWhisper to generate more focused and effective code modifications.
 
-    - Relevant code files
-    - Snippets from financial compliance documents
-    - Notes on transaction flow architecture
-      CodeWhisper uses this rich context to generate compliant, architecturally sound code modifications.
+   > Example: For a UI redesign task, you can exclude backend complexities, allowing CodeWhisper to concentrate on generating precise frontend component updates and style changes.
 
-3.  **Noise Reduction, Signal Amplification**: By manually curating the context, you eliminate irrelevant information, enabling CodeWhisper to generate more focused and effective code modifications.
+4. **Adaptive to Project Evolution**: As your project evolves, manual curation ensures CodeWhisper always works with the most up-to-date and relevant information.
 
-    > Example: For a UI redesign task, you can exclude backend complexities, allowing CodeWhisper to concentrate on generating precise frontend component updates and style changes.
+   > Example: After adopting a new state management library, you can immediately update the context, ensuring CodeWhisper's generated code aligns with your new architecture.
 
-4.  **Adaptive to Project Evolution**: As your project evolves, manual curation ensures CodeWhisper always works with the most up-to-date and relevant information.
+5. **Seamless Integration of External Knowledge**: CodeWhisper's approach allows you to easily incorporate relevant code snippets or documentation from outside your current project.
 
-    > Example: After adopting a new state management library, you can immediately update the context, ensuring CodeWhisper's generated code aligns with your new architecture.
+   > Example: When implementing a new API integration, you could include:
+   >
+   > - Your existing API service files
+   > - Official documentation of the third-party API
+   > - Example implementations from other projects
+   >
+   > CodeWhisper will then use this context to generate a fully functional integration, handling authentication, data mapping, and error scenarios.
 
-5.  **Seamless Integration of External Knowledge**: CodeWhisper's approach allows you to easily incorporate relevant code snippets or documentation from outside your current project.
+6. **Git-First Workflow**: CodeWhisper automatically creates new branches before applying any code modifications, ensuring a clean and organized development process.
 
-    > Example: When implementing a new API integration, you could include:
-
-    - Your existing API service files
-    - Official documentation of the third-party API
-    - Example implementations from other projects
-      CodeWhisper will then use this context to generate a fully functional integration, handling authentication, data mapping, and error scenarios.
-
-6.  **Git-First Workflow**: CodeWhisper automatically creates new branches before applying any code modifications, ensuring a clean and organized development process.
-
-    > Example: For a task to "Add user profile management":
-
-    - CodeWhisper creates a new branch (e.g., `feature/user-profile-management` )
-    - Generates and applies all necessary code changes within this branch
-    - Optionally prepares a commit with a descriptive message
-
-    This approach makes it straightforward to track CodeWhisper's output and review the changes in a dedicated branch.
+   > Example: For a task to "Add user profile management":
+   >
+   > - CodeWhisper creates a new branch (e.g., `feature/user-profile-management`)
+   > - Generates and applies all necessary code changes within this branch
+   > - Optionally prepares a commit with a descriptive message
+   >
+   > This approach makes it straightforward to track CodeWhisper's output and review the changes in a dedicated branch.
 
 By leveraging manually curated context and a git-first approach, CodeWhisper transforms from a simple code assistant into a comprehensive task implementation tool. It doesn't just suggest code snippets; it generates, applies, and organizes entire feature implementations. This approach combines the best of both worlds: the vast knowledge and processing power of AI models with the nuanced understanding and decision-making capabilities of experienced developers.
 
@@ -109,24 +111,26 @@ While CodeWhisper excels at performing individual coding tasks and even large fe
 
 ## ✨ Key Features
 
-- 🧠 AI-powered task planning and code generation
-- 🔄 Full git integration for version control of AI-generated changes
-- 🔄 Support for diff-based code modifications to handle larger edits within output token limits
-- 🌍 Support for various models and LLM providers, such as Anthropic, OpenAI, and Groq
-- 🔐 Support for local models via Ollama
-- 🚀 Blazingly fast code processing with concurrent workers
-- 🎯 Customizable file filtering and exclusion
-- 📊 Intelligent caching for improved performance
-- 🔧 Extensible template system with interactive variable prompts
-- 🖊️ Support for single-line and multi-line custom variables in templates
-- 💾 Value caching for quick template reuse
-- 🖥️ CLI and programmatic API
-- 🔒 Respects .gitignore and/or custom include and exclude globs
-- 🌈 Full language support for all text-based file types
-- 🤖 Interactive mode for granular file selection and template customization
-- ⚡ Optimized for large repositories
-- 📝 Detailed logging of AI prompts, responses, and parsing results
-- 🔗 GitHub integration for fetching and working with issues (see [Configuration](#-configuration))
+| Feature                                         | Description                                                       |
+| ----------------------------------------------- | ----------------------------------------------------------------- |
+| 🧠 AI-powered task planning and code generation | Leverage AI to plan and implement complex coding tasks            |
+| 🔄 Full git integration                         | Version control of AI-generated changes                           |
+| 🔄 Diff-based code modifications                | Handle larger edits within output token limits                    |
+| 🌍 Support for various LLM providers            | Compatible with Anthropic, OpenAI, Ollama and Groq                |
+| 🔐 Support for local models                     | Use local models via Ollama                                       |
+| 🚀 Blazingly fast code processing               | Concurrent workers for improved performance                       |
+| 🎯 Customizable file filtering and exclusion    | Fine-tune which files to include in the context                   |
+| 📊 Intelligent caching                          | Improved performance through smart caching                        |
+| 🔧 Extensible template system                   | Interactive variable prompts for flexible output                  |
+| 🖊️ Custom variables in templates                | Support for single-line and multi-line custom variables           |
+| 💾 Value caching                                | Quick template reuse with cached values                           |
+| 🖥️ CLI and programmatic API                     | Use CodeWhisper in scripts or as a library                        |
+| 🔒 Respect for .gitignore                       | Option to use custom include and exclude globs                    |
+| 🌈 Full language support                        | Compatible with all text-based file types                         |
+| 🤖 Interactive mode                             | Granular file selection and template customization                |
+| ⚡ Optimized for large repositories             | Efficient processing of extensive codebases                       |
+| 📝 Detailed logging                             | Log AI prompts, responses, and parsing results                    |
+| 🔗 GitHub integration                           | Fetch and work with issues (see [Configuration](#-configuration)) |
 
 ## 📺 Video
 
@@ -161,8 +165,9 @@ codewhisper list-models
 # CodeWhisper will prompt you to select a model from the list of available models
 codewhisper task
 
-# To use the new experimental diff-based code modifications, you can use the following command:
-codewhisper task --diff
+# To disable the new diff-based code modifications, you can use the following command:
+# This will use full-file code modifications
+codewhisper task --no-diff
 
 # You can also specify a model directly
 # Claude-3.5 Sonnet
@@ -178,32 +183,21 @@ codewhisper task --undo
 codewhisper task --redo
 ```
 
-> Note: If you are using CodeWhisper's LLM integration with `codewhisper task` you will need to set the respective environment variable for the model you want to use (e.g. `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key` ).
+> Note: If you are using CodeWhisper's LLM integration with `codewhisper task`, you will need to set the respective environment variable for the model you want to use (e.g., `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key`).
 
 For more detailed instructions, see the [Installation](#-installation) and [Usage](#-usage) sections.
 
 ### Supported Models and Current Recommendations
 
-While CodeWhisper supports a variety of providers and models, my current recommendations are based on extensive testing and real-world usage. Here's an overview of the current status:
+While CodeWhisper supports a variety of providers and models, our current recommendations are based on extensive testing and real-world usage. Here's an overview of the current status:
 
 #### Recommended Models
 
-1. **Claude-3.5-Sonnet (Anthropic)**
-
-   - Highest recommendation
-   - Generates exceptional quality plans and results
-   - Optimal performance for comprehensive task implementation
-
-2. **GPT-4o (OpenAI)**
-
-   - Excellent performance
-   - Produces high-quality plans and good results
-   - Nearly on par with Claude-3.5-Sonnet
-
-3. **GPT-4o-mini (OpenAI)**
-   - Strong performance
-   - Generates good quality plans and results
-   - Has a long max output length of 16384 tokens which can be used for complex tasks
+| Model             | Provider  | Recommendation | Notes                                                                 |
+| ----------------- | --------- | -------------- | --------------------------------------------------------------------- |
+| Claude-3.5-Sonnet | Anthropic | Highest        | Generates exceptional quality plans and results                       |
+| GPT-4o            | OpenAI    | Excellent      | Produces high-quality plans and good results                          |
+| GPT-4o-mini       | OpenAI    | Strong         | Good quality plans and results, long max output length (16384 tokens) |
 
 #### Experimental Support
 
@@ -221,7 +215,7 @@ Currently not recommended for complex tasks. Models tested include:
 - Mistral Nemo
 - Mistral Large
 
-These models currently struggle to follow instructions accurately for comprehensive task implementation. However, I am actively working on:
+These models currently struggle to follow instructions accurately for comprehensive task implementation. However, we are actively working on:
 
 1. Improving the workflow for smaller local models
 2. Developing an evaluation pipeline for consistent performance measurement
@@ -229,7 +223,7 @@ These models currently struggle to follow instructions accurately for comprehens
 
 ## 📦 Installation
 
-You can use CodeWhisper without installation using `npx` , or install it globally:
+You can use CodeWhisper without installation using `npx`, or install it globally:
 
 ```bash
 # Using npx (no installation required)
@@ -243,33 +237,22 @@ npm install -g codewhisper
 
 CodeWhisper offers several commands to cater to different use cases:
 
-```bash
-# Generate a codebase summary
-codewhisper generate
-
-# Start an interactive session
-codewhisper interactive
-
-# Begin an AI-assisted coding task
-codewhisper task
-
-# Apply a previously AI-generated task
-codewhisper apply-task <file>
-
-# List available templates
-codewhisper list-templates
-
-# Export templates to the current or specified directory
-codewhisper export-templates -d ./my-templates
-```
+| Command             | Description                                                  |
+| ------------------- | ------------------------------------------------------------ |
+| `task`              | Begin an AI-assisted coding task                             |
+| `generate`          | Generate a codebase summary                                  |
+| `interactive`       | Start an interactive session for codebase summary generation |
+| `apply-task <file>` | Apply a previously AI-generated task                         |
+| `list-templates`    | List available templates                                     |
+| `list-models`       | List available AI models                                     |
+| `clear-cache`       | Clear CodeWhisper's cache                                    |
+| `export-templates`  | Export templates to the current or specified directory       |
 
 For detailed usage instructions and examples, please refer to [USAGE.md](USAGE.md).
 
-Certainly! Here's the relevant section to be added to the README.md file:
-
 ### Undoing AI-Assisted Task Changes
 
-To undo changes made by an AI-assisted task, you can use the `--undo` option with the `task` command:
+To undo changes made by an AI-assisted task, use the `--undo` option with the `task` command:
 
 ```bash
 codewhisper task --undo
@@ -285,11 +268,9 @@ The command will always ask for confirmation before making any changes. It will 
 
 Always review the proposed changes carefully before confirming, as this operation may result in loss of work.
 
-Here's the updated section for the README.md file that includes information about the new --redo functionality:
-
 ### Redoing AI-Assisted Tasks
 
-CodeWhisper now supports redoing AI-assisted tasks from the review plan stage. This feature allows you to restart your last task with the option to modify the generated plan as well as the model and file selection. To use this feature, you can use the `--redo` option with the `task` command:
+CodeWhisper now supports redoing AI-assisted tasks from the review plan stage. This feature allows you to restart your last task with the option to modify the generated plan as well as the model and file selection. To use this feature, use the `--redo` option with the `task` command:
 
 ```bash
 codewhisper task --redo
@@ -329,6 +310,18 @@ CodeWhisper uses Handlebars templates to generate output. You can use pre-define
 
 ## 🔧 Configuration
 
+For more details on custom templates, extending CodeWhisper, and integrating with other tools, check [CUSTOMIZATION.md](CUSTOMIZATION.md).
+
+### Environment Variables
+
+To use CodeWhisper's LLM integration, you need to set the appropriate environment variable for the model you want to use:
+
+| Provider  | Environment Variable | Example                                 |
+| --------- | -------------------- | --------------------------------------- |
+| Anthropic | `ANTHROPIC_API_KEY`  | `export ANTHROPIC_API_KEY=your_api_key` |
+| OpenAI    | `OPENAI_API_KEY`     | `export OPENAI_API_KEY=your_api_key`    |
+| Groq      | `GROQ_API_KEY`       | `export GROQ_API_KEY=your_api_key`      |
+
 ### GitHub Integration
 
 To use the GitHub issue integration feature, you need to set the `GITHUB_TOKEN` environment variable with a valid GitHub personal access token.
@@ -348,9 +341,25 @@ To set up the token:
 export GITHUB_TOKEN=your_github_personal_access_token
 ```
 
+To use the GitHub integration in your CodeWhisper tasks:
+
+1. Use the `--github-issue` flag to select from open issues in the current repository:
+
+```bash
+codewhisper task --github-issue -m claude-3-5-sonnet-20240620
+```
+
+2. Use the `--github-issue-filters` flag to filter issues by label, assignee, or other criteria:
+
+```bash
+codewhisper task --github-issue --github-issue-filters assignee:abc,label:p1 -m claude-3-5-sonnet-20240620
+```
+
+The `--github-issue-filters` option accepts comma-separated key:value pairs. For a full list of available filter options, refer to the [GitHub API documentation](https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues--parameters).
+
 > Note: This endpoint can be used without authentication if only public resources are requested. However, using a token is recommended to avoid rate limiting and access private repositories.
 
-For more details on custom templates, extending CodeWhisper, and integrating with other tools, check [CUSTOMIZATION.md](CUSTOMIZATION.md).
+For more detailed instructions on using the GitHub integration and other CodeWhisper features, please refer to [USAGE.md](USAGE.md).
 
 ## 📚 API
 
@@ -375,23 +384,14 @@ We welcome contributions to CodeWhisper! Please read our [CONTRIBUTING.md](CONTR
 
 ## ❓ FAQ
 
-**Q: How does CodeWhisper handle large codebases?**
-A: CodeWhisper uses concurrent workers and intelligent caching for optimal performance with large repositories. For very large projects, use specific file filters or interactive mode to focus on relevant parts.
-
-**Q: Can I use custom templates?**
-A: Yes, you can create custom Handlebars templates and use them with the `--custom-template` option or by placing them in the `templates/` directory. See [TEMPLATES.md](TEMPLATES.md) for more information.
-
-**Q: Does CodeWhisper support languages other than JavaScript/TypeScript?**
-A: Yes, CodeWhisper supports all text-based file types and has language detection for a wide range of programming languages.
-
-**Q: How can I use CodeWhisper in my CI/CD pipeline?**
-A: CodeWhisper can be integrated into CI/CD pipelines. Install it as a dependency and use the CLI or API in your scripts. You can generate code summaries for pull requests or create documentation automatically on each release. See [USAGE.md](USAGE.md) for CI/CD integration examples.
-
-**Q: Can I use CodeWhisper with other AI tools or language models?**
-A: Yes, CodeWhisper generates code summaries that can be used as input for various AI tools and language models. You can pipe the output to any AI tool or LLM of your choice.
-
-**Q: How does CodeWhisper handle sensitive information in the code?**
-A: CodeWhisper respects `.gitignore` files by default, helping to exclude sensitive files. Always review generated summaries before sharing, especially with confidential codebases.
+| Question                                                             | Answer                                                                                                                                                                                                                                                                                   |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| How does CodeWhisper handle large codebases?                         | CodeWhisper uses concurrent workers and intelligent caching for optimal performance with large repositories. For very large projects, use specific file filters or interactive mode to focus on relevant parts.                                                                          |
+| Can I use custom templates?                                          | Yes, you can create custom Handlebars templates and use them with the `--custom-template` option or by placing them in the `templates/` directory. See [TEMPLATES.md](TEMPLATES.md) for more information.                                                                                |
+| Does CodeWhisper support languages other than JavaScript/TypeScript? | Yes, CodeWhisper supports all text-based file types and has language detection for a wide range of programming languages.                                                                                                                                                                |
+| How can I use CodeWhisper in my CI/CD pipeline?                      | CodeWhisper can be integrated into CI/CD pipelines. Install it as a dependency and use the CLI or API in your scripts. You can generate code summaries for pull requests or create documentation automatically on each release. See [USAGE.md](USAGE.md) for CI/CD integration examples. |
+| Can I use CodeWhisper with other AI tools or language models?        | Yes, CodeWhisper generates code summaries that can be used as input for various AI tools and language models. You can pipe the output to any AI tool or LLM of your choice.                                                                                                              |
+| How does CodeWhisper handle sensitive information in the code?       | CodeWhisper respects `.gitignore` files by default, helping to exclude sensitive files. Always review generated summaries before sharing, especially with confidential codebases.                                                                                                        |
 
 ## 📄 License
 
