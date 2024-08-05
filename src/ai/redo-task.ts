@@ -2,12 +2,13 @@ import path from 'node:path';
 import { confirm } from '@inquirer/prompts';
 import chalk from 'chalk';
 import ora from 'ora';
+import { processFiles } from '../core/file-processor';
 import { selectFilesPrompt } from '../interactive/select-files-prompt';
 import { selectModelPrompt } from '../interactive/select-model-prompt';
 import type { AiAssistedTaskOptions } from '../types';
 import { TaskCache } from '../utils/task-cache';
 import { getModelConfig } from './model-config';
-import { continueTaskWorkflow } from './task-workflow';
+import { handleNoPlanWorkflow, handlePlanWorkflow } from './task-workflow';
 
 export async function redoLastTask(options: AiAssistedTaskOptions) {
   const spinner = ora();
@@ -77,13 +78,44 @@ export async function redoLastTask(options: AiAssistedTaskOptions) {
       });
     }
 
-    await continueTaskWorkflow(
-      { ...options, model: modelKey },
-      basePath,
-      taskCache,
-      lastTaskData.generatedPlan,
-      modelKey,
-    );
+    // Process files
+    spinner.start('Processing files...');
+    const processedFiles = await processFiles({
+      ...options,
+      path: basePath,
+      filter: options.invert ? undefined : selectedFiles,
+      exclude: options.invert ? selectedFiles : options.exclude,
+    });
+    spinner.succeed('Files processed successfully');
+
+    const updatedTaskData = {
+      ...lastTaskData,
+      model: modelKey,
+      selectedFiles,
+    };
+
+    if (
+      updatedTaskData.generatedPlan &&
+      updatedTaskData.generatedPlan.trim() !== ''
+    ) {
+      await handlePlanWorkflow(
+        { ...options, model: modelKey },
+        basePath,
+        taskCache,
+        updatedTaskData,
+        processedFiles,
+        modelKey,
+      );
+    } else {
+      await handleNoPlanWorkflow(
+        { ...options, model: modelKey },
+        basePath,
+        taskCache,
+        updatedTaskData,
+        processedFiles,
+        modelKey,
+      );
+    }
   } catch (error) {
     spinner.fail('Error in redoing AI-assisted task');
     console.error(

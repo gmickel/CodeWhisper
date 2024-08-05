@@ -14,6 +14,7 @@ import type {
   AiAssistedTaskOptions,
   FileInfo,
   MarkdownOptions,
+  TaskData,
 } from '../types';
 import {
   DEFAULT_CACHE_PATH,
@@ -49,64 +50,40 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     );
     const selectedFiles = await selectFiles(options, basePath);
 
-    const templatePath = getTemplatePath('task-plan-prompt');
-    const templateContent = await fs.readFile(templatePath, 'utf-8');
-    const customData = await prepareCustomData(
-      templateContent,
-      taskDescription,
-      instructions,
-      options,
-    );
-
     spinner.start('Processing files...');
     const processedFiles = await processFiles(
       getProcessOptions(options, basePath, selectedFiles),
     );
     spinner.succeed('Files processed successfully');
 
+    const taskData = {
+      selectedFiles,
+      taskDescription,
+      instructions,
+      model: modelKey,
+    } as TaskData;
+
     if (options.plan) {
-      const planPrompt = await generatePlanPrompt(
-        processedFiles,
-        templateContent,
-        customData,
-        options,
-        basePath,
-      );
-
-      const generatedPlan = await generatePlan(planPrompt, modelKey, options);
-
-      // Cache the task data
-      taskCache.setTaskData(basePath, {
-        selectedFiles,
-        generatedPlan,
-        taskDescription,
-        instructions,
-        model: modelKey,
-      });
-
-      await continueTaskWorkflow(
+      await handlePlanWorkflow(
         options,
         basePath,
         taskCache,
-        generatedPlan,
+        taskData,
+        processedFiles,
         modelKey,
       );
     } else {
-      taskCache.setTaskData(basePath, {
-        selectedFiles,
-        generatedPlan: '',
-        taskDescription,
-        instructions,
-        model: modelKey,
-      });
-
-      await continueTaskWorkflowWithoutPlan(
+      await handleNoPlanWorkflow(
         options,
         basePath,
         taskCache,
+        taskData,
+        processedFiles,
         modelKey,
       );
     }
+
+    spinner.succeed('AI-assisted task completed! 🎉');
   } catch (error) {
     spinner.fail('Error in AI-assisted task');
     console.error(
@@ -273,6 +250,63 @@ function getProcessOptions(
   };
 }
 
+export async function handlePlanWorkflow(
+  options: AiAssistedTaskOptions,
+  basePath: string,
+  taskCache: TaskCache,
+  taskData: TaskData,
+  processedFiles: FileInfo[],
+  modelKey: string,
+) {
+  const planTemplatePath = getTemplatePath('task-plan-prompt');
+  const planTemplateContent = await fs.readFile(planTemplatePath, 'utf-8');
+  const planCustomData = await prepareCustomData(
+    planTemplateContent,
+    taskData.taskDescription,
+    taskData.instructions,
+    options,
+  );
+
+  const planPrompt = await generatePlanPrompt(
+    processedFiles,
+    planTemplateContent,
+    planCustomData,
+    options,
+    basePath,
+  );
+  const generatedPlan = await generatePlan(planPrompt, modelKey, options);
+  const reviewedPlan = await reviewPlan(generatedPlan);
+
+  taskCache.setTaskData(basePath, { ...taskData, generatedPlan: reviewedPlan });
+
+  await generateAndApplyCode(
+    options,
+    basePath,
+    taskCache,
+    modelKey,
+    processedFiles,
+    reviewedPlan,
+  );
+}
+
+export async function handleNoPlanWorkflow(
+  options: AiAssistedTaskOptions,
+  basePath: string,
+  taskCache: TaskCache,
+  taskData: TaskData,
+  processedFiles: FileInfo[],
+  modelKey: string,
+) {
+  taskCache.setTaskData(basePath, { ...taskData, generatedPlan: '' });
+  await generateAndApplyCode(
+    options,
+    basePath,
+    taskCache,
+    modelKey,
+    processedFiles,
+  );
+}
+
 async function generatePlanPrompt(
   processedFiles: FileInfo[],
   templateContent: string,
@@ -330,21 +364,15 @@ async function generatePlan(
   return generatedPlan;
 }
 
-export async function continueTaskWorkflow(
+async function generateAndApplyCode(
   options: AiAssistedTaskOptions,
   basePath: string,
   taskCache: TaskCache,
-  generatedPlan: string,
   modelKey: string,
+  processedFiles: FileInfo[],
+  reviewedPlan?: string,
 ) {
-  const spinner = ora();
-
-  const reviewedPlan = await reviewPlan(generatedPlan);
-
-  const codegenTemplatePath = options.diff
-    ? getTemplatePath('codegen-diff-prompt')
-    : getTemplatePath('codegen-prompt');
-
+  const codegenTemplatePath = getCodegenTemplatePath(options);
   const codegenTemplateContent = await fs.readFile(
     codegenTemplatePath,
     'utf-8',
@@ -357,11 +385,11 @@ export async function continueTaskWorkflow(
     reviewedPlan,
   );
 
-  spinner.start('Generating Codegen prompt...');
+  const spinner = ora('Generating Codegen prompt...').start();
   const codeGenPrompt = await generateCodegenPrompt(
     options,
     basePath,
-    taskCache,
+    processedFiles,
     codegenTemplateContent,
     codegenCustomData,
   );
@@ -383,61 +411,17 @@ export async function continueTaskWorkflow(
   } else {
     await applyCodeModifications(options, basePath, parsedResponse);
   }
-
-  spinner.succeed('AI-assisted task completed! 🎉');
 }
 
-export async function continueTaskWorkflowWithoutPlan(
-  options: AiAssistedTaskOptions,
-  basePath: string,
-  taskCache: TaskCache,
-  modelKey: string,
-) {
-  const spinner = ora();
-
-  const codegenTemplatePath = options.diff
-    ? getTemplatePath('codegen-diff-no-plan-prompt')
-    : getTemplatePath('codegen-no-plan-prompt');
-
-  const codegenTemplateContent = await fs.readFile(
-    codegenTemplatePath,
-    'utf-8',
-  );
-  const codegenCustomData = await prepareCodegenCustomData(
-    codegenTemplateContent,
-    taskCache,
-    basePath,
-    options,
-  );
-
-  spinner.start('Generating Codegen prompt...');
-  const codeGenPrompt = await generateCodegenPrompt(
-    options,
-    basePath,
-    taskCache,
-    codegenTemplateContent,
-    codegenCustomData,
-  );
-  spinner.succeed('Codegen prompt generated successfully');
-
-  const generatedCode = await generateCode(codeGenPrompt, modelKey, options);
-  const parsedResponse = parseAICodegenResponse(
-    generatedCode,
-    options.logAiInteractions,
-    options.diff,
-  );
-
-  if (options.dryRun) {
-    await handleDryRun(
-      basePath,
-      parsedResponse,
-      taskCache.getLastTaskData(basePath)?.taskDescription || '',
+function getCodegenTemplatePath(options: AiAssistedTaskOptions): string {
+  if (options.plan) {
+    return getTemplatePath(
+      options.diff ? 'codegen-diff-prompt' : 'codegen-prompt',
     );
-  } else {
-    await applyCodeModifications(options, basePath, parsedResponse);
   }
-
-  spinner.succeed('AI-assisted task completed! 🎉');
+  return getTemplatePath(
+    options.diff ? 'codegen-diff-no-plan-prompt' : 'codegen-no-plan-prompt',
+  );
 }
 
 async function prepareCodegenCustomData(
@@ -470,7 +454,7 @@ async function prepareCodegenCustomData(
 async function generateCodegenPrompt(
   options: AiAssistedTaskOptions,
   basePath: string,
-  taskCache: TaskCache,
+  processedFiles: FileInfo[],
   codegenTemplateContent: string,
   codegenCustomData: Record<string, string>,
 ): Promise<string> {
@@ -480,17 +464,6 @@ async function generateCodegenPrompt(
     customData: codegenCustomData,
     lineNumbers: options.lineNumbers,
   };
-
-  const processedFiles = await processFiles({
-    ...options,
-    path: basePath,
-    filter: options.invert
-      ? undefined
-      : taskCache.getLastTaskData(basePath)?.selectedFiles,
-    exclude: options.invert
-      ? taskCache.getLastTaskData(basePath)?.selectedFiles
-      : options.exclude,
-  });
 
   return generateMarkdown(
     processedFiles,
