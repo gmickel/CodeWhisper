@@ -1,3 +1,10 @@
+## [1.13.3](https://github.com/gmickel/CodeWhisper/compare/v1.13.2...v1.13.3) (2024-08-06)
+
+
+### Bug Fixes
+
+* more diff mode improvements ([#81](https://github.com/gmickel/CodeWhisper/issues/81)) ([2e3ceb3](https://github.com/gmickel/CodeWhisper/commit/2e3ceb37b8f98edc35c59f33026c1f0e6a2213b0))
+
 ## [1.13.2](https://github.com/gmickel/CodeWhisper/compare/v1.13.1...v1.13.2) (2024-08-06)
 
 
