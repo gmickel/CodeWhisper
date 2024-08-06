@@ -269,7 +269,7 @@ describe('applyChanges', () => {
     expect(createPatch).toHaveBeenCalledWith(
       'modified-file.js',
       oldContent,
-      oldContent,
+      newContent,
       'modified-file.js',
       'modified-file.js',
       { context: 3 },
