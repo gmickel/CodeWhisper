@@ -1,7 +1,7 @@
 import type { AIFileInfo } from '../../types';
-
+import { handleDeletedFiles } from './common-parser';
 export function parseFullContentFiles(response: string): AIFileInfo[] {
-  const files: AIFileInfo[] = [];
+  let files: AIFileInfo[] = [];
 
   // Parse individual files
   const fileRegex =
@@ -20,21 +20,7 @@ export function parseFullContentFiles(response: string): AIFileInfo[] {
     });
   }
 
-  // Handle deleted files
-  const deletedFileRegex =
-    /<file>[\s\S]*?<file_path>(.*?)<\/file_path>[\s\S]*?<file_status>deleted<\/file_status>[\s\S]*?<\/file>/g;
-  let deletedMatch: RegExpExecArray | null;
-  while (true) {
-    deletedMatch = deletedFileRegex.exec(response);
-    if (deletedMatch === null) break;
-    const [, path] = deletedMatch;
-    files.push({
-      path: path.trim(),
-      language: '',
-      content: '',
-      status: 'deleted',
-    });
-  }
+  files = handleDeletedFiles(files, response);
 
   return files;
 }

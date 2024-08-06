@@ -1,4 +1,4 @@
-import type { AIParsedResponse } from '../../types';
+import type { AIFileInfo, AIParsedResponse } from '../../types';
 import { ensureValidBranchName } from '../../utils/git-tools';
 
 export function parseCommonFields(response: string): Partial<AIParsedResponse> {
@@ -43,4 +43,26 @@ export function isResponseMalformed(result: AIParsedResponse): boolean {
     result.files.length === 0 &&
     result.gitCommitMessage === ''
   );
+}
+
+export function handleDeletedFiles(
+  files: AIFileInfo[],
+  response: string,
+): AIFileInfo[] {
+  // Handle deleted files
+  const deletedFileRegex =
+    /<file>[\s\S]*?<file_path>(.*?)<\/file_path>[\s\S]*?<file_status>deleted<\/file_status>[\s\S]*?<\/file>/g;
+  let deletedMatch: RegExpExecArray | null;
+  while (true) {
+    deletedMatch = deletedFileRegex.exec(response);
+    if (deletedMatch === null) break;
+    const [, path] = deletedMatch;
+    files.push({
+      path: path.trim(),
+      language: '',
+      content: '',
+      status: 'deleted',
+    });
+  }
+  return files;
 }

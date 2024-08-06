@@ -26,11 +26,9 @@ export function parseAICodegenResponse(
     const commonFields = parseCommonFields(response);
     result = { ...result, ...commonFields };
 
-    if (useDiffMode) {
-      result.files = parseSearchReplaceFiles(response);
-    } else {
-      result.files = parseFullContentFiles(response);
-    }
+    result.files = useDiffMode
+      ? parseSearchReplaceFiles(response)
+      : parseFullContentFiles(response);
 
     if (isResponseMalformed(result)) {
       throw new Error('Malformed response');

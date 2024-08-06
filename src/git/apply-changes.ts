@@ -133,8 +133,8 @@ function applyChange(content: string, search: string, replace: string): string {
 
   if (regex.test(content)) {
     return content.replace(regex, (match) => {
-      const leadingWhitespace = match.match(/^\s*/)[0];
-      const trailingWhitespace = match.match(/\s*$/)[0];
+      const leadingWhitespace = match.match(/^\s*/)?.[0] || '';
+      const trailingWhitespace = match.match(/\s*$/)?.[0] || '';
       return leadingWhitespace + trimmedReplace + trailingWhitespace;
     });
   }

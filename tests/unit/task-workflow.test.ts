@@ -173,6 +173,7 @@ describe('runAIAssistedTask', () => {
     const mockOptionsWithoutPlan = {
       ...mockOptions,
       plan: false,
+      diff: false,
     };
 
     await runAIAssistedTask(mockOptionsWithoutPlan);
@@ -190,6 +191,7 @@ describe('runAIAssistedTask', () => {
     expect(parseAICodegenResponse).toHaveBeenCalledWith(
       mockGeneratedCode,
       undefined,
+      false,
     );
 
     expect(ensureBranch).toHaveBeenCalledWith(
@@ -306,7 +308,12 @@ describe('runAIAssistedTask', () => {
     vi.mocked(applyChanges).mockResolvedValue();
     vi.mocked(getModelConfig).mockReturnValue(mockModelConfig);
 
-    await runAIAssistedTask(mockOptions);
+    const mockOptionsWithPlan = {
+      ...mockOptions,
+      diff: false,
+    };
+
+    await runAIAssistedTask(mockOptionsWithPlan);
 
     expect(getTaskDescription).toHaveBeenCalled();
     expect(getInstructions).toHaveBeenCalled();
@@ -321,6 +328,7 @@ describe('runAIAssistedTask', () => {
     expect(parseAICodegenResponse).toHaveBeenCalledWith(
       mockGeneratedCode,
       undefined,
+      false,
     );
 
     expect(ensureBranch).toHaveBeenCalledWith(
@@ -445,6 +453,7 @@ describe('runAIAssistedTask', () => {
     expect(parseAICodegenResponse).toHaveBeenCalledWith(
       mockGeneratedCode,
       undefined,
+      true,
     );
     expect(applyChanges).toHaveBeenCalledWith(
       expect.objectContaining({
