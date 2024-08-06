@@ -84,12 +84,20 @@ async function applyFileChange(
             await fs.writeFile(fullPath, updatedContent);
           } else if (file.changes) {
             let currentContent = await fs.readFile(fullPath, 'utf-8');
+            const appliedChanges = new Set();
             for (const change of file.changes) {
-              currentContent = applyChange(
-                currentContent,
-                change.search,
-                change.replace,
-              );
+              if (!appliedChanges.has(change.search)) {
+                currentContent = applyChange(
+                  currentContent,
+                  change.search,
+                  change.replace,
+                );
+                appliedChanges.add(change.search);
+              } else {
+                console.warn(
+                  `Skipping duplicate change for ${file.path}: ${change.search}`,
+                );
+              }
             }
             await fs.writeFile(fullPath, currentContent);
           } else if (file.content) {
@@ -129,7 +137,7 @@ function applyChange(content: string, search: string, replace: string): string {
 
   // If exact match fails, try matching with flexible whitespace
   const flexibleSearch = trimmedSearch.replace(/\s+/g, '\\s+');
-  const regex = new RegExp(flexibleSearch, 'g');
+  const regex = new RegExp(flexibleSearch);
 
   if (regex.test(content)) {
     return content.replace(regex, (match) => {
