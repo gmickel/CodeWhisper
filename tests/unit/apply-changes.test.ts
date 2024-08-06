@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { applyPatch } from 'diff';
 import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { applyChanges } from '../../src/git/apply-changes';
@@ -64,7 +63,8 @@ describe('applyChanges', () => {
     };
 
     vi.mocked(fs.readFile).mockResolvedValue(
-      'console.log("Old content");\nfunction oldFunction() {}',
+      // biome-ignore lint/suspicious/noExplicitAny: explicit any is required for the mock
+      'console.log("Old content");\nfunction oldFunction() {}' as any,
     );
 
     await applyChanges({
