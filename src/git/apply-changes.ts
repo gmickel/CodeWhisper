@@ -1,6 +1,6 @@
 import path from 'node:path';
 import chalk from 'chalk';
-import { applyPatch } from 'diff';
+import { applyPatch, createPatch } from 'diff';
 import fs from 'fs-extra';
 import type { AIFileInfo, ApplyChangesOptions } from '../types';
 
@@ -70,10 +70,33 @@ async function applyFileChange(
         } else {
           if (file.diff) {
             const currentContent = await fs.readFile(fullPath, 'utf-8');
-            const updatedContent = applyPatch(currentContent, file.diff);
-            if (updatedContent === false) {
+
+            // Generate the new content based on the diff
+            const newContent = file.diff.hunks.reduce((acc, hunk) => {
+              const lines = acc.split('\n');
+              const newLines = hunk.lines
+                .filter((line) => !line.startsWith('-'))
+                .map((line) => (line.startsWith('+') ? line.slice(1) : line));
+              lines.splice(hunk.newStart - 1, hunk.oldLines, ...newLines);
+              return lines.join('\n');
+            }, currentContent);
+
+            // Create the patch
+            const patchString = createPatch(
+              file.path,
+              currentContent,
+              newContent,
+              file.diff.oldFileName || file.path,
+              file.diff.newFileName || file.path,
+              { context: 3 },
+            );
+
+            // Apply the patch
+            const updatedContent = applyPatch(currentContent, patchString);
+
+            if (typeof updatedContent === 'boolean') {
               throw new Error(
-                `Failed to apply patch to file: ${file.path}\n A common cause is the the file was not sent to the LLM and it hallucinated the content. Try running the task again (task --redo) and selecting the problemtic file.`,
+                `Failed to apply patch to file: ${file.path}\nA common cause is that the file was not sent to the LLM and it hallucinated the content. Try running the task again (task --redo) and selecting the problematic file.`,
               );
             }
             await fs.writeFile(fullPath, updatedContent);
