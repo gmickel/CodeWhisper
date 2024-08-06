@@ -1,3 +1,10 @@
+## [1.13.4](https://github.com/gmickel/CodeWhisper/compare/v1.13.3...v1.13.4) (2024-08-06)
+
+
+### Bug Fixes
+
+* revert back to our working diff method ([#82](https://github.com/gmickel/CodeWhisper/issues/82)) ([8ba856a](https://github.com/gmickel/CodeWhisper/commit/8ba856ae1472ea8cfb4aad2f3cbbd2982274648e))
+
 ## [1.13.3](https://github.com/gmickel/CodeWhisper/compare/v1.13.2...v1.13.3) (2024-08-06)
 
 
