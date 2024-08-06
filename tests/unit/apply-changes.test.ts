@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { applyPatch, createPatch } from 'diff';
+import { applyPatch } from 'diff';
 import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { applyChanges } from '../../src/git/apply-changes';
@@ -13,7 +13,6 @@ vi.mock('diff', async () => {
   return {
     ...actual,
     applyPatch: vi.fn(),
-    createPatch: vi.fn(),
   };
 });
 
