@@ -43,6 +43,16 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     const taskCache = new TaskCache(basePath);
 
     const modelKey = await selectModel(options);
+
+    if (options.diff && modelKey !== 'claude-3-sonnet-20240229') {
+      console.log(
+        chalk.yellow(
+          'Diff-based code modifications are currently only supported with Claude 3.5 Sonnet. Falling back to full-file code modifications.',
+        ),
+      );
+      options.diff = false;
+    }
+
     const { taskDescription, instructions } = await getTaskInfo(
       options,
       basePath,
