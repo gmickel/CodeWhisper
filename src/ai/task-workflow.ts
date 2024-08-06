@@ -44,7 +44,7 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
 
     const modelKey = await selectModel(options);
 
-    if (options.diff && modelKey !== 'claude-3-sonnet-20240229') {
+    if (options.diff && modelKey !== 'claude-3-5-sonnet-20240620') {
       console.log(
         chalk.yellow(
           'Diff-based code modifications are currently only supported with Claude 3.5 Sonnet. Falling back to full-file code modifications.',
