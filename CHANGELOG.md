@@ -1,3 +1,10 @@
+## [1.13.2](https://github.com/gmickel/CodeWhisper/compare/v1.13.1...v1.13.2) (2024-08-06)
+
+
+### Bug Fixes
+
+* add correct version number to cli ([#79](https://github.com/gmickel/CodeWhisper/issues/79)) ([4ff493e](https://github.com/gmickel/CodeWhisper/commit/4ff493e8a566a31be7c6517b33da843af17f8f5f))
+
 ## [1.13.1](https://github.com/gmickel/CodeWhisper/compare/v1.13.0...v1.13.1) (2024-08-05)
 
 
