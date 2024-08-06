@@ -114,7 +114,12 @@ FORMAT: Instructions for how to format your response.
   FILE_CONTENT_OR_DIFF:
   - For new files: Provide the complete file content, including all necessary imports, function definitions, and
   exports.
-  - For modified files: Provide a unified diff format. Use '---' for removed lines and '+++' for added lines.
+  - For modified files: Provide a unified diff format. This MUST include:
+    1. File header lines (starting with "---" and "+++")
+    2. Hunk headers (starting with "@@")
+    3. Context lines (starting with a space)
+    4. Removed lines (starting with "-")
+    5. Added lines (starting with "+")
   - For deleted files: Leave this section empty.
 
   Ensure proper indentation and follow the project's coding standards.
@@ -125,28 +130,29 @@ FORMAT: Instructions for how to format your response.
   EXPLANATION: Provide a brief explanation for any significant design decisions or non-obvious implementations.
 
   When creating diffs for modified files:
+  - Always include file header lines with the correct file paths.
+  - Always include hunk headers with the correct line numbers.
   - Use '+' at the beginning of the line to indicate added lines, including new imports.
   - Use '-' at the beginning of the line to indicate removed lines.
   - Use ' ' (space) at the beginning of the line for unchanged lines (context).
-  - Ensure that new imports are marked with '+' at the beginning of the line.
   - Include at least 3 lines of unchanged context before and after changes to help with patch application.
 
   Example of a correct diff format:
   <file_content language="typescript">
-    --- src/types/index.ts
-    +++ src/types/index.ts
-    @@ -1,4 +1,6 @@
-     import type { ParsedDiff } from 'diff';
-    +import type { LogLevel } from '../utils/logger';
-    +
-     export interface GitHubIssue {
+  --- src/types/index.ts
+  +++ src/types/index.ts
+  @@ -1,4 +1,6 @@
+   import type { ParsedDiff } from 'diff';
+  +import type { LogLevel } from '../utils/logger';
+  +
+   export interface GitHubIssue {
      number: number;
      title: string;
-    @@ -40,6 +42,7 @@
-     | 'noCodeblock'
-     > & {
+  @@ -40,6 +42,7 @@
+   | 'noCodeblock'
+   > & {
      dryRun: boolean;
-    + logLevel?: LogLevel;
+  +  logLevel?: LogLevel;
      maxCostThreshold?: number;
      task?: string;
      description?: string;
@@ -173,22 +179,22 @@ FORMAT: Instructions for how to format your response.
     <file_path>src/components/IssueList.tsx</file_path>
     <file_status>new</file_status>
     <file_content language="tsx">
-      import React from 'react';
-      import { Issue } from '../types';
+  import React from 'react';
+  import { Issue } from '../types';
 
-      interface IssueListProps {
-        issues: Issue[];
-      }
+  interface IssueListProps {
+    issues: Issue[];
+  }
 
-      export const IssueList: React.FC<IssueListProps> = ({ issues }) => {
-        return (
-          <ul>
-            {issues.map((issue) => (
-              <li key={issue.id}>{issue.title}</li>
-            ))}
-          </ul>
-        );
-      };
+  export const IssueList: React.FC<IssueListProps> = ({ issues }) => {
+    return (
+      <ul>
+        {issues.map((issue) => (
+          <li key={issue.id}>{issue.title}</li>
+        ))}
+      </ul>
+    );
+  };
     </file_content>
     <explanation>
       Created a new IssueList component to display a list of issues. Used React.FC for type-safety and map function for
@@ -201,24 +207,24 @@ FORMAT: Instructions for how to format your response.
     <file_path>src/components/App.tsx</file_path>
     <file_status>modified</file_status>
     <file_content language="tsx">
-      --- src/components/App.tsx
-      +++ src/components/App.tsx
-      @@ -1,5 +1,6 @@
-       import React from 'react';
-       import { Header } from './Header';
-      +import { IssueList } from './IssueList';
+  --- src/components/App.tsx
+  +++ src/components/App.tsx
+  @@ -1,5 +1,6 @@
+   import React from 'react';
+   import { Header } from './Header';
+  +import { IssueList } from './IssueList';
 
-       export const App: React.FC = () => {
-         return (
-      @@ -7,6 +8,7 @@
-           <div>
-             <Header />
-             <main>
-      -        {/* TODO: Add issue list */}
-      +        <IssueList issues={[]} />
-             </main>
-           </div>
-         );
+   export const App: React.FC = () => {
+     return (
+  @@ -7,6 +8,7 @@
+       <div>
+         <Header />
+         <main>
+  -        {/* TODO: Add issue list */}
+  +        <IssueList issues={[]} />
+         </main>
+       </div>
+     );
     </file_content>
     <explanation>
       Updated App component to import and use the new IssueList component.
@@ -229,8 +235,8 @@ FORMAT: Instructions for how to format your response.
   - You have thoroughly analyzed the task and plan and have planned your implementation strategy.
   - Everything specified in the task description and plan is implemented.
   - All new files contain the full code.
-  - All modified files have accurate and clear diffs.
-  - Fiff formatting across all modified files is consistent.
+  - All modified files have accurate and clear diffs in the correct unified diff format.
+  - Diff formatting across all modified files is consistent and includes all required elements (file headers, hunk headers, context lines).
   - The content includes all necessary imports, function definitions, and exports.
   - The code is clean, maintainable, and efficient.
   - The code is properly formatted and follows the project's coding standards.
@@ -243,6 +249,7 @@ FORMAT: Instructions for how to format your response.
   - You complete all necessary work.
 
   Note: The accuracy of the diff format is crucial for successful patch application. Even small errors in formatting can
-  cause the entire patch to fail. Pay extra attention to the correctness of your diff output.
+  cause the entire patch to fail. Pay extra attention to the correctness of your diff output, ensuring all required
+  elements (file headers, hunk headers, context lines) are present and correctly formatted.
 
 </format>

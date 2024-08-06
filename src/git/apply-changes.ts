@@ -1,6 +1,6 @@
 import path from 'node:path';
 import chalk from 'chalk';
-import { applyPatch } from 'diff';
+import { applyPatch, createPatch } from 'diff';
 import fs from 'fs-extra';
 import type { AIFileInfo, ApplyChangesOptions } from '../types';
 
@@ -70,10 +70,23 @@ async function applyFileChange(
         } else {
           if (file.diff) {
             const currentContent = await fs.readFile(fullPath, 'utf-8');
-            const updatedContent = applyPatch(currentContent, file.diff);
-            if (updatedContent === false) {
+
+            // Convert the parsed diff back to a string
+            const patchString = createPatch(
+              file.path,
+              currentContent,
+              currentContent, // This will be ignored, but is required by the function
+              file.diff.oldFileName || file.path,
+              file.diff.newFileName || file.path,
+              { context: 3 },
+            );
+
+            // Apply the patch
+            const updatedContent = applyPatch(currentContent, patchString);
+
+            if (typeof updatedContent === 'boolean') {
               throw new Error(
-                `Failed to apply patch to file: ${file.path}\n A common cause is the the file was not sent to the LLM and it hallucinated the content. Try running the task again (task --redo) and selecting the problemtic file.`,
+                `Failed to apply patch to file: ${file.path}\nA common cause is that the file was not sent to the LLM and it hallucinated the content. Try running the task again (task --redo) and selecting the problematic file.`,
               );
             }
             await fs.writeFile(fullPath, updatedContent);
