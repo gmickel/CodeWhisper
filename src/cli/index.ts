@@ -94,7 +94,7 @@ export function cli(_args: string[]) {
     .option(
       '-df, --diff',
       'Use the new diff mode for AI-generated code modifications',
-      true,
+      false,
     )
     .option('--no-diff', 'Use full file content for updates')
     .option(
