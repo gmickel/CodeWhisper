@@ -168,3 +168,17 @@ export interface TaskData {
   timestamp: number;
   model: string;
 }
+
+export interface AIFileChange {
+  search: string;
+  replace: string;
+}
+
+export interface AIFileInfo {
+  path: string;
+  language: string;
+  content?: string;
+  changes?: AIFileChange[];
+  status: 'new' | 'modified' | 'deleted';
+  explanation?: string;
+}
