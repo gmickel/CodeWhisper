@@ -1,5 +1,6 @@
 import path from 'node:path';
 import chalk from 'chalk';
+import { applyPatch } from 'diff';
 import fs from 'fs-extra';
 import type { AIFileInfo, ApplyChangesOptions } from '../types';
 
@@ -52,15 +53,36 @@ async function applyFileChange(
           console.log(
             chalk.yellow(`[DRY RUN] Would modify file: ${file.path}`),
           );
-          file.changes?.forEach((change, index) => {
+          if (file.diff) {
             console.log(
               chalk.gray(
-                `[DRY RUN] Change ${index + 1} preview:\nSearch:\n${change.search.substring(0, 100)}${change.search.length > 100 ? '...' : ''}\nReplace:\n${change.replace.substring(0, 100)}${change.replace.length > 100 ? '...' : ''}`,
+                `[DRY RUN] Diff preview:\n${JSON.stringify(file.diff, null, 2)}`,
               ),
             );
-          });
+          } else if (file.changes) {
+            console.log(
+              chalk.gray(
+                `[DRY RUN] Changes preview:\n${JSON.stringify(file.changes, null, 2)}`,
+              ),
+            );
+          } else if (file.content) {
+            console.log(
+              chalk.gray(
+                `[DRY RUN] Content preview:\n${file.content.substring(0, 200)}${file.content.length > 200 ? '...' : ''}`,
+              ),
+            );
+          }
         } else {
-          if (file.changes && file.changes.length > 0) {
+          if (file.diff) {
+            const currentContent = await fs.readFile(fullPath, 'utf-8');
+            const updatedContent = applyPatch(currentContent, file.diff);
+            if (updatedContent === false) {
+              throw new Error(
+                `Failed to apply patch to file: ${file.path}\nA common cause is that the file was not sent to the LLM and it hallucinated the content. Try running the task again (task --redo) and selecting the problematic file.`,
+              );
+            }
+            await fs.writeFile(fullPath, updatedContent);
+          } else if (file.changes) {
             let currentContent = await fs.readFile(fullPath, 'utf-8');
             for (const change of file.changes) {
               currentContent = applyChange(
@@ -70,9 +92,11 @@ async function applyFileChange(
               );
             }
             await fs.writeFile(fullPath, currentContent);
+          } else if (file.content) {
+            await fs.writeFile(fullPath, file.content);
           } else {
             throw new Error(
-              `No changes provided for modified file: ${file.path}`,
+              `No content, diff, or changes provided for modified file: ${file.path}`,
             );
           }
           console.log(chalk.green(`Modified file: ${file.path}`));
@@ -108,7 +132,11 @@ function applyChange(content: string, search: string, replace: string): string {
   const regex = new RegExp(flexibleSearch, 'g');
 
   if (regex.test(content)) {
-    return content.replace(regex, trimmedReplace);
+    return content.replace(regex, (match) => {
+      const leadingWhitespace = match.match(/^\s*/)[0];
+      const trailingWhitespace = match.match(/\s*$/)[0];
+      return leadingWhitespace + trimmedReplace + trailingWhitespace;
+    });
   }
 
   throw new Error(

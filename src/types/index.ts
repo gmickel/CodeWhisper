@@ -178,6 +178,7 @@ export interface AIFileInfo {
   path: string;
   language: string;
   content?: string;
+  diff?: ParsedDiff;
   changes?: AIFileChange[];
   status: 'new' | 'modified' | 'deleted';
   explanation?: string;

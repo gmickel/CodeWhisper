@@ -409,6 +409,7 @@ async function generateAndApplyCode(
   const parsedResponse = parseAICodegenResponse(
     generatedCode,
     options.logAiInteractions,
+    options.diff,
   );
 
   if (options.dryRun) {

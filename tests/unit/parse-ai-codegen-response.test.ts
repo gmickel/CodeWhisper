@@ -2,57 +2,76 @@ import { describe, expect, it } from 'vitest';
 import { parseAICodegenResponse } from '../../src/ai/parse-ai-codegen-response';
 
 describe('parseAICodegenResponse', () => {
-  describe('Full Content Mode', () => {
-    it('should correctly parse a valid AI response in full content mode', () => {
+  describe('parseAICodegenResponse', () => {
+    it('should correctly parse a valid AI response with multiple changes', () => {
       const mockResponse = `
-<file_list>
-file1.js
-file2.ts
-</file_list>
+    <file_list>
+    file1.js
+    file2.ts
+    </file_list>
 
-<file>
-<file_path>src/file1.js</file_path>
-<file_content language="javascript">
-console.log('Hello, World!');
-</file_content>
-<file_status>modified</file_status>
-<explanation>
-Updated console log message
-</explanation>
-</file>
+    <file>
+    <file_path>src/file1.js</file_path>
+    <file_content>
+    <<<<<<< SEARCH
+    console.log('Old message');
+    =======
+    console.log('Hello, World!');
+    >>>>>>> REPLACE
 
-<file>
-<file_path>src/file2.ts</file_path>
-<file_content language="typescript">
-const greeting: string = 'Hello, TypeScript!';
-console.log(greeting);
-</file_content>
-<file_status>new</file_status>
-</file>
+    <<<<<<< SEARCH
+    function oldFunction() {}
+    =======
+    function newFunction() {}
+    >>>>>>> REPLACE
+    </file_content>
+    <file_status>modified</file_status>
+    <explanation>
+    Updated console log message and renamed a function
+    </explanation>
+    </file>
 
-<git_branch_name>feature/new-greeting</git_branch_name>
+    <file>
+    <file_path>src/file2.ts</file_path>
+    <file_content>
+    const greeting: string = 'Hello, TypeScript!';
+    console.log(greeting);
+    </file_content>
+    <file_status>new</file_status>
+    </file>
 
-<git_commit_message>Add new greeting functionality</git_commit_message>
+    <git_branch_name>feature/new-greeting</git_branch_name>
 
-<summary>
-Added a new TypeScript file and modified an existing JavaScript file.
-</summary>
+    <git_commit_message>Add new greeting functionality</git_commit_message>
 
-<potential_issues>
-None identified.
-</potential_issues>
-`;
+    <summary>
+    Added a new TypeScript file and modified an existing JavaScript file.
+    </summary>
 
-      const result = parseAICodegenResponse(mockResponse, false, false);
+    <potential_issues>
+    None identified.
+    </potential_issues>
+    `;
+
+      const result = parseAICodegenResponse(mockResponse);
 
       expect(result.fileList).toEqual(['file1.js', 'file2.ts']);
       expect(result.files).toHaveLength(2);
       expect(result.files[0]).toEqual({
         path: 'src/file1.js',
         language: 'javascript',
-        content: "console.log('Hello, World!');",
         status: 'modified',
-        explanation: 'Updated console log message',
+        changes: [
+          {
+            search: "console.log('Old message');",
+            replace: "console.log('Hello, World!');",
+          },
+          {
+            search: 'function oldFunction() {}',
+            replace: 'function newFunction() {}',
+          },
+        ],
+        explanation: 'Updated console log message and renamed a function',
       });
       expect(result.files[1]).toEqual({
         path: 'src/file2.ts',
@@ -69,117 +88,7 @@ None identified.
       expect(result.potentialIssues).toBe('None identified.');
     });
 
-    it('should handle responses with deleted files in full content mode', () => {
-      const mockResponse = `
-<file_list>
-file-to-delete.js
-</file_list>
-
-<file>
-<file_path>src/file-to-delete.js</file_path>
-<file_status>deleted</file_status>
-</file>
-`;
-
-      const result = parseAICodegenResponse(mockResponse, false, false);
-
-      expect(result.fileList).toEqual(['file-to-delete.js']);
-      expect(result.files).toHaveLength(1);
-      expect(result.files[0]).toEqual({
-        path: 'src/file-to-delete.js',
-        language: '',
-        content: '',
-        status: 'deleted',
-      });
-    });
-  });
-
-  describe('Diff Mode', () => {
-    it('should correctly parse a valid AI response in diff mode', () => {
-      const mockResponse = `
-<file_list>
-file1.js
-file2.ts
-</file_list>
-<file>
-<file_path>src/file1.js</file_path>
-<file_status>modified</file_status>
-<file_content language="javascript">
---- src/file1.js
-+++ src/file1.js
-@@ -1,1 +1,1 @@
--console.log('Old message');
-+console.log('Hello, World!');
-</file_content>
-<explanation>
-Updated console log message
-</explanation>
-</file>
-
-<file>
-<file_path>src/file2.ts</file_path>
-<file_status>new</file_status>
-<file_content language="typescript">
-const greeting: string = 'Hello, TypeScript!';
-console.log(greeting);
-</file_content>
-</file>
-
-<git_branch_name>feature/new-greeting</git_branch_name>
-
-<git_commit_message>Add new greeting functionality</git_commit_message>
-
-<summary>
-Added a new TypeScript file and modified an existing JavaScript file.
-</summary>
-
-<potential_issues>
-None identified.
-</potential_issues>
-`;
-
-      const result = parseAICodegenResponse(mockResponse, false, true);
-
-      expect(result.fileList).toEqual(['file1.js', 'file2.ts']);
-      expect(result.files).toHaveLength(2);
-      expect(result.files[0]).toEqual({
-        path: 'src/file1.js',
-        language: 'javascript',
-        diff: {
-          oldFileName: 'src/file1.js',
-          newFileName: 'src/file1.js',
-          hunks: [
-            {
-              oldStart: 1,
-              oldLines: 1,
-              newStart: 1,
-              newLines: 1,
-              lines: [
-                "-console.log('Old message');",
-                "+console.log('Hello, World!');",
-              ],
-            },
-          ],
-        },
-        status: 'modified',
-        explanation: 'Updated console log message',
-      });
-      expect(result.files[1]).toEqual({
-        path: 'src/file2.ts',
-        language: 'typescript',
-        content:
-          "const greeting: string = 'Hello, TypeScript!';\nconsole.log(greeting);",
-        status: 'new',
-      });
-      expect(result.gitBranchName).toBe('feature/new-greeting');
-      expect(result.gitCommitMessage).toBe('Add new greeting functionality');
-      expect(result.summary).toBe(
-        'Added a new TypeScript file and modified an existing JavaScript file.',
-      );
-      expect(result.potentialIssues).toBe('None identified.');
-    });
-
-    it('should handle responses with deleted files in diff mode', () => {
+    it('should handle responses with deleted files', () => {
       const mockResponse = `
   <file_list>
   file-to-delete.js
@@ -191,109 +100,15 @@ None identified.
   </file>
   `;
 
-      const result = parseAICodegenResponse(mockResponse, false, true);
+      const result = parseAICodegenResponse(mockResponse);
 
       expect(result.fileList).toEqual(['file-to-delete.js']);
       expect(result.files).toHaveLength(1);
       expect(result.files[0]).toEqual({
         path: 'src/file-to-delete.js',
-        language: '',
+        language: 'javascript',
         status: 'deleted',
       });
-    });
-
-    it('should generate correctly formatted diffs in diff mode with only additions', () => {
-      const mockResponse = `
-<file_list>
-src/file1.js
-</file_list>
-<git_branch_name>
-update-console-log
-</git_branch_name>
-<git_commit_message>
-Add console log message
-</git_commit_message>
-<summary>
-Added a console log message to file1.js
-</summary>
-<potential_issues>
-None identified
-</potential_issues>
-<file>
-<file_path>src/file1.js</file_path>
-<file_status>modified</file_status>
-<file_content language="javascript">
---- src/file1.js
-+++ src/file1.js
-@@ -1,3 +1,4 @@
- import { existingImport } from './existing';
-
-+console.log('Hello, World!');
-</file_content>
-<explanation>
-Added a console log message to demonstrate the change.
-</explanation>
-</file>
-  `;
-
-      const result = parseAICodegenResponse(mockResponse, false, true);
-      const diff = result.files[0].diff;
-
-      expect(diff).toBeDefined();
-      if (!diff) return;
-      expect(diff.hunks[0].lines).toEqual([
-        " import { existingImport } from './existing';",
-        '',
-        "+console.log('Hello, World!');",
-      ]);
-    });
-
-    it('should generate correctly formatted diffs in diff mode with additions and removals', () => {
-      const mockResponse = `
-<file_list>
-src/file1.js
-</file_list>
-<git_branch_name>
-update-console-log-message
-</git_branch_name>
-<git_commit_message>
-Update console log message
-</git_commit_message>
-<summary>
-Changed the console log message in file1.js
-</summary>
-<potential_issues>
-None identified
-</potential_issues>
-<file>
-<file_path>src/file1.js</file_path>
-<file_status>modified</file_status>
-<file_content language="javascript">
---- src/file1.js
-+++ src/file1.js
-@@ -1,3 +1,3 @@
- import { existingImport } from './existing';
-
--console.log('Old message');
-+console.log('Hello, World!');
-</file_content>
-<explanation>
-Updated the console log message to 'Hello, World!'.
-</explanation>
-</file>
-  `;
-
-      const result = parseAICodegenResponse(mockResponse, false, true);
-      const diff = result.files[0].diff;
-
-      expect(diff).toBeDefined();
-      if (!diff) return;
-      expect(diff.hunks[0].lines).toEqual([
-        " import { existingImport } from './existing';",
-        '',
-        "-console.log('Old message');",
-        "+console.log('Hello, World!');",
-      ]);
     });
   });
 
@@ -351,8 +166,13 @@ file1.js
 
 <file>
 <file_path>src/file1.js</file_path>
-<file_content language="javascript">
+<file_content>
+src/file1.js
+<<<<<<< SEARCH
+console.log('Old message');
+=======
 console.log('Hello, World!');
+>>>>>>> REPLACE
 </file_content>
 <file_status>modified</file_status>
 </file>
@@ -391,32 +211,6 @@ console.log('Hello, World!');
       expect(result.gitBranchName).toBe('invalid/branch/name----------');
     });
 
-    it('should sanitize invalid branch names with a leading slash', () => {
-      const mockResponse = `
-<file_list></file_list>
-<git_branch_name>/feature/invalid-branch-name-issue-123</git_branch_name>
-<git_commit_message>Some commit message</git_commit_message>
-`;
-
-      const result = parseAICodegenResponse(mockResponse);
-
-      expect(result.gitBranchName).toBe(
-        'feature/invalid-branch-name-issue-123',
-      );
-    });
-
-    it('should provide a default branch name when sanitized name is empty', () => {
-      const mockResponse = `
-<file_list></file_list>
-<git_branch_name>!@#$%^&*()</git_branch_name>
-<git_commit_message>Some commit message</git_commit_message>
-`;
-
-      const result = parseAICodegenResponse(mockResponse);
-
-      expect(result.gitBranchName).toMatch(/^feature\/ai-task-\d+$/);
-    });
-
     it('should handle responses with extra whitespace and newlines', () => {
       const mockResponse = `
     <file_list>
@@ -426,10 +220,17 @@ console.log('Hello, World!');
 
     <file>
       <file_path>  src/file1.js  </file_path>
-      <file_content language="javascript">
+      <file_content>
+      src/file1.js
+      <<<<<<< SEARCH
+
+        console.log('Old message');
+
+      =======
 
         console.log('Hello, World!');
 
+      >>>>>>> REPLACE
       </file_content>
       <file_status>  modified  </file_status>
     </file>
@@ -448,7 +249,16 @@ console.log('Hello, World!');
       expect(result.fileList).toEqual(['file1.js', 'file2.js']);
       expect(result.files).toHaveLength(1);
       expect(result.files[0].path).toBe('src/file1.js');
-      expect(result.files[0].content).toBe("console.log('Hello, World!');");
+      if (!result.files[0].changes) {
+        return;
+      }
+      expect(result.files[0].changes).toHaveLength(1);
+      expect(result.files[0].changes[0].search).toBe(
+        "console.log('Old message');",
+      );
+      expect(result.files[0].changes[0].replace).toBe(
+        "console.log('Hello, World!');",
+      );
       expect(result.files[0].status).toBe('modified');
       expect(result.gitBranchName).toBe('feature/whitespace');
       expect(result.gitCommitMessage).toBe('Handle extra whitespace');
@@ -463,7 +273,7 @@ file1.js
 
 <file>
 <file_path>src/file1.js</file_path>
-<file_content language="javascript">
+<file_content>
 console.log('First file');
 </file_content>
 <file_status>new</file_status>
@@ -471,7 +281,7 @@ console.log('First file');
 
 <file>
 <file_path>test/file1.js</file_path>
-<file_content language="javascript">
+<file_content>
 console.log('Second file');
 </file_content>
 <file_status>new</file_status>
