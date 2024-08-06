@@ -65,11 +65,7 @@ Then, for each file:
 <file>
 <file_path>__FILE_PATH__</file_path>
 <file_content>
-<<<<<<< SEARCH
-__ORIGINAL_CONTENT__
-=======
-__MODIFIED_CONTENT__
->>>>>>> REPLACE
+__CONTENT_OR_SEARCH_REPLACE_BLOCK__
 </file_content>
 <file_status>__STATUS__</file_status>
 <explanation>
@@ -77,50 +73,87 @@ __EXPLANATION__ (if necessary)
 </explanation>
 </file>
 
-Please adhere to the following guidelines:
+File Handling Instructions:
 
-FILE_PATH: Use the full path from the project root, without any leading dots.
-Example: 'src/components/Button.tsx'
+1. For modified files:
+   Use SEARCH/REPLACE blocks as described in the SEARCH/REPLACE Block Rules below.
 
-For modified files:
-- Use one or more SEARCH/REPLACE blocks within the <file_content> tags.
-- Each SEARCH/REPLACE block should focus on a specific, minimal change.
-- Provide sufficient context in the SEARCH block to uniquely identify the location of the change, but keep it as small as possible.
-- For large changes, break them down into multiple smaller SEARCH/REPLACE blocks.
-- Ensure that the SEARCH content exists exactly as specified in the file.
-- For changes to object literals or nested structures, focus on the specific key or value being changed, rather than the entire structure.
-- Include some unchanged lines before and after the change to provide context.
-- Limit each SEARCH/REPLACE block to a maximum of 10-15 lines for better accuracy.
+2. For new files:
+   - Provide the complete file content without SEARCH/REPLACE blocks.
+   - Set the file status to 'new'.
+   - Include the full path of the new file.
 
-Please adhere to the following guidelines for SEARCH/REPLACE blocks in modified files:
+3. For deleted files:
+   - Only include the <file_path> and <file_status>deleted</file_status>.
 
-1. Provide sufficient context: Include enough surrounding code to uniquely identify the location of the change, typically 2-3 lines before and after the modified section.
+SEARCH/REPLACE Block Rules (for modified files only):
 
-2. Keep changes focused: Each SEARCH/REPLACE block should address a single, specific change. For multiple changes in a file, use multiple blocks.
+1. Every SEARCH/REPLACE block must use this exact format:
+   <<<<<<< SEARCH
+   [Exact existing code]
+   =======
+   [Modified code]
+   >>>>>>> REPLACE
 
-3. Maintain exact matching: Ensure the SEARCH content exists exactly as specified in the original file, including whitespace and indentation.
+2. Every SEARCH section must EXACTLY MATCH the existing source code, character for character, including all comments, docstrings, whitespace, etc.
 
-4. Limit block size: Keep each SEARCH/REPLACE block to a maximum of 10-15 lines for better accuracy.
+3. SEARCH/REPLACE blocks will replace ALL matching occurrences.
 
-5. Preserve structure: For changes within functions, classes, or nested structures, include the enclosing context (e.g., function signature, class declaration).
+4. Include enough lines to make the SEARCH blocks uniquely match the lines to change.
 
-6. Handle imports: When adding new imports, include the entire import section in the SEARCH block, even if only adding one line.
+5. Keep SEARCH/REPLACE blocks concise. Break large SEARCH/REPLACE blocks into a series of smaller blocks that each change a small portion of the file.
 
-7. Comment changes: If modifying comments, include them in the SEARCH/REPLACE blocks.
+6. Include just the changing lines, and a few surrounding lines if needed for uniqueness. Do not include long runs of unchanging lines in SEARCH/REPLACE blocks.
 
-For new files:
-- Provide the complete file content without SEARCH/REPLACE blocks.
+7. Only create SEARCH/REPLACE blocks for files that are part of the given codebase or that you've been explicitly told exist!
 
-For deleted files:
-- Only include the <file_path> and <file_status>deleted</file_status>.
+8. To move code within a file, use 2 SEARCH/REPLACE blocks: 1 to delete it from its current location, 1 to insert it in the new location.
 
-STATUS: Use 'new' for newly created files, 'modified' for existing files that are being updated, and 'deleted' for files that are being deleted.
+Examples:
 
-EXPLANATION: Provide a brief explanation for any significant design decisions or non-obvious implementations.
+1. Modifying a JSON configuration file:
 
-Examples of good SEARCH/REPLACE blocks for different scenarios:
+<file>
+<file_path>src/config/app-config.json</file_path>
+<file_content>
+<<<<<<< SEARCH
+{
+  "apiVersion": "v1",
+  "server": {
+    "port": 3000,
+    "host": "localhost"
+  },
+  "database": {
+    "url": "mongodb://localhost:27017/myapp",
+    "name": "myapp"
+  }
+}
+=======
+{
+  "apiVersion": "v2",
+  "server": {
+    "port": 3000,
+    "host": "localhost"
+  },
+  "database": {
+    "url": "mongodb://localhost:27017/myapp",
+    "name": "myapp"
+  },
+  "cache": {
+    "type": "redis",
+    "url": "redis://localhost:6379"
+  }
+}
+>>>>>>> REPLACE
+</file_content>
+<file_status>modified</file_status>
+<explanation>
+Updated API version to v2 and added cache configuration for Redis.
+</explanation>
+</file>
 
-1. Modifying a function:
+2. Modifying a TypeScript function:
+
 <file>
 <file_path>src/utils/data-processor.ts</file_path>
 <file_content>
@@ -138,6 +171,7 @@ export function processData(data: any[]): ProcessedData {
     id: item.id,
     name: item.name.toUpperCase(),
     value: item.value * 2,
+    processed: true,
     timestamp: new Date().toISOString()
   }));
 }
@@ -145,59 +179,14 @@ export function processData(data: any[]): ProcessedData {
 </file_content>
 <file_status>modified</file_status>
 <explanation>
-Added a timestamp field to each processed item for better tracking.
+Enhanced processData function to include 'processed' flag and timestamp in the output.
 </explanation>
 </file>
 
-2. Adding a new import:
-<file>
-<file_path>src/components/UserProfile.tsx</file_path>
-<file_content>
-<<<<<<< SEARCH
-import React from 'react';
-import { User } from '../types';
-import { Avatar } from './Avatar';
-=======
-import React from 'react';
-import { User } from '../types';
-import { Avatar } from './Avatar';
-import { formatDate } from '../utils/date-helpers';
->>>>>>> REPLACE
-</file_content>
-<file_status>modified</file_status>
-<explanation>
-Imported the formatDate utility function to properly display user dates.
-</explanation>
-</file>
+3. Example for a new file:
 
-3. Modifying a configuration object:
 <file>
-<file_path>src/config/app-config.ts</file_path>
-<file_content>
-<<<<<<< SEARCH
-export const CONFIG = {
-  apiUrl: 'https://api.example.com',
-  timeout: 5000,
-  retryAttempts: 3,
-};
-=======
-export const CONFIG = {
-  apiUrl: 'https://api.example.com',
-  timeout: 5000,
-  retryAttempts: 3,
-  cacheTimeout: 60000,
-};
->>>>>>> REPLACE
-</file_content>
-<file_status>modified</file_status>
-<explanation>
-Added a cacheTimeout configuration to implement response caching.
-</explanation>
-</file>
-
-Example for a new file:
-<file>
-<file_path>src/utils/helpers.ts</file_path>
+<file_path>src/utils/new-helper.ts</file_path>
 <file_content>
 import { useState, useEffect } from 'react';
 
@@ -219,16 +208,17 @@ export const useDebounce = (value: any, delay: number) => {
 </file_content>
 <file_status>new</file_status>
 <explanation>
-Created a new utility hook for debouncing values, useful for optimizing performance in input fields or search functionality.
+Created a new utility function for debouncing values, useful for optimizing performance in input fields or search functionality.
 </explanation>
 </file>
 
-Example for a deleted file:
+4. Example for a deleted file:
+
 <file>
-<file_path>src/deprecated/OldComponent.tsx</file_path>
+<file_path>src/deprecated/old-utility.ts</file_path>
 <file_status>deleted</file_status>
 <explanation>
-Removed deprecated component that is no longer used in the project.
+Removed deprecated utility file as its functions have been replaced by new-helper.ts
 </explanation>
 </file>
 
@@ -248,6 +238,8 @@ Ensure that:
 - You complete all necessary work to fully implement the task.
 - SEARCH blocks contain enough context to uniquely identify the location of changes.
 - Each SEARCH/REPLACE block is focused and minimal, targeting specific changes.
+
+ONLY EVER RETURN CODE IN A SEARCH/REPLACE BLOCK FOR MODIFIED FILES!
 </format>
 ---
-Now, implement the task described above. Take your time to think through the problem and craft an elegant, efficient, and complete solution that fully addresses the task requirements and integrates seamlessly with the existing codebase.
+Now, implement the task described above, following the provided implementation plan. Take your time to think through the problem and craft an elegant, efficient, and complete solution that fully addresses the task requirements and integrates seamlessly with the existing codebase.
