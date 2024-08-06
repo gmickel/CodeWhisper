@@ -1,3 +1,10 @@
+## [1.13.6](https://github.com/gmickel/CodeWhisper/compare/v1.13.5...v1.13.6) (2024-08-06)
+
+
+### Bug Fixes
+
+* model check for diff mode ([d64ce8c](https://github.com/gmickel/CodeWhisper/commit/d64ce8c3b0ca89fbfac67bddf2bf66ad1bb1ddb2))
+
 ## [1.13.5](https://github.com/gmickel/CodeWhisper/compare/v1.13.4...v1.13.5) (2024-08-06)
 
 
