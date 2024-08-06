@@ -71,11 +71,21 @@ async function applyFileChange(
           if (file.diff) {
             const currentContent = await fs.readFile(fullPath, 'utf-8');
 
-            // Convert the parsed diff back to a string
+            // Generate the new content based on the diff
+            const newContent = file.diff.hunks.reduce((acc, hunk) => {
+              const lines = acc.split('\n');
+              const newLines = hunk.lines
+                .filter((line) => !line.startsWith('-'))
+                .map((line) => (line.startsWith('+') ? line.slice(1) : line));
+              lines.splice(hunk.newStart - 1, hunk.oldLines, ...newLines);
+              return lines.join('\n');
+            }, currentContent);
+
+            // Create the patch
             const patchString = createPatch(
               file.path,
               currentContent,
-              currentContent, // This will be ignored, but is required by the function
+              newContent,
               file.diff.oldFileName || file.path,
               file.diff.newFileName || file.path,
               { context: 3 },
