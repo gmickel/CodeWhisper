@@ -340,7 +340,11 @@ describe('runAIAssistedTask', () => {
   });
 
   it('should handle diff-based updates when --diff flag is used', async () => {
-    const diffOptions = { ...mockOptions, diff: true };
+    const diffOptions = {
+      ...mockOptions,
+      model: 'claude-3-sonnet-20240229',
+      diff: true,
+    };
 
     const mockTaskDescription = 'Test diff-based task';
     const mockInstructions = 'Test diff-based instructions';
