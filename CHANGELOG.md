@@ -1,3 +1,11 @@
+## [1.13.5](https://github.com/gmickel/CodeWhisper/compare/v1.13.4...v1.13.5) (2024-08-06)
+
+
+### Bug Fixes
+
+* set diff mode to be default false ([14165ac](https://github.com/gmickel/CodeWhisper/commit/14165ac923202619c0a5d15fe8a7f3f48151fe1e))
+* test ([5800e15](https://github.com/gmickel/CodeWhisper/commit/5800e15695706f294550cd94f0f27196c967ec22))
+
 ## [1.13.4](https://github.com/gmickel/CodeWhisper/compare/v1.13.3...v1.13.4) (2024-08-06)
 
 
