@@ -85,16 +85,35 @@ __EXPLANATION__ (if necessary)
 
 Please adhere to the following guidelines:
 
-FILE_PATH: Use the full path from the project root.
+FILE_PATH: Use the full path from the project root, without any leading dots.
 Example: 'src/components/Button.tsx'
 
 For modified files:
 - Use one or more SEARCH/REPLACE blocks within the <file_content> tags.
-- Each SEARCH/REPLACE block should focus on a specific change.
-- You can include multiple SEARCH/REPLACE blocks for a single file if needed.
-- IMPORTANT: Provide sufficient context in the SEARCH block to uniquely identify the location of the change. Include surrounding code, function names, or object structures to ensure the change can be accurately applied.
-- For changes to object literals or nested structures, include the full key path and surrounding context in the search pattern.
+- Each SEARCH/REPLACE block should focus on a specific, minimal change.
+- Provide sufficient context in the SEARCH block to uniquely identify the location of the change, but keep it as small as possible.
+- For large changes, break them down into multiple smaller SEARCH/REPLACE blocks.
+- Ensure that the SEARCH content exists exactly as specified in the file.
+- For changes to object literals or nested structures, focus on the specific key or value being changed, rather than the entire structure.
 - If adding a new item to an object or array, include the entire opening of the structure in the search pattern.
+- Include some unchanged lines before and after the change to provide context.
+- Limit each SEARCH/REPLACE block to a maximum of 10-15 lines for better accuracy.
+
+Please adhere to the following guidelines for SEARCH/REPLACE blocks in modified files:
+
+1. Provide sufficient context: Include enough surrounding code to uniquely identify the location of the change, typically 2-3 lines before and after the modified section.
+
+2. Keep changes focused: Each SEARCH/REPLACE block should address a single, specific change. For multiple changes in a file, use multiple blocks.
+
+3. Maintain exact matching: Ensure the SEARCH content exists exactly as specified in the original file, including whitespace and indentation.
+
+4. Limit block size: Keep each SEARCH/REPLACE block to a maximum of 10-15 lines for better accuracy.
+
+5. Preserve structure: For changes within functions, classes, or nested structures, include the enclosing context (e.g., function signature, class declaration).
+
+6. Handle imports: When adding new imports, include the entire import section in the SEARCH block, even if only adding one line.
+
+7. Comment changes: If modifying comments, include them in the SEARCH/REPLACE blocks.
 
 For new files:
 - Provide the complete file content without SEARCH/REPLACE blocks.
@@ -106,50 +125,80 @@ STATUS: Use 'new' for newly created files, 'modified' for existing files that ar
 
 EXPLANATION: Provide a brief explanation for any significant design decisions or non-obvious implementations.
 
-Example for a modified file with multiple changes and good context:
+Examples of good SEARCH/REPLACE blocks for different scenarios:
+
+1. Modifying a function:
 <file>
-<file_path>src/ai/model-config.ts</file_path>
+<file_path>src/utils/data-processor.ts</file_path>
 <file_content>
 <<<<<<< SEARCH
-export const MODEL_CONFIGS: ModelSpecs = {
-  'claude-3-5-sonnet-20240620': {
-    contextWindow: 200000,
-    maxOutput: 8192,
-    modelName: 'Claude 3.5 Sonnet',
-    pricing: { inputCost: 3, outputCost: 15 },
-    modelFamily: 'claude',
-    temperature: {
-      planningTemperature: 0.5,
-      codegenTemperature: 0.3,
-    },
-  },
+export function processData(data: any[]): ProcessedData {
+  return data.map(item => ({
+    id: item.id,
+    name: item.name.toUpperCase(),
+    value: item.value * 2
+  }));
+}
+=======
+export function processData(data: any[]): ProcessedData {
+  return data.map(item => ({
+    id: item.id,
+    name: item.name.toUpperCase(),
+    value: item.value * 2,
+    timestamp: new Date().toISOString()
+  }));
+}
+>>>>>>> REPLACE
+</file_content>
+<file_status>modified</file_status>
+<explanation>
+Added a timestamp field to each processed item for better tracking.
+</explanation>
+</file>
+
+2. Adding a new import:
+<file>
+<file_path>src/components/UserProfile.tsx</file_path>
+<file_content>
+<<<<<<< SEARCH
+import React from 'react';
+import { User } from '../types';
+import { Avatar } from './Avatar';
+=======
+import React from 'react';
+import { User } from '../types';
+import { Avatar } from './Avatar';
+import { formatDate } from '../utils/date-helpers';
+>>>>>>> REPLACE
+</file_content>
+<file_status>modified</file_status>
+<explanation>
+Imported the formatDate utility function to properly display user dates.
+</explanation>
+</file>
+
+3. Modifying a configuration object:
+<file>
+<file_path>src/config/app-config.ts</file_path>
+<file_content>
+<<<<<<< SEARCH
+export const CONFIG = {
+  apiUrl: 'https://api.example.com',
+  timeout: 5000,
+  retryAttempts: 3,
 };
 =======
-export const MODEL_CONFIGS: ModelSpecs = {
-  'claude-3-5-sonnet-20240620': {
-    contextWindow: 200000,
-    maxOutput: 8192,
-    modelName: 'Claude 3.5 Sonnet',
-    pricing: { inputCost: 3, outputCost: 15 },
-    modelFamily: 'claude',
-    temperature: {
-      planningTemperature: 0.5,
-      codegenTemperature: 0.3,
-    },
-  },
-  'deepseek-coder': {
-    contextWindow: 128000,
-    maxOutput: 8000,
-    modelName: 'DeepSeek-Coder',
-    pricing: { inputCost: 0.14, outputCost: 0.28 },
-    modelFamily: 'openai-compatible',
-  },
+export const CONFIG = {
+  apiUrl: 'https://api.example.com',
+  timeout: 5000,
+  retryAttempts: 3,
+  cacheTimeout: 60000,
 };
 >>>>>>> REPLACE
 </file_content>
 <file_status>modified</file_status>
 <explanation>
-Added a new model configuration for DeepSeek-Coder to the MODEL_CONFIGS object, including its context window, max output, pricing, and model family.
+Added a cacheTimeout configuration to implement response caching.
 </explanation>
 </file>
 
@@ -205,4 +254,7 @@ Ensure that:
 - Your code is easy to understand and maintain.
 - You complete all necessary work to fully implement the task.
 - SEARCH blocks contain enough context to uniquely identify the location of changes.
+- Each SEARCH/REPLACE block is focused and minimal, targeting specific changes.
 </format>
+---
+Now, implement the task described above, following the provided implementation plan. Take your time to think through the problem and craft an elegant, efficient, and complete solution that fully addresses the task requirements and integrates seamlessly with the existing codebase.
