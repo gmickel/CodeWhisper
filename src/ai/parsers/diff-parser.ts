@@ -7,7 +7,8 @@ export function parseDiffFiles(response: string): AIFileInfo[] {
   const fileRegex =
     /<file>[\s\S]*?<file_path>(.*?)<\/file_path>[\s\S]*?<file_status>(.*?)<\/file_status>[\s\S]*?<file_content language="(.*?)">([\s\S]*?)<\/file_content>(?:[\s\S]*?<explanation>([\s\S]*?)<\/explanation>)?[\s\S]*?<\/file>/gs;
   let match: RegExpExecArray | null;
-  // biome-ignore lint/suspicious/noAssignInExpressions: avoid potential infinite loop
+
+  // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
   while ((match = fileRegex.exec(response)) !== null) {
     const [, path, status, language, content, explanation] = match;
     const fileInfo: AIFileInfo = {
@@ -19,14 +20,8 @@ export function parseDiffFiles(response: string): AIFileInfo[] {
 
     if (status.trim() === 'modified') {
       try {
-        // First, try parsing the content as-is
-        let parsedDiff = parsePatch(content);
-
-        // If parsing fails or results in empty hunks, try with normalized content
-        if (parsedDiff.length === 0 || parsedDiff[0].hunks.length === 0) {
-          const normalizedContent = content.trim().replace(/\r\n/g, '\n');
-          parsedDiff = parsePatch(normalizedContent);
-        }
+        const normalizedContent = content.trim().replace(/\r\n/g, '\n');
+        const parsedDiff = parsePatch(normalizedContent);
 
         if (parsedDiff.length > 0 && parsedDiff[0].hunks.length > 0) {
           const diff = parsedDiff[0];
@@ -57,7 +52,8 @@ export function parseDiffFiles(response: string): AIFileInfo[] {
   const deletedFileRegex =
     /<file>[\s\S]*?<file_path>(.*?)<\/file_path>[\s\S]*?<file_status>deleted<\/file_status>[\s\S]*?<\/file>/g;
   let deletedMatch: RegExpExecArray | null;
-  // biome-ignore lint/suspicious/noAssignInExpressions: Avoid potential infinite loop
+
+  // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
   while ((deletedMatch = deletedFileRegex.exec(response)) !== null) {
     const [, path] = deletedMatch;
     files.push({

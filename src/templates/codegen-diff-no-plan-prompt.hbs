@@ -75,7 +75,6 @@ FORMAT: Instructions for how to format your response.
 
   <potential_issues>
     __LIST_OF_POTENTIAL_ISSUES_OR_TRADE_OFFS__
-    Include any constraints (e.g., performance, scalability, maintainability) you've considered and explain why the trade-offs you've made are appropriate for this task.
   </potential_issues>
 
   Then, for each file:
@@ -86,7 +85,7 @@ FORMAT: Instructions for how to format your response.
       __FILE_CONTENT_OR_DIFF__
     </file_content>
     <explanation>
-      __EXPLANATION__
+      __EXPLANATION__ (if necessary)
     </explanation>
   </file>
 
@@ -103,15 +102,22 @@ FORMAT: Instructions for how to format your response.
   etc
 
   FILE_CONTENT_OR_DIFF:
-  - For new files: Provide the complete file content, including all necessary imports, function definitions, and exports.
-  - For modified files: Provide a unified diff format. Use '---' for removed lines and '+++' for added lines.
+  - For new files: Provide the complete file content, including all necessary imports, function definitions, and
+  exports.
+  - For modified files: Provide a unified diff format. This MUST include:
+    1. File header lines (starting with "---" and "+++")
+    2. Hunk headers (starting with "@@")
+    3. Context lines (starting with a space)
+    4. Removed lines (starting with "-")
+    5. Added lines (starting with "+")
   - For deleted files: Leave this section empty.
 
   Ensure proper indentation and follow the project's coding standards.
 
-  STATUS: Use 'new' for newly created files, 'modified' for existing files that are being updated, and 'deleted' for files that are being deleted.
+  STATUS: Use 'new' for newly created files, 'modified' for existing files that are being updated, and 'deleted' for
+  files that are being deleted.
 
-  EXPLANATION: Provide a brief explanation for your implementation choices, including any significant design decisions, alternatives considered, and reasons for your final decision. Address any non-obvious implementations or optimizations.
+  EXPLANATION: Provide a brief explanation for any significant design decisions or non-obvious implementations.
 
   When creating diffs for modified files:
   - Always include file header lines with the correct file paths.
@@ -142,7 +148,8 @@ FORMAT: Instructions for how to format your response.
      description?: string;
   </file_content>
 
-  Before modifying a file, carefully review its entire content. Ensure that your changes, especially new imports, are placed in the correct location and don't duplicate existing code.
+  Before modifying a file, carefully review its entire content. Ensure that your changes, especially new imports, are
+  placed in the correct location and don't duplicate existing code.
 
   When generating diffs:
   1. Start with the original file content.
@@ -157,7 +164,7 @@ FORMAT: Instructions for how to format your response.
   added/removed lines.
   - Check that there are sufficient unchanged context lines around modifications.
 
-    Example for a new file:
+  Example for a new file:
   <file>
     <file_path>src/components/IssueList.tsx</file_path>
     <file_status>new</file_status>
@@ -216,12 +223,13 @@ FORMAT: Instructions for how to format your response.
 
 
   Ensure that:
-  - You have thoroughly analyzed the task and planned your implementation strategy.
+  - You have thoroughly analyzed the task description and have planned your implementation strategy.
   - Everything specified in the task description and instructions is implemented.
   - All new files contain the full code.
-  - All modified files have accurate and clear diffs.
+  - All modified files have accurate and clear diffs in the correct unified diff format.
+  - Diff formatting across all modified files is consistent and includes all required elements (file headers, hunk headers, context lines).
   - The content includes all necessary imports, function definitions, and exports.
-  - The code is clean, maintainable, efficient, and considers performance implications.
+  - The code is clean, maintainable, and efficient.
   - The code is properly formatted and follows the project's coding standards.
   - Necessary comments for clarity are included if needed.
   - Any conceptual or high-level descriptions are translated into actual, executable code.
@@ -229,9 +237,11 @@ FORMAT: Instructions for how to format your response.
   - Your changes are consistent with the existing codebase.
   - You haven't introduced any potential bugs or performance issues.
   - Your code is easy to understand and maintain.
-  - You complete all necessary work to fully implement the task.
+  - You complete all necessary work.
 
-  Note: The accuracy of the diff format is crucial for successful patch application. Even small errors in formatting can cause the entire patch to fail. Pay extra attention to the correctness of your diff output.
+  Note: The accuracy of the diff format is crucial for successful patch application. Even small errors in formatting can
+  cause the entire patch to fail. Pay extra attention to the correctness of your diff output, ensuring all required
+  elements (file headers, hunk headers, context lines) are present and correctly formatted.
 
 </format>
 

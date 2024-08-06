@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { applyPatch, createPatch } from 'diff';
+import { applyPatch } from 'diff';
 import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { applyChanges } from '../../src/git/apply-changes';
@@ -13,7 +13,6 @@ vi.mock('diff', async () => {
   return {
     ...actual,
     applyPatch: vi.fn(),
-    createPatch: vi.fn(),
   };
 });
 
@@ -212,6 +211,7 @@ describe('applyChanges', () => {
   });
 
   it('should apply diffs for modified files when provided', async () => {
+    const mockBasePath = '/mock/base/path';
     const mockParsedResponse = {
       fileList: ['modified-file.js'],
       files: [
@@ -246,35 +246,29 @@ describe('applyChanges', () => {
     const oldContent = 'console.log("Old content");';
     const newContent = 'console.log("New content");';
 
-    // biome-ignore lint/suspicious/noExplicitAny: explicit any is fine here
+    // biome-ignore lint/suspicious/noExplicitAny: explicit any is fine here, we're mocking fs.readFile
     vi.mocked(fs.readFile).mockResolvedValue(oldContent as any);
-    vi.mocked(createPatch).mockReturnValue('mocked patch string');
     vi.mocked(applyPatch).mockReturnValue(newContent);
 
     await applyChanges({
       basePath: mockBasePath,
-      parsedResponse: {
-        ...mockParsedResponse,
-        files: [
-          {
-            ...mockParsedResponse.files[0],
-            status: 'modified' as const,
-          },
-        ],
-      },
+      parsedResponse: mockParsedResponse as AIParsedResponse,
       dryRun: false,
     });
 
     expect(fs.readFile).toHaveBeenCalledTimes(1);
-    expect(createPatch).toHaveBeenCalledWith(
-      'modified-file.js',
-      oldContent,
-      newContent,
-      'modified-file.js',
-      'modified-file.js',
-      { context: 3 },
+    expect(fs.readFile).toHaveBeenCalledWith(
+      expect.stringContaining('modified-file.js'),
+      'utf-8',
     );
-    expect(applyPatch).toHaveBeenCalledWith(oldContent, 'mocked patch string');
+
+    expect(applyPatch).toHaveBeenCalledTimes(1);
+    expect(applyPatch).toHaveBeenCalledWith(
+      oldContent,
+      mockParsedResponse.files[0].diff,
+    );
+
+    expect(fs.writeFile).toHaveBeenCalledTimes(1);
     expect(fs.writeFile).toHaveBeenCalledWith(
       expect.stringContaining('modified-file.js'),
       newContent,
