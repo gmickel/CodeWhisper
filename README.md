@@ -165,9 +165,9 @@ codewhisper list-models
 # CodeWhisper will prompt you to select a model from the list of available models
 codewhisper task
 
-# To disable the new diff-based code modifications, you can use the following command:
-# This will use full-file code modifications
-codewhisper task --no-diff
+# To enable the new diff-based code modifications, you can use the following command:
+# This will use diff-based code modifications. Please note that this is still experimental and may not work with all models. It is currently only recommended with Claude 3.5 Sonnet.
+codewhisper task --diff
 
 # You can also specify a model directly
 # Claude-3.5 Sonnet
