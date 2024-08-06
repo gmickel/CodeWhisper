@@ -81,6 +81,13 @@ export const MODEL_CONFIGS: ModelSpecs = {
     pricing: { inputCost: 0, outputCost: 0 },
     modelFamily: 'ollama',
   },
+  'deepseek-coder': {
+    contextWindow: 128000,
+    maxOutput: 8000,
+    modelName: 'DeepSeek-Coder',
+    pricing: { inputCost: 0.14, outputCost: 0.28 },
+    modelFamily: 'deepseek',
+  },
 };
 
 export function getModelNames(): string[] {

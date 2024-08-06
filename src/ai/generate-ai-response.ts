@@ -61,6 +61,14 @@ const modelFamilies: Record<ModelFamily, ModelFamilyConfig> = {
         baseURL: 'http://localhost:11434/api',
       }),
   },
+  deepseek: {
+    initClient: (apiKey?: string) =>
+      createOpenAI({
+        baseURL: 'https://api.deepseek.com/beta',
+        apiKey,
+      }),
+    apiKeyEnv: 'DEEPSEEK_API_KEY',
+  },
 };
 
 let totalCost = 0;
@@ -98,6 +106,18 @@ export async function generateAIResponse(
       maxOutput: options.maxTokens || modelConfig.maxOutput,
       modelName: `Ollama ${ollamaModelName}`,
     };
+  } else if (modelFamily === 'deepseek') {
+    let apiKey: string | undefined;
+
+    if (familyConfig.apiKeyEnv) {
+      apiKey = process.env[familyConfig.apiKeyEnv];
+      if (!apiKey) {
+        throw new Error(
+          `${familyConfig.apiKeyEnv} is not set in the environment variables.`,
+        );
+      }
+    }
+    client = familyConfig.initClient(apiKey);
   } else {
     let apiKey: string | undefined;
 

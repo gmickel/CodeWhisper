@@ -135,7 +135,8 @@ export type ModelFamily =
   | 'openai'
   | 'openai-compatible'
   | 'groq'
-  | 'ollama';
+  | 'ollama'
+  | 'deepseek';
 
 export interface ModelSpec {
   contextWindow: number;
