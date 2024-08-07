@@ -81,8 +81,8 @@ describe('applyChanges', () => {
     // Check if the writeFile calls include both the new and modified files
     expect(vi.mocked(fs.writeFile).mock.calls).toEqual(
       expect.arrayContaining([
-        [`${mockBasePath}/new-file.js`, 'console.log("New file");'],
-        [`${mockBasePath}/existing-file.js`, expect.any(Promise)],
+        [path.join(mockBasePath, 'new-file.js'), 'console.log("New file");'],
+        [path.join(mockBasePath, 'existing-file.js'), expect.any(Promise)],
       ]),
     );
 
