@@ -1,7 +1,7 @@
 import * as Diff3 from 'node-diff3';
 import { detectLanguage } from '../../core/file-worker';
 import type { AIFileChange, AIFileInfo } from '../../types';
-import { handleDeletedFiles } from './common-parser';
+import { handleDeletedFiles, preprocessBlock } from './common-parser';
 
 export function parseSearchReplaceFiles(response: string): AIFileInfo[] {
   let files: AIFileInfo[] = [];
@@ -73,8 +73,8 @@ function parseSearchReplaceBlocks(content: string): AIFileChange[] {
 
   // biome-ignore lint/suspicious/noAssignInExpressions: avoid infinite loop
   while ((match = blockRegex.exec(content)) !== null) {
-    const search = match[1].trim();
-    const replace = match[2].trim();
+    const search = preprocessBlock(match[1].trim());
+    const replace = preprocessBlock(match[2].trim());
 
     if (search && replace) {
       changes.push({ search, replace });
@@ -91,39 +91,109 @@ export function applySearchReplace(
   source: string,
   searchReplaceBlocks: AIFileChange[],
 ): string {
-  const result = source.split('\n');
+  let result = source;
 
   for (const block of searchReplaceBlocks) {
-    const searchArray = block.search.split('\n');
-    const replaceArray = block.replace.split('\n');
-
-    // Create a patch
-    const patch = Diff3.diffPatch(searchArray, replaceArray);
-
-    // Find the location in the result that matches the search
-    let startIndex = -1;
-    for (let i = 0; i <= result.length - searchArray.length; i++) {
-      if (result.slice(i, i + searchArray.length).join('\n') === block.search) {
-        startIndex = i;
-        break;
-      }
-    }
-
-    if (startIndex !== -1) {
-      // Apply the patch at the found location
-      const changedSection = Diff3.patch(
-        result.slice(startIndex, startIndex + searchArray.length),
-        patch,
-      );
-      if (Array.isArray(changedSection)) {
-        result.splice(startIndex, searchArray.length, ...changedSection);
-      } else {
-        console.warn(`Failed to apply patch for search block: ${block.search}`);
-      }
+    const matchResult = flexibleMatch(result, block.search, block.replace);
+    if (matchResult) {
+      result = matchResult;
     } else {
-      console.warn(`Search block not found: ${block.search}`);
+      console.warn(handleMatchFailure(result, block.search));
     }
   }
 
-  return result.join('\n');
+  return result;
+}
+
+function flexibleMatch(
+  content: string,
+  searchBlock: string,
+  replaceBlock: string,
+): string | null {
+  // Try exact matching
+  const patch = Diff3.diffPatch(content.split('\n'), searchBlock.split('\n'));
+  let result = Diff3.patch(content.split('\n'), patch);
+
+  if (result) {
+    return result.join('\n').replace(searchBlock, replaceBlock);
+  }
+
+  // Try matching with flexible whitespace
+  const normalizedContent = content.replace(/\s+/g, ' ');
+  const normalizedSearch = searchBlock.replace(/\s+/g, ' ');
+  const flexPatch = Diff3.diffPatch(
+    normalizedContent.split('\n'),
+    normalizedSearch.split('\n'),
+  );
+  result = Diff3.patch(normalizedContent.split('\n'), flexPatch);
+
+  if (result) {
+    // Map the changes back to the original content
+    return mapChangesToOriginal(
+      content,
+      result.join('\n').replace(normalizedSearch, replaceBlock),
+    );
+  }
+
+  return null;
+}
+
+function mapChangesToOriginal(
+  originalContent: string,
+  changedContent: string,
+): string {
+  const originalLines = originalContent.split('\n');
+  const changedLines = changedContent.split('\n');
+
+  let result = '';
+  let originalIndex = 0;
+  let changedIndex = 0;
+
+  while (
+    originalIndex < originalLines.length &&
+    changedIndex < changedLines.length
+  ) {
+    if (
+      originalLines[originalIndex].trim() === changedLines[changedIndex].trim()
+    ) {
+      result += `${originalLines[originalIndex]}\n`;
+      originalIndex++;
+      changedIndex++;
+    } else {
+      result += `${changedLines[changedIndex]}\n`;
+      changedIndex++;
+    }
+  }
+
+  // Add any remaining lines from either original or changed content
+  while (originalIndex < originalLines.length) {
+    result += `${originalLines[originalIndex]}\n`;
+    originalIndex++;
+  }
+  while (changedIndex < changedLines.length) {
+    result += `${changedLines[changedIndex]}\n`;
+    changedIndex++;
+  }
+
+  return result.trim();
+}
+
+function handleMatchFailure(content: string, searchBlock: string): string {
+  const contentLines = content.split('\n');
+  const searchLines = searchBlock.split('\n');
+  const indices = Diff3.diffIndices(contentLines, searchLines);
+
+  let errorMessage = 'Failed to match the following block:\n\n';
+  errorMessage += `${searchBlock}\n\n`;
+  errorMessage += 'Possible similar sections in the file:\n\n';
+
+  for (const index of indices) {
+    if (Array.isArray(index) && index.length >= 2) {
+      const start = Math.max(0, index[0] - 2);
+      const end = Math.min(contentLines.length, index[1] + 3);
+      errorMessage += `${contentLines.slice(start, end).join('\n')}\n---\n`;
+    }
+  }
+
+  return errorMessage;
 }
