@@ -13,7 +13,8 @@ SEARCH/REPLACE Block Rules (for modified files only):
    - Focus on one logical change per block (e.g., updating a single function or adding one import statement).
 
 3. Include minimal context:
-   - Add only 1-2 unchanged lines before and after the modified code for context, if necessary.
+   - Add 1-2 unchanged lines before and after the modified code for context.
+   - This context helps ensure unique matching and proper application of changes.
    - Do not include long runs of unchanging lines in SEARCH/REPLACE blocks.
 
 4. Ensure uniqueness:
@@ -33,6 +34,12 @@ SEARCH/REPLACE Block Rules (for modified files only):
 
 8. File scope:
    - Only create SEARCH/REPLACE blocks for files that are part of the given codebase or that you've been explicitly told exist.
+
+9. Consistency and Sequential Application:
+   - Order SEARCH/REPLACE blocks logically so they can be applied sequentially without conflicts.
+   - After each block, mentally apply the change and base subsequent blocks on the updated code.
+   - Ensure each SEARCH block will match the code after all previous blocks have been applied.
+   - For dependent changes, make sure the SEARCH block reflects the code state after previous changes.
 
 Example of breaking down a large change into multiple smaller SEARCH/REPLACE blocks:
 
@@ -123,120 +130,9 @@ Updated logger configuration to use environment variable for log level, changed 
 </explanation>
 </file>
 
-9. Consistency and Sequential Application:
-   - Order SEARCH/REPLACE blocks logically so they can be applied sequentially without conflicts.
-   - After each block, mentally apply the change and base subsequent blocks on the updated code.
-   - Ensure each SEARCH block will match the code after all previous blocks have been applied.
-   - For dependent changes, make sure the SEARCH block reflects the code state after previous changes.
-
-Example of correctly sequencing changes when renaming and modifying a function:
-
-<file>
-<file_path>src/utils/logger.ts</file_path>
-<file_content>
-<<<<<<< SEARCH
-const getLogger = (logAiInteractions: boolean) => {
-  if (!logAiInteractions) {
-    return {
-      info: () => {},
-      error: () => {},
-    };
-  }
-
-  const date = new Date().toISOString().split('T')[0];
-  const logFileName = `codewhisper-${date}.log`;
-
-  return winston.createLogger({
-    level: 'info',
-    format: winston.format.simple(),
-    transports: [
-      new winston.transports.File({
-        filename: path.join(process.cwd(), logFileName),
-      }),
-    ],
-  });
-};
-=======
-const createLogger = (logLevel: string = 'info') => {
-  const date = new Date().toISOString().split('T')[0];
-  const logFileName = `codewhisper-${date}.log`;
-
-  return winston.createLogger({
-    level: logLevel,
-    format: winston.format.simple(),
-    transports: [
-      new winston.transports.File({
-        filename: path.join(process.cwd(), logFileName),
-      }),
-    ],
-  });
-};
->>>>>>> REPLACE
-
-<<<<<<< SEARCH
-const createLogger = (logLevel: string = 'info') => {
-  const date = new Date().toISOString().split('T')[0];
-  const logFileName = `codewhisper-${date}.log`;
-
-  return winston.createLogger({
-    level: logLevel,
-    format: winston.format.simple(),
-    transports: [
-      new winston.transports.File({
-        filename: path.join(process.cwd(), logFileName),
-      }),
-    ],
-  });
-};
-=======
-const createLogger = (logLevel: string = 'info') => {
-  const date = new Date().toISOString().split('T')[0];
-  const logFileName = `codewhisper-${date}.log`;
-
-  return winston.createLogger({
-    level: logLevel,
-    format: winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.json()
-    ),
-    transports: [
-      new winston.transports.File({
-        filename: path.join(process.cwd(), logFileName),
-      }),
-      new winston.transports.Console(),
-    ],
-  });
-};
->>>>>>> REPLACE
-
-<<<<<<< SEARCH
-export default getLogger;
-=======
-const getLogger = (logAiInteractions: boolean, logLevel: string = 'info') => {
-  if (!logAiInteractions) {
-    return {
-      error: () => {},
-      warn: () => {},
-      info: () => {},
-      debug: () => {},
-    };
-  }
-  return createLogger(logLevel);
-};
-
-export const setLogLevel = (level: string) => {
-  logger.level = level;
-};
-
-export default getLogger;
->>>>>>> REPLACE
-</file_content>
-<file_status>modified</file_status>
-<explanation>
-This example shows the correct sequence of changes:
-1. Rename getLogger to createLogger and modify its parameters.
-2. Update the internals of createLogger.
-3. Create a new getLogger function that uses createLogger, add setLogLevel, and update the export.
-Each SEARCH block reflects the state of the code after the previous changes have been applied.
-</explanation>
-</file>
+Remember:
+- Keep SEARCH/REPLACE blocks small and focused.
+- Provide sufficient context for unique matching.
+- Ensure logical ordering of blocks for sequential application.
+- Base each block on the state of the code after applying previous blocks.
+- Always consider the readability and maintainability of the resulting code.

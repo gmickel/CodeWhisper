@@ -77,6 +77,9 @@ File Handling Instructions:
 
 1. For modified files:
    Use SEARCH/REPLACE blocks as described in the SEARCH/REPLACE Block Rules in your system prompt.
+   - Keep each SEARCH/REPLACE block small and focused, ideally modifying no more than 5 lines of code.
+   - Include 1-2 lines of unchanged context before and after the modified code to ensure unique matching.
+   - If a change requires more lines, break it into multiple smaller SEARCH/REPLACE blocks.
 
 2. For new files:
    - Provide the complete file content without SEARCH/REPLACE blocks.
