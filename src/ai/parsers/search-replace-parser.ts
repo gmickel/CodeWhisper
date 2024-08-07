@@ -1,4 +1,3 @@
-import fs from 'fs-extra';
 import * as Diff3 from 'node-diff3';
 import { detectLanguage } from '../../core/file-worker';
 import type { AIFileChange, AIFileInfo } from '../../types';
@@ -37,7 +36,6 @@ export function parseSearchReplaceFiles(response: string): AIFileInfo[] {
 
     console.log(`Parsing file: ${path}`);
     console.log(`Status: ${status}`);
-    console.log(`Content: ${content}`);
 
     const fileInfo: AIFileInfo = {
       path,
@@ -47,22 +45,11 @@ export function parseSearchReplaceFiles(response: string): AIFileInfo[] {
     };
 
     if (status === 'modified') {
-      fileInfo.changes = parseSearchReplaceBlocks(content);
-      if (fileInfo.changes.length === 0) {
-        console.warn(`No changes found for modified file: ${path}`);
-        fileInfo.content = content;
+      const changes = parseSearchReplaceBlocks(content);
+      if (changes.length > 0) {
+        fileInfo.changes = changes;
       } else {
-        // Apply changes and store the entire modified content
-        try {
-          const originalContent = fs.readFileSync(path, 'utf-8');
-          fileInfo.content = applySearchReplace(
-            originalContent,
-            fileInfo.changes,
-          );
-        } catch (error) {
-          console.error(`Error reading or modifying file ${path}:`, error);
-          fileInfo.content = content; // Fallback to AI-provided content
-        }
+        fileInfo.content = content;
       }
     } else if (status === 'new') {
       fileInfo.content = content;
