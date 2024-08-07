@@ -158,7 +158,7 @@ export async function generateAIResponse(
     };
 
     if (options.systemPrompt) {
-      console.log('Using system prompt:', options.systemPrompt);
+      console.log(chalk.cyan('Using system prompt'));
       generateTextOptions.system = options.systemPrompt;
     }
 
