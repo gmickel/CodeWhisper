@@ -92,7 +92,9 @@ describe('applyChanges', () => {
     );
 
     // Check if the deleted file was removed
-    expect(fs.remove).toHaveBeenCalledWith(`${mockBasePath}/deleted-file.js`);
+    expect(fs.remove).toHaveBeenCalledWith(
+      path.join(mockBasePath, 'deleted-file.js'),
+    );
   });
 
   it('should not apply changes in dry run mode', async () => {
