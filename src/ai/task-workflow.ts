@@ -5,7 +5,6 @@ import ora from 'ora';
 import simpleGit from 'simple-git';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
-import { applyChanges } from '../git/apply-changes';
 import { selectFilesPrompt } from '../interactive/select-files-prompt';
 import { selectGitHubIssuePrompt } from '../interactive/select-github-issue-prompt';
 import { selectModelPrompt } from '../interactive/select-model-prompt';
@@ -28,6 +27,7 @@ import {
   extractTemplateVariables,
   getTemplatePath,
 } from '../utils/template-utils';
+import { applyChanges } from './apply-changes';
 import { generateAIResponse } from './generate-ai-response';
 import { getInstructions } from './get-instructions';
 import { getTaskDescription } from './get-task-description';

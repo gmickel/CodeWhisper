@@ -1,8 +1,8 @@
 import path from 'node:path';
 import chalk from 'chalk';
 import fs from 'fs-extra';
-import { applySearchReplace } from '../ai/parsers/search-replace-parser';
 import type { AIFileInfo, ApplyChangesOptions } from '../types';
+import { applySearchReplace } from './parsers/search-replace-parser';
 
 export async function applyChanges({
   basePath,

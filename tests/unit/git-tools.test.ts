@@ -1,7 +1,7 @@
 import { confirm } from '@inquirer/prompts';
 import simpleGit from 'simple-git';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { undoTaskChanges } from '../../src/git/undo-task-changes';
+import { undoTaskChanges } from '../../src/ai/undo-task-changes';
 import { ensureBranch } from '../../src/utils/git-tools';
 import { findDefaultBranch } from '../../src/utils/git-tools';
 

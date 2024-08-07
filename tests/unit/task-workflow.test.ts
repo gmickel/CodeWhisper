@@ -1,6 +1,7 @@
 import path from 'node:path';
 import simpleGit, { type SimpleGit } from 'simple-git';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { applyChanges } from '../../src/ai/apply-changes';
 import { generateAIResponse } from '../../src/ai/generate-ai-response';
 import { getInstructions } from '../../src/ai/get-instructions';
 import { getTaskDescription } from '../../src/ai/get-task-description';
@@ -10,7 +11,6 @@ import { reviewPlan } from '../../src/ai/plan-review';
 import { runAIAssistedTask } from '../../src/ai/task-workflow';
 import { processFiles } from '../../src/core/file-processor';
 import { generateMarkdown } from '../../src/core/markdown-generator';
-import { applyChanges } from '../../src/git/apply-changes';
 import { selectFilesPrompt } from '../../src/interactive/select-files-prompt';
 import { selectModelPrompt } from '../../src/interactive/select-model-prompt';
 import type {

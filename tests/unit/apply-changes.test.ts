@@ -1,7 +1,7 @@
 import path from 'node:path';
 import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { applyChanges } from '../../src/git/apply-changes';
+import { applyChanges } from '../../src/ai/apply-changes';
 import type { AIParsedResponse } from '../../src/types';
 
 vi.mock('fs-extra');
