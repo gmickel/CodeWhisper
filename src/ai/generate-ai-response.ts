@@ -15,10 +15,10 @@ dotenv.config();
 interface ModelFamilyConfig {
   initClient: (
     apiKey?: string,
+    baseURL?: string,
   ) => ReturnType<
     typeof createAnthropic | typeof createOpenAI | typeof createOllama
   >;
-  apiKeyEnv?: string;
 }
 
 const modelFamilies: Record<ModelFamily, ModelFamilyConfig> = {
@@ -30,7 +30,6 @@ const modelFamilies: Record<ModelFamily, ModelFamilyConfig> = {
           'anthropic-beta': 'max-tokens-3-5-sonnet-2024-07-15',
         },
       }),
-    apiKeyEnv: 'ANTHROPIC_API_KEY',
   },
   openai: {
     initClient: (apiKey?: string) =>
@@ -38,22 +37,13 @@ const modelFamilies: Record<ModelFamily, ModelFamilyConfig> = {
         apiKey,
         compatibility: 'strict',
       }),
-    apiKeyEnv: 'OPENAI_API_KEY',
   },
   'openai-compatible': {
-    initClient: (apiKey?: string) =>
+    initClient: (apiKey?: string, baseURL?: string) =>
       createOpenAI({
         apiKey,
+        baseURL,
       }),
-    apiKeyEnv: 'OPENAI_COMPATIBLE_API_KEY',
-  },
-  groq: {
-    initClient: (apiKey?: string) =>
-      createOpenAI({
-        baseURL: 'https://api.groq.com/openai/v1',
-        apiKey,
-      }),
-    apiKeyEnv: 'GROQ_API_KEY',
   },
   ollama: {
     initClient: () =>
@@ -87,6 +77,17 @@ export async function generateAIResponse(
     typeof createAnthropic | typeof createOpenAI | typeof createOllama
   >;
 
+  let apiKey: string | undefined;
+
+  if (modelConfig.apiKeyEnv) {
+    apiKey = process.env[modelConfig.apiKeyEnv];
+    if (!apiKey) {
+      throw new Error(
+        `${modelConfig.apiKeyEnv} is not set in the environment variables.`,
+      );
+    }
+  }
+
   if (modelFamily === 'ollama') {
     const ollamaModelName = modelKey.split(':')[1] || 'llama3.1:8b';
     client = familyConfig.initClient();
@@ -98,17 +99,9 @@ export async function generateAIResponse(
       maxOutput: options.maxTokens || modelConfig.maxOutput,
       modelName: `Ollama ${ollamaModelName}`,
     };
+  } else if (modelFamily === 'openai-compatible') {
+    client = familyConfig.initClient(apiKey, modelConfig.baseURL);
   } else {
-    let apiKey: string | undefined;
-
-    if (familyConfig.apiKeyEnv) {
-      apiKey = process.env[familyConfig.apiKeyEnv];
-      if (!apiKey) {
-        throw new Error(
-          `${familyConfig.apiKeyEnv} is not set in the environment variables.`,
-        );
-      }
-    }
     client = familyConfig.initClient(apiKey);
   }
 
@@ -193,6 +186,7 @@ export async function generateAIResponse(
     throw error;
   }
 }
+
 async function confirmCostExceedsThreshold(
   estimatedCost: number,
   threshold: number,
