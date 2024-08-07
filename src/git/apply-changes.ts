@@ -2,6 +2,7 @@ import path from 'node:path';
 import chalk from 'chalk';
 import { applyPatch } from 'diff';
 import fs from 'fs-extra';
+import { applySearchReplace } from '../ai/parsers/search-replace-parser';
 import type { AIFileInfo, ApplyChangesOptions } from '../types';
 
 export async function applyChanges({
@@ -84,13 +85,7 @@ async function applyFileChange(
             await fs.writeFile(fullPath, updatedContent);
           } else if (file.changes) {
             let currentContent = await fs.readFile(fullPath, 'utf-8');
-            for (const change of file.changes) {
-              currentContent = applyChange(
-                currentContent,
-                change.search,
-                change.replace,
-              );
-            }
+            currentContent = applySearchReplace(currentContent, file.changes);
             await fs.writeFile(fullPath, currentContent);
           } else if (file.content) {
             await fs.writeFile(fullPath, file.content);
@@ -117,36 +112,4 @@ async function applyFileChange(
     console.error(chalk.red(`Error applying change to ${file.path}:`), error);
     throw error;
   }
-}
-
-function escapeRegExp(string: string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-function applyChange(content: string, search: string, replace: string): string {
-  const trimmedSearch = search.trim();
-  const trimmedReplace = replace.trim();
-
-  const escapedSearch = escapeRegExp(trimmedSearch);
-  const regex = new RegExp(escapedSearch, 'g');
-
-  if (regex.test(content)) {
-    return content.replace(regex, trimmedReplace);
-  }
-
-  // If exact match fails, try matching with flexible whitespace
-  const flexibleSearch = escapedSearch.replace(/\s+/g, '\\s+');
-  const flexibleRegex = new RegExp(flexibleSearch, 'g');
-
-  if (flexibleRegex.test(content)) {
-    return content.replace(flexibleRegex, (match) => {
-      const leadingWhitespace = match.match(/^\s*/)?.[0] || '';
-      const trailingWhitespace = match.match(/\s*$/)?.[0] || '';
-      return leadingWhitespace + trimmedReplace + trailingWhitespace;
-    });
-  }
-
-  throw new Error(
-    'Failed to apply changes: search content not found in the file',
-  );
 }

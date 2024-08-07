@@ -68,6 +68,9 @@ importers:
       micromatch:
         specifier: 4.0.7
         version: 4.0.7
+      node-diff3:
+        specifier: 3.1.2
+        version: 3.1.2
       ollama-ai-provider:
         specifier: 0.11.0
         version: 0.11.0(zod@3.23.8)
@@ -2155,6 +2158,10 @@ packages:
 
   node-addon-api@3.2.1:
     resolution: {integrity: sha512-mmcei9JghVNDYydghQmeDX8KoAm0FAiYyIcUt/N4nhyAipB17pllZQDOJD2fotxABnt4Mdz+dKTO7eftLg4d0A==}
+
+  node-diff3@3.1.2:
+    resolution: {integrity: sha512-wUd9TWy059I8mZdH6G3LPNlAEfxDvXtn/RcyFrbqL3v34WlDxn+Mh4HDhOwWuaMk/ROVepe5tTpnGHbve6Db2g==}
+    engines: {node: '>14'}
 
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
@@ -5095,6 +5102,8 @@ snapshots:
 
   node-addon-api@3.2.1:
     optional: true
+
+  node-diff3@3.1.2: {}
 
   node-domexception@1.0.0: {}
 

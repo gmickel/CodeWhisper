@@ -112,6 +112,7 @@
     "inquirer-file-tree-selection-prompt": "2.0.5",
     "isbinaryfile": "5.0.2",
     "micromatch": "4.0.7",
+    "node-diff3": "3.1.2",
     "ollama-ai-provider": "0.11.0",
     "ora": "8.0.1",
     "piscina": "4.6.1",

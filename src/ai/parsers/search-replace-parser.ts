@@ -1,3 +1,5 @@
+import fs from 'fs-extra';
+import * as Diff3 from 'node-diff3';
 import { detectLanguage } from '../../core/file-worker';
 import type { AIFileChange, AIFileInfo } from '../../types';
 import { handleDeletedFiles } from './common-parser';
@@ -49,6 +51,18 @@ export function parseSearchReplaceFiles(response: string): AIFileInfo[] {
       if (fileInfo.changes.length === 0) {
         console.warn(`No changes found for modified file: ${path}`);
         fileInfo.content = content;
+      } else {
+        // Apply changes and store the entire modified content
+        try {
+          const originalContent = fs.readFileSync(path, 'utf-8');
+          fileInfo.content = applySearchReplace(
+            originalContent,
+            fileInfo.changes,
+          );
+        } catch (error) {
+          console.error(`Error reading or modifying file ${path}:`, error);
+          fileInfo.content = content; // Fallback to AI-provided content
+        }
       }
     } else if (status === 'new') {
       fileInfo.content = content;
@@ -61,6 +75,7 @@ export function parseSearchReplaceFiles(response: string): AIFileInfo[] {
 
   return files;
 }
+
 function parseSearchReplaceBlocks(content: string): AIFileChange[] {
   console.log('Parsing search/replace blocks. Content:', content);
 
@@ -83,4 +98,45 @@ function parseSearchReplaceBlocks(content: string): AIFileChange[] {
 
   console.log(`Found ${changes.length} valid changes`);
   return changes;
+}
+
+export function applySearchReplace(
+  source: string,
+  searchReplaceBlocks: AIFileChange[],
+): string {
+  const result = source.split('\n');
+
+  for (const block of searchReplaceBlocks) {
+    const searchArray = block.search.split('\n');
+    const replaceArray = block.replace.split('\n');
+
+    // Create a patch
+    const patch = Diff3.diffPatch(searchArray, replaceArray);
+
+    // Find the location in the result that matches the search
+    let startIndex = -1;
+    for (let i = 0; i <= result.length - searchArray.length; i++) {
+      if (result.slice(i, i + searchArray.length).join('\n') === block.search) {
+        startIndex = i;
+        break;
+      }
+    }
+
+    if (startIndex !== -1) {
+      // Apply the patch at the found location
+      const changedSection = Diff3.patch(
+        result.slice(startIndex, startIndex + searchArray.length),
+        patch,
+      );
+      if (Array.isArray(changedSection)) {
+        result.splice(startIndex, searchArray.length, ...changedSection);
+      } else {
+        console.warn(`Failed to apply patch for search block: ${block.search}`);
+      }
+    } else {
+      console.warn(`Search block not found: ${block.search}`);
+    }
+  }
+
+  return result.join('\n');
 }
