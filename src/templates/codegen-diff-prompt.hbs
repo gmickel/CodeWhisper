@@ -101,146 +101,119 @@ SEARCH/REPLACE Block Rules (for modified files only):
    [Modified code]
    >>>>>>> REPLACE
 
-Explanation of the SEARCH/REPLACE format:
+2. Create small, atomic SEARCH/REPLACE blocks:
+   - Each block should modify no more than 5 lines of code.
+   - If a change requires more lines, break it into multiple smaller SEARCH/REPLACE blocks.
+   - Focus on one logical change per block (e.g., updating a single function or adding one import statement).
 
-- The start of search block: <<<<<<< SEARCH
-- A contiguous chunk of lines to search for in the existing source code
-- The dividing line: =======
-- The lines to replace into the source code
-- The end of the replace block: >>>>>>> REPLACE
+3. Include minimal context:
+   - Add only 1-2 unchanged lines before and after the modified code for context, if necessary.
+   - Do not include long runs of unchanging lines in SEARCH/REPLACE blocks.
 
-Every *SEARCH* section must *EXACTLY MATCH* the existing source code, character for character, including all comments, docstrings, etc.
+4. Ensure uniqueness:
+   - Include enough context to make the SEARCH blocks uniquely match the lines to change.
+   - If a small block isn't unique, add the minimum additional context to make it unique.
 
-*SEARCH/REPLACE* blocks will replace *all* matching occurrences.
-Include enough lines to make the SEARCH blocks uniquely match the lines to change.
+5. Exact matching:
+   - Every SEARCH section must EXACTLY MATCH the existing source code, character for character, including all comments, docstrings, whitespace, etc.
 
-Keep *SEARCH/REPLACE* blocks concise.
-Break large *SEARCH/REPLACE* blocks into a series of smaller blocks that each change a small portion of the file.
-Include just the changing lines, and a few surrounding lines if needed for uniqueness.
-Do not include long runs of unchanging lines in *SEARCH/REPLACE* blocks.
+6. Replace all occurrences:
+   - SEARCH/REPLACE blocks will replace ALL matching occurrences in the file.
 
-Only create *SEARCH/REPLACE* blocks for files that the user has added to the chat!
+7. Moving code:
+   - To move code within a file, use 2 separate SEARCH/REPLACE blocks:
+     1) to delete it from its current location
+     2) to insert it in the new location
 
-To move code within a file, use 2 *SEARCH/REPLACE* blocks: 1 to delete it from its current location, 1 to insert it in the new location.
+8. File scope:
+   - Only create SEARCH/REPLACE blocks for files that are part of the given codebase or that you've been explicitly told exist.
 
-Examples:
+Example of breaking down a large change into multiple smaller SEARCH/REPLACE blocks:
 
-1. Modifying a JSON configuration file:
-
-<file>
-<file_path>src/config/app-config.json</file_path>
-<file_content>
-<<<<<<< SEARCH
-{
-  "apiVersion": "v1",
-  "server": {
-    "port": 3000,
-    "host": "localhost"
-  },
-  "database": {
-    "url": "mongodb://localhost:27017/myapp",
-    "name": "myapp"
-  }
-}
-=======
-{
-  "apiVersion": "v2",
-  "server": {
-    "port": 3000,
-    "host": "localhost"
-  },
-  "database": {
-    "url": "mongodb://localhost:27017/myapp",
-    "name": "myapp"
-  },
-  "cache": {
-    "type": "redis",
-    "url": "redis://localhost:6379"
-  }
-}
->>>>>>> REPLACE
-</file_content>
-<file_status>modified</file_status>
-<explanation>
-Updated API version to v2 and added cache configuration for Redis.
-</explanation>
-</file>
-
-2. Modifying a TypeScript function:
+Instead of:
 
 <file>
-<file_path>src/utils/data-processor.ts</file_path>
+<file_path>src/utils/logger.ts</file_path>
 <file_content>
 <<<<<<< SEARCH
-import { ProcessedData } from './types';
+import winston from 'winston';
 
-export function processData(data: any[]): ProcessedData {
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.simple(),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' }),
+  ],
+});
+
+export default logger;
 =======
-import { ProcessedData } from './types';
-import { getCurrentTimestamp } from './time-utils';
+import winston from 'winston';
 
-export function processData(data: any[]): ProcessedData {
->>>>>>> REPLACE
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' }),
+  ],
+});
 
-<<<<<<< SEARCH
-  return data.map(item => ({
-    id: item.id,
-    name: item.name.toUpperCase(),
-    value: item.value * 2
-  }));
-=======
-  return data.map(item => ({
-    id: item.id,
-    name: item.name.toUpperCase(),
-    value: item.value * 2,
-    processed: true,
-    timestamp: getCurrentTimestamp()
-  }));
->>>>>>> REPLACE
-}
-</file_content>
-<file_status>modified</file_status>
-<explanation>
-Enhanced processData function to include 'processed' flag and timestamp in the output. Also added an import for getCurrentTimestamp from time-utils.
-</explanation>
-</file>
-
-3. Example for a new file:
-
-<file>
-<file_path>src/utils/new-helper.ts</file_path>
-<file_content>
-import { useState, useEffect } from 'react';
-
-export const useDebounce = (value: any, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
+export const setLogLevel = (level: string) => {
+  logger.level = level;
 };
+
+export default logger;
+>>>>>>> REPLACE
 </file_content>
-<file_status>new</file_status>
-<explanation>
-Created a new utility function for debouncing values, useful for optimizing performance in input fields or search functionality.
-</explanation>
+<file_status>modified</file_status>
 </file>
 
-4. Example for a deleted file:
+Use multiple smaller blocks:
 
 <file>
-<file_path>src/deprecated/old-utility.ts</file_path>
-<file_status>deleted</file_status>
+<file_path>src/utils/logger.ts</file_path>
+<file_content>
+<<<<<<< SEARCH
+import winston from 'winston';
+
+const logger = winston.createLogger({
+  level: 'info',
+=======
+import winston from 'winston';
+
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || 'info',
+>>>>>>> REPLACE
+
+<<<<<<< SEARCH
+  format: winston.format.simple(),
+=======
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+>>>>>>> REPLACE
+
+<<<<<<< SEARCH
+export default logger;
+=======
+export const setLogLevel = (level: string) => {
+  logger.level = level;
+};
+
+export default logger;
+>>>>>>> REPLACE
+</file_content>
+<file_status>modified</file_status>
 <explanation>
-Removed deprecated utility file as its functions have been replaced by new-helper.ts
+Updated logger configuration to use environment variable for log level, changed format to include timestamp and use JSON, and added a setLogLevel function.
 </explanation>
 </file>
 
@@ -260,7 +233,7 @@ Ensure that:
 - You complete all necessary work to fully implement the task.
 - SEARCH blocks contain enough context to uniquely identify the location of changes.
 - Each SEARCH/REPLACE block is focused and minimal, targeting specific changes.
-- Only modfiy files that were provided in the <codebase> section.
+- Only modify files that were provided in the <codebase> section.
 
 ONLY EVER RETURN CODE IN A SEARCH/REPLACE BLOCK FOR MODIFIED FILES!
 </format>
