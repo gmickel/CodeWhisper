@@ -64,12 +64,18 @@ async function applyFileChange(
                 `[DRY RUN] Changes preview:\n${JSON.stringify(file.changes, null, 2)}`,
               ),
             );
+          } else if (file.content) {
+            console.log(
+              chalk.gray(
+                `[DRY RUN] Content preview:\n${file.content.substring(0, 200)}${file.content.length > 200 ? '...' : ''}`,
+              ),
+            );
           }
         } else {
+          const currentContent = await fs.readFile(fullPath, 'utf-8');
           let updatedContent: string;
 
           if (file.changes && file.changes.length > 0) {
-            const currentContent = await fs.readFile(fullPath, 'utf-8');
             updatedContent = applySearchReplace(currentContent, file.changes);
           } else if (file.content) {
             updatedContent = file.content;

@@ -42,11 +42,17 @@ export function parseSearchReplaceFiles(response: string): AIFileInfo[] {
       language: detectLanguage(path),
       status,
       explanation,
-      content: content,
     };
 
     if (status === 'modified') {
-      fileInfo.changes = parseSearchReplaceBlocks(content);
+      const changes = parseSearchReplaceBlocks(content);
+      if (changes.length > 0) {
+        fileInfo.changes = changes;
+      } else {
+        fileInfo.content = content;
+      }
+    } else if (status === 'new') {
+      fileInfo.content = content;
     }
 
     files.push(fileInfo);
