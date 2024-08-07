@@ -29,7 +29,7 @@ vi.mock('../../src/core/markdown-generator');
 vi.mock('../../src/ai/generate-ai-response');
 vi.mock('../../src/ai/parse-ai-codegen-response');
 vi.mock('../../src/ai/plan-review');
-vi.mock('../../src/git/apply-changes');
+vi.mock('../../src/ai/apply-changes');
 vi.mock('../../src/utils/git-tools');
 vi.mock('../../src/ai/model-config');
 vi.mock('simple-git');

@@ -2,16 +2,11 @@ import path from 'node:path';
 import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { applyChanges } from '../../src/ai/apply-changes';
+import { applySearchReplace } from '../../src/ai/parsers/search-replace-parser';
 import type { AIParsedResponse } from '../../src/types';
 
 vi.mock('fs-extra');
-vi.mock('diff', async () => {
-  const actual = await vi.importActual('diff');
-  return {
-    ...actual,
-    applyPatch: vi.fn(),
-  };
-});
+vi.mock('../../src/ai/parsers/search-replace-parser');
 
 describe('applyChanges', () => {
   const mockBasePath = '/mock/base/path';
@@ -62,10 +57,14 @@ describe('applyChanges', () => {
       potentialIssues: 'None',
     };
 
-    vi.mocked(fs.readFile).mockResolvedValue(
-      // biome-ignore lint/suspicious/noExplicitAny: explicit any is required for the mock
-      'console.log("Old content");\nfunction oldFunction() {}' as any,
-    );
+    const originalContent =
+      'console.log("Old content");\nfunction oldFunction() {}';
+    const modifiedContent =
+      'console.log("Modified content");\nfunction newFunction() {}';
+
+    // biome-ignore lint/suspicious/noExplicitAny: explicit any is required for the mock
+    vi.mocked(fs.readFile).mockResolvedValue(originalContent as any);
+    vi.mocked(applySearchReplace).mockResolvedValue(modifiedContent);
 
     await applyChanges({
       basePath: mockBasePath,
@@ -77,12 +76,23 @@ describe('applyChanges', () => {
     expect(fs.writeFile).toHaveBeenCalledTimes(2);
     expect(fs.readFile).toHaveBeenCalledTimes(1);
     expect(fs.remove).toHaveBeenCalledTimes(1);
+    expect(applySearchReplace).toHaveBeenCalledTimes(1);
 
-    // Check if the content of the modified file is correct
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      expect.stringContaining('existing-file.js'),
-      'console.log("Modified content");\nfunction newFunction() {}',
+    // Check if the writeFile calls include both the new and modified files
+    expect(vi.mocked(fs.writeFile).mock.calls).toEqual(
+      expect.arrayContaining([
+        [`${mockBasePath}/new-file.js`, 'console.log("New file");'],
+        [`${mockBasePath}/existing-file.js`, expect.any(Promise)],
+      ]),
     );
+
+    // Resolve the Promise for the modified file content
+    await expect(vi.mocked(fs.writeFile).mock.calls[1][1]).resolves.toBe(
+      modifiedContent,
+    );
+
+    // Check if the deleted file was removed
+    expect(fs.remove).toHaveBeenCalledWith(`${mockBasePath}/deleted-file.js`);
   });
 
   it('should not apply changes in dry run mode', async () => {

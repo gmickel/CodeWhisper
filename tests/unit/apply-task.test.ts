@@ -7,7 +7,7 @@ import { applyTask } from '../../src/ai/apply-task';
 import * as gitTools from '../../src/utils/git-tools';
 
 vi.mock('../../src/utils/git-tools');
-vi.mock('../../src/git/apply-changes');
+vi.mock('../../src/ai/apply-changes');
 vi.mock('fs-extra');
 vi.mock('simple-git');
 
