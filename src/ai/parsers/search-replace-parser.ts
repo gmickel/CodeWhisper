@@ -92,16 +92,26 @@ export function applySearchReplace(
   searchReplaceBlocks: AIFileChange[],
 ): string {
   let result = source;
+  console.log('Original content length:', source.length);
 
   for (const block of searchReplaceBlocks) {
+    console.log('Applying search/replace block:', block);
     const matchResult = flexibleMatch(result, block.search, block.replace);
     if (matchResult) {
       result = matchResult;
+      console.log(
+        'Block applied successfully. New content length:',
+        result.length,
+      );
     } else {
-      console.warn(handleMatchFailure(result, block.search));
+      console.warn(
+        'Failed to apply block:',
+        handleMatchFailure(result, block.search),
+      );
     }
   }
 
+  console.log('Final content length after all changes:', result.length);
   return result;
 }
 
@@ -110,13 +120,23 @@ function flexibleMatch(
   searchBlock: string,
   replaceBlock: string,
 ): string | null {
+  console.log('Attempting flexible match');
+  console.log('Content length:', content.length);
+  console.log('Search block length:', searchBlock.length);
+  console.log('Replace block length:', replaceBlock.length);
+
   // Try exact matching
   const patch = Diff3.diffPatch(content.split('\n'), searchBlock.split('\n'));
   let result = Diff3.patch(content.split('\n'), patch);
 
   if (result) {
-    return result.join('\n').replace(searchBlock, replaceBlock);
+    console.log('Exact match successful');
+    const finalResult = result.join('\n').replace(searchBlock, replaceBlock);
+    console.log('Result after exact match. Length:', finalResult.length);
+    return finalResult;
   }
+
+  console.log('Exact match failed, trying flexible whitespace match');
 
   // Try matching with flexible whitespace
   const normalizedContent = content.replace(/\s+/g, ' ');
@@ -128,13 +148,19 @@ function flexibleMatch(
   result = Diff3.patch(normalizedContent.split('\n'), flexPatch);
 
   if (result) {
-    // Map the changes back to the original content
-    return mapChangesToOriginal(
-      content,
-      result.join('\n').replace(normalizedSearch, replaceBlock),
+    console.log('Flexible whitespace match successful');
+    const flexResult = result
+      .join('\n')
+      .replace(normalizedSearch, replaceBlock);
+    const mappedResult = mapChangesToOriginal(content, flexResult);
+    console.log(
+      'Result after flexible match and mapping. Length:',
+      mappedResult.length,
     );
+    return mappedResult;
   }
 
+  console.log('All matching attempts failed');
   return null;
 }
 
@@ -142,6 +168,10 @@ function mapChangesToOriginal(
   originalContent: string,
   changedContent: string,
 ): string {
+  console.log('Mapping changes to original content');
+  console.log('Original content length:', originalContent.length);
+  console.log('Changed content length:', changedContent.length);
+
   const originalLines = originalContent.split('\n');
   const changedLines = changedContent.split('\n');
 
@@ -175,6 +205,7 @@ function mapChangesToOriginal(
     changedIndex++;
   }
 
+  console.log('Mapping complete. Result length:', result.length);
   return result.trim();
 }
 
