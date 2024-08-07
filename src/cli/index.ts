@@ -93,7 +93,11 @@ export function cli(_args: string[]) {
     )
     .option(
       '-df, --diff',
-      'Use the new diff mode for AI-generated code modifications',
+      "Use the new diff mode for AI-generated code modifications (overwrites the model's editing mode settings)",
+    )
+    .option(
+      '--no-diff',
+      "Use the whole file edit mode for AI-generated code modifications (overwrites the model's editing mode settings)",
     )
     .option(
       '--plan',
