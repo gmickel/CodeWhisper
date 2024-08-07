@@ -1,6 +1,5 @@
 import path from 'node:path';
 import chalk from 'chalk';
-import { applyPatch } from 'diff';
 import fs from 'fs-extra';
 import { applySearchReplace } from '../ai/parsers/search-replace-parser';
 import type { AIFileInfo, ApplyChangesOptions } from '../types';
@@ -54,13 +53,7 @@ async function applyFileChange(
           console.log(
             chalk.yellow(`[DRY RUN] Would modify file: ${file.path}`),
           );
-          if (file.diff) {
-            console.log(
-              chalk.gray(
-                `[DRY RUN] Diff preview:\n${JSON.stringify(file.diff, null, 2)}`,
-              ),
-            );
-          } else if (file.changes) {
+          if (file.changes) {
             console.log(
               chalk.gray(
                 `[DRY RUN] Changes preview:\n${JSON.stringify(file.changes, null, 2)}`,
@@ -74,26 +67,20 @@ async function applyFileChange(
             );
           }
         } else {
-          if (file.diff) {
-            const currentContent = await fs.readFile(fullPath, 'utf-8');
-            const updatedContent = applyPatch(currentContent, file.diff);
-            if (updatedContent === false) {
-              throw new Error(
-                `Failed to apply patch to file: ${file.path}\nA common cause is that the file was not sent to the LLM and it hallucinated the content. Try running the task again (task --redo) and selecting the problematic file.`,
-              );
-            }
-            await fs.writeFile(fullPath, updatedContent);
-          } else if (file.changes) {
-            let currentContent = await fs.readFile(fullPath, 'utf-8');
-            currentContent = applySearchReplace(currentContent, file.changes);
-            await fs.writeFile(fullPath, currentContent);
+          const currentContent = await fs.readFile(fullPath, 'utf-8');
+          let updatedContent: string;
+
+          if (file.changes) {
+            updatedContent = applySearchReplace(currentContent, file.changes);
           } else if (file.content) {
-            await fs.writeFile(fullPath, file.content);
+            updatedContent = file.content;
           } else {
             throw new Error(
-              `No content, diff, or changes provided for modified file: ${file.path}`,
+              `No content or changes provided for modified file: ${file.path}`,
             );
           }
+
+          await fs.writeFile(fullPath, updatedContent);
           console.log(chalk.green(`Modified file: ${file.path}`));
         }
         break;
