@@ -66,3 +66,10 @@ export function handleDeletedFiles(
   }
   return files;
 }
+
+export function preprocessBlock(block: string): string {
+  return block
+    .trim()
+    .replace(/\r\n/g, '\n')
+    .replace(/[ \t]+$/gm, '');
+}
