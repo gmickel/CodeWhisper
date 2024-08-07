@@ -1,6 +1,8 @@
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import chalk from 'chalk';
 import fs from 'fs-extra';
+import { v4 as uuidv4 } from 'uuid';
 import type { AIFileInfo, ApplyChangesOptions } from '../types';
 import { applySearchReplace } from './parsers/search-replace-parser';
 
@@ -30,6 +32,8 @@ async function applyFileChange(
   dryRun: boolean,
 ): Promise<void> {
   const fullPath = path.join(basePath, file.path);
+  const tempPath = path.join(tmpdir(), `codewhisper-${uuidv4()}`);
+
   try {
     switch (file.status) {
       case 'new':
@@ -44,7 +48,8 @@ async function applyFileChange(
           );
         } else {
           await fs.ensureDir(path.dirname(fullPath));
-          await fs.writeFile(fullPath, file.content || '');
+          await fs.writeFile(tempPath, file.content || '');
+          await fs.move(tempPath, fullPath, { overwrite: true });
           console.log(chalk.green(`Created file: ${file.path}`));
         }
         break;
@@ -59,18 +64,12 @@ async function applyFileChange(
                 `[DRY RUN] Changes preview:\n${JSON.stringify(file.changes, null, 2)}`,
               ),
             );
-          } else if (file.content) {
-            console.log(
-              chalk.gray(
-                `[DRY RUN] Content preview:\n${file.content.substring(0, 200)}${file.content.length > 200 ? '...' : ''}`,
-              ),
-            );
           }
         } else {
-          const currentContent = await fs.readFile(fullPath, 'utf-8');
           let updatedContent: string;
 
-          if (file.changes) {
+          if (file.changes && file.changes.length > 0) {
+            const currentContent = await fs.readFile(fullPath, 'utf-8');
             updatedContent = applySearchReplace(currentContent, file.changes);
           } else if (file.content) {
             updatedContent = file.content;
@@ -80,7 +79,8 @@ async function applyFileChange(
             );
           }
 
-          await fs.writeFile(fullPath, updatedContent);
+          await fs.writeFile(tempPath, updatedContent);
+          await fs.move(tempPath, fullPath, { overwrite: true });
           console.log(chalk.green(`Modified file: ${file.path}`));
         }
         break;
@@ -97,6 +97,7 @@ async function applyFileChange(
     }
   } catch (error) {
     console.error(chalk.red(`Error applying change to ${file.path}:`), error);
+    await fs.remove(tempPath).catch(() => {});
     throw error;
   }
 }
