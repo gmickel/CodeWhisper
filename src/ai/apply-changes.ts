@@ -67,22 +67,34 @@ async function applyFileChange(
           } else if (file.content) {
             console.log(
               chalk.gray(
-                `[DRY RUN] Content preview:\n${file.content.substring(0, 200)}${file.content.length > 200 ? '...' : ''}`,
+                `[DRY RUN] Full content replacement preview:\n${file.content.substring(0, 200)}${file.content.length > 200 ? '...' : ''}`,
               ),
             );
           }
         } else {
-          const currentContent = await fs.readFile(fullPath, 'utf-8');
+          let currentContent: string;
+          try {
+            currentContent = await fs.readFile(fullPath, 'utf-8');
+          } catch (error) {
+            console.error(chalk.red(`Error reading file ${file.path}:`, error));
+            throw error;
+          }
+
           let updatedContent: string;
 
           if (file.changes && file.changes.length > 0) {
+            // Diff mode edits
             updatedContent = applySearchReplace(currentContent, file.changes);
+            if (updatedContent === currentContent) {
+              console.log(chalk.yellow(`No changes applied to: ${file.path}`));
+              return;
+            }
           } else if (file.content) {
+            // Whole file edits
             updatedContent = file.content;
           } else {
-            throw new Error(
-              `No content or changes provided for modified file: ${file.path}`,
-            );
+            console.log(chalk.yellow(`No changes to apply for: ${file.path}`));
+            return;
           }
 
           await fs.writeFile(tempPath, updatedContent);
