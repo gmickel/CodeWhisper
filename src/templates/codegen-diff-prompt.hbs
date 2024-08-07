@@ -101,19 +101,27 @@ SEARCH/REPLACE Block Rules (for modified files only):
    [Modified code]
    >>>>>>> REPLACE
 
-2. Every SEARCH section must EXACTLY MATCH the existing source code, character for character, including all comments, docstrings, whitespace, etc.
+Explanation of the SEARCH/REPLACE format:
 
-3. SEARCH/REPLACE blocks will replace ALL matching occurrences.
+- The start of search block: <<<<<<< SEARCH
+- A contiguous chunk of lines to search for in the existing source code
+- The dividing line: =======
+- The lines to replace into the source code
+- The end of the replace block: >>>>>>> REPLACE
 
-4. Include enough lines to make the SEARCH blocks uniquely match the lines to change.
+Every *SEARCH* section must *EXACTLY MATCH* the existing source code, character for character, including all comments, docstrings, etc.
 
-5. Keep SEARCH/REPLACE blocks concise. Break large SEARCH/REPLACE blocks into a series of smaller blocks that each change a small portion of the file.
+*SEARCH/REPLACE* blocks will replace *all* matching occurrences.
+Include enough lines to make the SEARCH blocks uniquely match the lines to change.
 
-6. Include just the changing lines, and a few surrounding lines if needed for uniqueness. Do not include long runs of unchanging lines in SEARCH/REPLACE blocks.
+Keep *SEARCH/REPLACE* blocks concise.
+Break large *SEARCH/REPLACE* blocks into a series of smaller blocks that each change a small portion of the file.
+Include just the changing lines, and a few surrounding lines if needed for uniqueness.
+Do not include long runs of unchanging lines in *SEARCH/REPLACE* blocks.
 
-7. Only create SEARCH/REPLACE blocks for files that are part of the given codebase or that you've been explicitly told exist!
+Only create *SEARCH/REPLACE* blocks for files that the user has added to the chat!
 
-8. To move code within a file, use 2 SEARCH/REPLACE blocks: 1 to delete it from its current location, 1 to insert it in the new location.
+To move code within a file, use 2 *SEARCH/REPLACE* blocks: 1 to delete it from its current location, 1 to insert it in the new location.
 
 Examples:
 
@@ -164,28 +172,36 @@ Updated API version to v2 and added cache configuration for Redis.
 <file_path>src/utils/data-processor.ts</file_path>
 <file_content>
 <<<<<<< SEARCH
+import { ProcessedData } from './types';
+
 export function processData(data: any[]): ProcessedData {
+=======
+import { ProcessedData } from './types';
+import { getCurrentTimestamp } from './time-utils';
+
+export function processData(data: any[]): ProcessedData {
+>>>>>>> REPLACE
+
+<<<<<<< SEARCH
   return data.map(item => ({
     id: item.id,
     name: item.name.toUpperCase(),
     value: item.value * 2
   }));
-}
 =======
-export function processData(data: any[]): ProcessedData {
   return data.map(item => ({
     id: item.id,
     name: item.name.toUpperCase(),
     value: item.value * 2,
     processed: true,
-    timestamp: new Date().toISOString()
+    timestamp: getCurrentTimestamp()
   }));
-}
 >>>>>>> REPLACE
+}
 </file_content>
 <file_status>modified</file_status>
 <explanation>
-Enhanced processData function to include 'processed' flag and timestamp in the output.
+Enhanced processData function to include 'processed' flag and timestamp in the output. Also added an import for getCurrentTimestamp from time-utils.
 </explanation>
 </file>
 
