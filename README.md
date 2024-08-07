@@ -165,13 +165,20 @@ codewhisper list-models
 # CodeWhisper will prompt you to select a model from the list of available models
 codewhisper task
 
-# To enable the new diff-based code modifications, you can use the following command:
-# This will use diff-based code modifications. Please note that this is still experimental and may not work with all models. It is currently only recommended with Claude 3.5 Sonnet.
+# The mode of operation for generating code modifications is set automatically based on the model.
+# You can override this by using the --diff or --no-diff option.
 codewhisper task --diff
+codewhisper task --no-diff
 
 # You can also specify a model directly
 # Claude-3.5 Sonnet
 codewhisper task -m claude-3-5-sonnet-20240620
+
+# GPT-4o
+codewhisper task -m gpt-4o-2024-08-06
+
+# DeepSeek Coder
+codewhisper task -m deepseek-coder
 
 # Or use a local Ollama model (not recommended as it will be slow and inaccurate for comprehensive feature implementation tasks)
 codewhisper task -m ollama:llama3.1:70b --context-window 131072 --max-tokens 8192
@@ -184,7 +191,7 @@ codewhisper task --undo
 codewhisper task --redo
 ```
 
-> Note: If you are using CodeWhisper's LLM integration with `codewhisper task`, you will need to set the respective environment variable for the model you want to use (e.g., `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key`).
+> Note: If you are using CodeWhisper's LLM integration with `codewhisper task`, you will need to set the respective environment variable for the model you want to use (e.g., `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key` or `export DEEPSEEK_API_KEY=your_api_key` ).
 
 For more detailed instructions, see the [Installation](#-installation) and [Usage](#-usage) sections.
 
@@ -192,13 +199,16 @@ For more detailed instructions, see the [Installation](#-installation) and [Usag
 
 While CodeWhisper supports a variety of providers and models, our current recommendations are based on extensive testing and real-world usage. Here's an overview of the current status:
 
-#### Recommended Models
+#### Model Evaluation
 
-| Model             | Provider  | Recommendation | Notes                                                                 |
-| ----------------- | --------- | -------------- | --------------------------------------------------------------------- |
-| Claude-3.5-Sonnet | Anthropic | Highest        | Generates exceptional quality plans and results                       |
-| GPT-4o            | OpenAI    | Excellent      | Produces high-quality plans and good results                          |
-| GPT-4o-mini       | OpenAI    | Strong         | Good quality plans and results, long max output length (16384 tokens) |
+This section is still under development. We are actively testing and evaluating models.
+
+| Model             | Provider  | Recommendation | Editing Mode | Notes                                                                               |
+| ----------------- | --------- | -------------- | ------------ | ----------------------------------------------------------------------------------- |
+| Claude-3.5-Sonnet | Anthropic | Highest        | Diff         | Generates exceptional quality plans and results                                     |
+| GPT-4o            | OpenAI    | Excellent      | Diff         | Produces high-quality plans and good results, long max output length (16384 tokens) |
+| GPT-4o-mini       | OpenAI    | Strong         | Whole        | Good quality plans and results, long max output length (16384 tokens)               |
+| DeepSeek Coder    | DeepSeek  | Good           | Diff         | Good quality plans and results, long max output length (16384 tokens)               |
 
 #### Experimental Support
 
