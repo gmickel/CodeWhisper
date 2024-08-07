@@ -4,7 +4,11 @@ import { generateText } from 'ai';
 import chalk from 'chalk';
 import dotenv from 'dotenv';
 import { createOllama } from 'ollama-ai-provider';
-import type { GenerateAIResponseOptions, ModelFamily } from '../types';
+import type {
+  GenerateAIResponseOptions,
+  GenerateTextOptions,
+  ModelFamily,
+} from '../types';
 import getLogger from '../utils/logger';
 import { calculateCost, estimateCost } from './cost-calculation';
 import { getModelConfig, getModelFamily } from './model-config';
@@ -140,8 +144,24 @@ export async function generateAIResponse(
   }
 
   logger.info('AI Prompt', { processedPrompt });
-
   try {
+    const modelName =
+      modelFamily === 'ollama'
+        ? modelKey.split(':')[1] || 'llama3.1:8b'
+        : modelKey;
+
+    const generateTextOptions: GenerateTextOptions = {
+      model: client(modelName),
+      maxTokens: modelConfig.maxOutput,
+      temperature: taskTemperature,
+      prompt: processedPrompt,
+    };
+
+    if (options.systemPrompt) {
+      console.log('Using system prompt:', options.systemPrompt);
+      generateTextOptions.system = options.systemPrompt;
+    }
+
     const result = await generateText({
       model:
         modelFamily === 'ollama'
@@ -149,6 +169,7 @@ export async function generateAIResponse(
           : client(modelKey),
       maxTokens: modelConfig.maxOutput,
       temperature: taskTemperature,
+      system: options.systemPrompt ?? '',
       prompt: processedPrompt,
     });
 

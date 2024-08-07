@@ -82,7 +82,7 @@ __EXPLANATION__ (if necessary)
 File Handling Instructions:
 
 1. For modified files:
-   Use SEARCH/REPLACE blocks as described in the SEARCH/REPLACE Block Rules below.
+   Use SEARCH/REPLACE blocks as described in the SEARCH/REPLACE Block Rules in your system prompt.
 
 2. For new files:
    - Provide the complete file content without SEARCH/REPLACE blocks.
@@ -92,128 +92,28 @@ File Handling Instructions:
 3. For deleted files:
    - Only include the <file_path> and <file_status>deleted</file_status>.
 
-SEARCH/REPLACE Block Rules (for modified files only):
-
-1. Every SEARCH/REPLACE block must use this exact format:
-   <<<<<<< SEARCH
-   [Exact existing code]
-   =======
-   [Modified code]
-   >>>>>>> REPLACE
-
-2. Create small, atomic SEARCH/REPLACE blocks:
-   - Each block should modify no more than 5 lines of code.
-   - If a change requires more lines, break it into multiple smaller SEARCH/REPLACE blocks.
-   - Focus on one logical change per block (e.g., updating a single function or adding one import statement).
-
-3. Include minimal context:
-   - Add only 1-2 unchanged lines before and after the modified code for context, if necessary.
-   - Do not include long runs of unchanging lines in SEARCH/REPLACE blocks.
-
-4. Ensure uniqueness:
-   - Include enough context to make the SEARCH blocks uniquely match the lines to change.
-   - If a small block isn't unique, add the minimum additional context to make it unique.
-
-5. Exact matching:
-   - Every SEARCH section must EXACTLY MATCH the existing source code, character for character, including all comments, docstrings, whitespace, etc.
-
-6. Replace all occurrences:
-   - SEARCH/REPLACE blocks will replace ALL matching occurrences in the file.
-
-7. Moving code:
-   - To move code within a file, use 2 separate SEARCH/REPLACE blocks:
-     1) to delete it from its current location
-     2) to insert it in the new location
-
-8. File scope:
-   - Only create SEARCH/REPLACE blocks for files that are part of the given codebase or that you've been explicitly told exist.
-
-Example of breaking down a large change into multiple smaller SEARCH/REPLACE blocks:
-
-Instead of:
+Here's a simple example of a SEARCH/REPLACE block:
 
 <file>
-<file_path>src/utils/logger.ts</file_path>
+<file_path>src/utils/math-helper.ts</file_path>
 <file_content>
 <<<<<<< SEARCH
-import winston from 'winston';
-
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.simple(),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log' }),
-  ],
-});
-
-export default logger;
+export function add(a: number, b: number): number {
+  return a + b;
+}
 =======
-import winston from 'winston';
+export function add(a: number, b: number): number {
+  return a + b;
+}
 
-const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log' }),
-  ],
-});
-
-export const setLogLevel = (level: string) => {
-  logger.level = level;
-};
-
-export default logger;
->>>>>>> REPLACE
-</file_content>
-<file_status>modified</file_status>
-</file>
-
-Use multiple smaller blocks:
-
-<file>
-<file_path>src/utils/logger.ts</file_path>
-<file_content>
-<<<<<<< SEARCH
-import winston from 'winston';
-
-const logger = winston.createLogger({
-  level: 'info',
-=======
-import winston from 'winston';
-
-const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
->>>>>>> REPLACE
-
-<<<<<<< SEARCH
-  format: winston.format.simple(),
-=======
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
->>>>>>> REPLACE
-
-<<<<<<< SEARCH
-export default logger;
-=======
-export const setLogLevel = (level: string) => {
-  logger.level = level;
-};
-
-export default logger;
+export function subtract(a: number, b: number): number {
+  return a - b;
+}
 >>>>>>> REPLACE
 </file_content>
 <file_status>modified</file_status>
 <explanation>
-Updated logger configuration to use environment variable for log level, changed format to include timestamp and use JSON, and added a setLogLevel function.
+Added a new subtract function to the math-helper utility.
 </explanation>
 </file>
 

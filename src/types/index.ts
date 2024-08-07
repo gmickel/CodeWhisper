@@ -117,6 +117,7 @@ export interface GenerateAIResponseOptions {
   contextWindow?: number;
   maxTokens?: number;
   logAiInteractions?: boolean;
+  systemPrompt?: string;
 }
 
 export interface ApplyChangesOptions {
@@ -182,4 +183,13 @@ export interface AIFileInfo {
   changes?: AIFileChange[];
   status: 'new' | 'modified' | 'deleted';
   explanation?: string;
+}
+
+export interface GenerateTextOptions {
+  // biome-ignore lint/suspicious/noExplicitAny: it's fine here
+  model: any;
+  maxTokens: number;
+  temperature: number;
+  system?: string;
+  prompt: string;
 }

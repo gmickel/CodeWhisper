@@ -386,6 +386,7 @@ async function generateAndApplyCode(
     codegenTemplatePath,
     'utf-8',
   );
+
   const codegenCustomData = await prepareCodegenCustomData(
     codegenTemplateContent,
     taskCache,
@@ -486,6 +487,13 @@ async function generateCode(
   modelKey: string,
   options: AiAssistedTaskOptions,
 ): Promise<string> {
+  let systemPromptContent = undefined;
+
+  if (options.diff) {
+    const systemPromptPath = getTemplatePath('diff-system-prompt');
+    systemPromptContent = await fs.readFile(systemPromptPath, 'utf-8');
+  }
+
   const spinner = ora('Generating AI Code Modifications...').start();
   const modelConfig = getModelConfig(modelKey);
 
@@ -497,6 +505,7 @@ async function generateCode(
       contextWindow: options.contextWindow,
       maxTokens: options.maxTokens,
       logAiInteractions: options.logAiInteractions,
+      systemPrompt: systemPromptContent,
     });
   } else {
     generatedCode = await generateAIResponse(
@@ -505,6 +514,7 @@ async function generateCode(
         maxCostThreshold: options.maxCostThreshold,
         model: modelKey,
         logAiInteractions: options.logAiInteractions,
+        systemPrompt: systemPromptContent,
       },
       modelConfig.temperature?.codegenTemperature,
     );
