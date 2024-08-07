@@ -130,12 +130,9 @@ interface LLMPricing {
   outputCost: number;
 }
 
-export type ModelFamily =
-  | 'claude'
-  | 'openai'
-  | 'openai-compatible'
-  | 'groq'
-  | 'ollama';
+export type ModelFamily = 'claude' | 'openai' | 'openai-compatible' | 'ollama';
+
+export type EditingMode = 'diff' | 'whole';
 
 export interface ModelSpec {
   contextWindow: number;
@@ -144,6 +141,9 @@ export interface ModelSpec {
   pricing: LLMPricing;
   modelFamily: ModelFamily;
   temperature?: ModelTemperature;
+  mode?: EditingMode;
+  baseURL?: string;
+  apiKeyEnv?: string;
 }
 
 export interface ModelSpecs {
