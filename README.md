@@ -420,6 +420,7 @@ We welcome contributions to CodeWhisper! Please read our [CONTRIBUTING.md](CONTR
 - [Commander.js](https://github.com/tj/commander.js/) for CLI support
 - [fast-glob](https://github.com/mrmlnc/fast-glob) for file matching
 - [Inquirer.js](https://github.com/SBoudrias/Inquirer.js/) for interactive prompts
+- [Vercel AI SDK](https://sdk.vercel.ai/docs/introduction) for the great AI SDK
 
 ## 📬 Contact
 
