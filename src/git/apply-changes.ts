@@ -84,20 +84,12 @@ async function applyFileChange(
             await fs.writeFile(fullPath, updatedContent);
           } else if (file.changes) {
             let currentContent = await fs.readFile(fullPath, 'utf-8');
-            const appliedChanges = new Set();
             for (const change of file.changes) {
-              if (!appliedChanges.has(change.search)) {
-                currentContent = applyChange(
-                  currentContent,
-                  change.search,
-                  change.replace,
-                );
-                appliedChanges.add(change.search);
-              } else {
-                console.warn(
-                  `Skipping duplicate change for ${file.path}: ${change.search}`,
-                );
-              }
+              currentContent = applyChange(
+                currentContent,
+                change.search,
+                change.replace,
+              );
             }
             await fs.writeFile(fullPath, currentContent);
           } else if (file.content) {
@@ -135,17 +127,19 @@ function applyChange(content: string, search: string, replace: string): string {
   const trimmedSearch = search.trim();
   const trimmedReplace = replace.trim();
 
-  if (content.includes(trimmedSearch)) {
-    return content.replace(trimmedSearch, trimmedReplace);
+  const escapedSearch = escapeRegExp(trimmedSearch);
+  const regex = new RegExp(escapedSearch, 'g');
+
+  if (regex.test(content)) {
+    return content.replace(regex, trimmedReplace);
   }
 
   // If exact match fails, try matching with flexible whitespace
-  const escapedSearch = escapeRegExp(trimmedSearch);
   const flexibleSearch = escapedSearch.replace(/\s+/g, '\\s+');
-  const regex = new RegExp(flexibleSearch, 'g');
+  const flexibleRegex = new RegExp(flexibleSearch, 'g');
 
-  if (regex.test(content)) {
-    return content.replace(regex, (match) => {
+  if (flexibleRegex.test(content)) {
+    return content.replace(flexibleRegex, (match) => {
       const leadingWhitespace = match.match(/^\s*/)?.[0] || '';
       const trailingWhitespace = match.match(/\s*$/)?.[0] || '';
       return leadingWhitespace + trimmedReplace + trailingWhitespace;
