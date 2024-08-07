@@ -127,6 +127,10 @@ async function applyFileChange(
   }
 }
 
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function applyChange(content: string, search: string, replace: string): string {
   const trimmedSearch = search.trim();
   const trimmedReplace = replace.trim();
@@ -136,8 +140,9 @@ function applyChange(content: string, search: string, replace: string): string {
   }
 
   // If exact match fails, try matching with flexible whitespace
-  const flexibleSearch = trimmedSearch.replace(/\s+/g, '\\s+');
-  const regex = new RegExp(flexibleSearch);
+  const escapedSearch = escapeRegExp(trimmedSearch);
+  const flexibleSearch = escapedSearch.replace(/\s+/g, '\\s+');
+  const regex = new RegExp(flexibleSearch, 'g');
 
   if (regex.test(content)) {
     return content.replace(regex, (match) => {
