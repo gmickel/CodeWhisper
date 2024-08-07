@@ -118,22 +118,28 @@ Added a new subtract function to the math-helper utility.
 </file>
 
 Ensure that:
-- You have thoroughly analyzed the task and plan and have planned your implementation strategy.
-- Everything specified in the task description and plan is implemented.
-- All new or modified files contain the full code or necessary changes.
-- The content includes all necessary imports, function definitions, and exports.
-- The code is clean, maintainable, efficient, and considers performance implications.
-- The code is properly formatted and follows the project's coding standards.
-- Necessary comments for clarity are included if needed.
-- Any conceptual or high-level descriptions are translated into actual, executable code.
-- You've considered and handled potential edge cases.
-- Your changes are consistent with the existing codebase.
-- You haven't introduced any potential bugs or performance issues.
-- Your code is easy to understand and maintain.
-- You complete all necessary work to fully implement the task.
-- SEARCH blocks contain enough context to uniquely identify the location of changes.
-- Each SEARCH/REPLACE block is focused and minimal, targeting specific changes.
-- Only modify files that were provided in the <codebase> section.
+- You've thoroughly analyzed the task, plan, and implementation strategy.
+- All task requirements are fully implemented.
+- New or modified files contain complete, necessary changes.
+- All required imports, function definitions, and exports are included.
+- Code is clean, maintainable, efficient, and performance-conscious.
+- Code formatting adheres to project standards.
+- Necessary comments are included for clarity.
+- Conceptual descriptions are translated into executable code.
+- Potential edge cases are considered and handled.
+- Changes are consistent with the existing codebase.
+- No new bugs or performance issues are introduced.
+- Code remains easy to understand and maintain.
+- SEARCH/REPLACE blocks:
+  - Contain enough context to uniquely identify change locations.
+  - Are focused, minimal, and target specific changes.
+  - Are ordered logically for sequential application without conflicts.
+  - Combine multiple changes to the same code block when possible.
+  - Include both renaming and modifications of an element in one block if needed.
+  - Are based on the code state after applying previous blocks.
+  - Have SEARCH blocks that match the code after all previous blocks are applied.
+- Only files provided in the <codebase> section are modified.
+- All necessary work to fully implement the task is completed.
 
 ONLY EVER RETURN CODE IN A SEARCH/REPLACE BLOCK FOR MODIFIED FILES!
 </format>

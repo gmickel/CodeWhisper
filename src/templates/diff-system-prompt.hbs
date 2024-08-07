@@ -122,3 +122,71 @@ export default logger;
 Updated logger configuration to use environment variable for log level, changed format to include timestamp and use JSON, and added a setLogLevel function.
 </explanation>
 </file>
+
+9. Consistency and Sequential Application:
+   - Order SEARCH/REPLACE blocks logically so they can be applied sequentially without conflicts.
+   - When making multiple changes to the same code block, combine them into a single SEARCH/REPLACE block if possible.
+   - For renaming and modifying the same element, include both changes in one block.
+   - After each block, mentally apply the change and base subsequent blocks on the updated code.
+   - Ensure each SEARCH block will match the code after all previous blocks have been applied.
+   - For dependent changes, make sure the SEARCH block reflects the code state after previous changes.
+
+Example of combining related changes:
+
+<file>
+<file_path>src/utils/logger.ts</file_path>
+<file_content>
+<<<<<<< SEARCH
+const getLogger = (logAiInteractions: boolean) => {
+  if (!logAiInteractions) {
+    return {
+      info: () => {},
+      error: () => {},
+    };
+  }
+
+  const date = new Date().toISOString().split('T')[0];
+  const logFileName = `codewhisper-${date}.log`;
+
+  return winston.createLogger({
+    level: 'info',
+    // ... rest of the logger configuration
+  });
+};
+
+export default getLogger;
+=======
+const createLogger = (logLevel: string = 'info') => {
+  const date = new Date().toISOString().split('T')[0];
+  const logFileName = `codewhisper-${date}.log`;
+
+  return winston.createLogger({
+    level: logLevel,
+    // ... rest of the logger configuration
+  });
+};
+
+const getLogger = (logAiInteractions: boolean, logLevel: string = 'info') => {
+  if (!logAiInteractions) {
+    return {
+      error: () => {},
+      warn: () => {},
+      info: () => {},
+      debug: () => {},
+    };
+  }
+  return createLogger(logLevel);
+};
+
+export const setLogLevel = (level: string) => {
+  logger.level = level;
+};
+
+export default getLogger;
+>>>>>>> REPLACE
+</file_content>
+<file_status>modified</file_status>
+<explanation>
+Combined multiple changes into a single block: renamed getLogger to createLogger, added logLevel parameter, created a new getLogger function that uses createLogger, and added setLogLevel function.
+</explanation>
+</file>
