@@ -43,14 +43,14 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
     const taskCache = new TaskCache(basePath);
 
     const modelKey = await selectModel(options);
+    const modelConfig = getModelConfig(modelKey);
 
-    if (options.diff && modelKey !== 'claude-3-5-sonnet-20240620') {
-      console.log(
-        chalk.yellow(
-          'Diff-based code modifications are currently only supported with Claude 3.5 Sonnet.',
-        ),
-      );
+    if (options.diff === undefined) {
+      options.diff = modelConfig.mode === 'diff';
     }
+    console.log(
+      chalk.blue(`Using ${options.diff ? 'diff' : 'whole-file'} editing mode`),
+    );
 
     const { taskDescription, instructions } = await getTaskInfo(
       options,
