@@ -46,11 +46,17 @@ describe('apply-changes integration', () => {
             expect(content).toContain(
               "logLevel: 'error' | 'warn' | 'info' | 'debug'",
             );
+            // Check for unchanged parts
+            expect(content).toContain("import path from 'node:path';");
+            expect(content).toContain("import winston from 'winston';");
           }
           if (file.path.includes('index.ts')) {
             expect(content).toContain(
               "logLevel?: 'error' | 'warn' | 'info' | 'debug'",
             );
+            // Check for unchanged parts
+            expect(content).toContain('export interface GitHubIssue');
+            expect(content).toContain('export interface MarkdownOptions');
           }
           if (file.path.includes('task-workflow.ts')) {
             expect(content).toContain(
@@ -58,6 +64,13 @@ describe('apply-changes integration', () => {
             );
             expect(content).toContain(
               "logger.info(`Using ${options.diff ? 'diff' : 'whole-file'} editing mode`);",
+            );
+            // Check for unchanged parts
+            expect(content).toContain(
+              "import { processFiles } from '../core/file-processor';",
+            );
+            expect(content).toContain(
+              "import { generateMarkdown } from '../core/markdown-generator';",
             );
           }
           break;
