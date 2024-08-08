@@ -1,3 +1,11 @@
+# [1.14.0](https://github.com/gmickel/CodeWhisper/compare/v1.13.6...v1.14.0) (2024-08-08)
+
+
+### Features
+
+* new diff mode ([#86](https://github.com/gmickel/CodeWhisper/issues/86)) ([b20e55b](https://github.com/gmickel/CodeWhisper/commit/b20e55b23bf0d0b2bc949d991df34c209671a676))
+* trigger release ([d646b46](https://github.com/gmickel/CodeWhisper/commit/d646b4632b82e23dd352898c052523802377cd58))
+
 ## [1.13.6](https://github.com/gmickel/CodeWhisper/compare/v1.13.5...v1.13.6) (2024-08-06)
 
 
