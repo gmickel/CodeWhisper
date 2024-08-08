@@ -92,16 +92,15 @@
     "prepare": "lefthook install"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "0.0.35",
-    "@ai-sdk/openai": "0.0.40",
+    "@ai-sdk/anthropic": "0.0.39",
+    "@ai-sdk/openai": "0.0.44",
     "@anthropic-ai/sdk": "0.25.0",
-    "@inquirer/prompts": "5.3.7",
+    "@inquirer/prompts": "5.3.8",
     "@octokit/rest": "21.0.1",
-    "@types/diff": "5.2.1",
-    "ai": "3.3.0",
+    "@types/uuid": "10.0.0",
+    "ai": "3.3.4",
     "chalk": "5.3.0",
     "commander": "12.1.0",
-    "diff": "5.2.0",
     "dotenv": "16.4.5",
     "fast-glob": "3.3.2",
     "fs-extra": "11.2.0",
@@ -112,12 +111,13 @@
     "inquirer-file-tree-selection-prompt": "2.0.5",
     "isbinaryfile": "5.0.2",
     "micromatch": "4.0.7",
-    "ollama-ai-provider": "0.11.0",
+    "ollama-ai-provider": "0.12.0",
     "ora": "8.0.1",
     "piscina": "4.6.1",
     "simple-git": "3.25.0",
     "strip-comments": "2.0.1",
-    "winston": "3.13.1"
+    "uuid": "10.0.0",
+    "winston": "3.14.1"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
@@ -135,7 +135,7 @@
     "semantic-release": "24.0.0",
     "tsup": "8.2.4",
     "typescript": "5.5.4",
-    "vite": "5.3.5",
+    "vite": "5.4.0",
     "vitest": "2.0.5"
   },
   "packageManager": "pnpm@9.6.0",

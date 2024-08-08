@@ -4,8 +4,8 @@ import {
   isResponseMalformed,
   parseCommonFields,
 } from './parsers/common-parser';
-import { parseDiffFiles } from './parsers/diff-parser';
 import { parseFullContentFiles } from './parsers/full-content-parser';
+import { parseSearchReplaceFiles } from './parsers/search-replace-parser';
 
 export function parseAICodegenResponse(
   response: string,
@@ -27,7 +27,7 @@ export function parseAICodegenResponse(
     result = { ...result, ...commonFields };
 
     result.files = useDiffMode
-      ? parseDiffFiles(response)
+      ? parseSearchReplaceFiles(response)
       : parseFullContentFiles(response);
 
     if (isResponseMalformed(result)) {

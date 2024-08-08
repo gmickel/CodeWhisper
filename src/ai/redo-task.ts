@@ -45,12 +45,19 @@ export async function redoLastTask(options: AiAssistedTaskOptions) {
       default: false,
     });
 
+    const modelConfig = getModelConfig(modelKey);
+
     if (changeModel) {
       modelKey = await selectModelPrompt();
-      console.log(
-        chalk.blue(`Using new model: ${getModelConfig(modelKey).modelName}`),
-      );
+      console.log(chalk.blue(`Using new model: ${modelConfig.modelName}`));
     }
+
+    if (options.diff === undefined) {
+      options.diff = modelConfig.mode === 'diff';
+    }
+    console.log(
+      chalk.blue(`Using ${options.diff ? 'diff' : 'whole-file'} editing mode`),
+    );
 
     // Confirmation for changing file selection
     const changeFiles = await confirm({

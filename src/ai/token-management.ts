@@ -33,7 +33,6 @@ export function estimateTokenCount(text: string, modelKey: string): number {
     }
     case 'openai':
     case 'openai-compatible':
-    case 'groq':
       // OpenAI and OpenAI-compatible models use the same tokenizer
       return baseTokenCount;
     default:

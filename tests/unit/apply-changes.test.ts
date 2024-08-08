@@ -1,20 +1,13 @@
+import os from 'node:os';
 import path from 'node:path';
-import { applyPatch } from 'diff';
 import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { applyChanges } from '../../src/git/apply-changes';
+import { applyChanges } from '../../src/ai/apply-changes';
+import { applySearchReplace } from '../../src/ai/parsers/search-replace-parser';
 import type { AIParsedResponse } from '../../src/types';
 
 vi.mock('fs-extra');
-vi.mock('simple-git');
-vi.mock('../../src/utils/git-tools');
-vi.mock('diff', async () => {
-  const actual = await vi.importActual('diff');
-  return {
-    ...actual,
-    applyPatch: vi.fn(),
-  };
-});
+vi.mock('../../src/ai/parsers/search-replace-parser');
 
 describe('applyChanges', () => {
   const mockBasePath = '/mock/base/path';
@@ -27,9 +20,9 @@ describe('applyChanges', () => {
     vi.clearAllMocks();
   });
 
-  it('should create new files and modify existing ones', async () => {
+  it('should create new files, modify existing ones with multiple changes, and delete files', async () => {
     const mockParsedResponse: AIParsedResponse = {
-      fileList: ['new-file.js', 'existing-file.js'],
+      fileList: ['new-file.js', 'existing-file.js', 'deleted-file.js'],
       files: [
         {
           path: 'new-file.js',
@@ -40,15 +33,39 @@ describe('applyChanges', () => {
         {
           path: 'existing-file.js',
           language: 'javascript',
-          content: 'console.log("Modified file");',
+          changes: [
+            {
+              search: 'console.log("Old content");',
+              replace: 'console.log("Modified content");',
+            },
+            {
+              search: 'function oldFunction() {}',
+              replace: 'function newFunction() {}',
+            },
+          ],
           status: 'modified',
         },
+        {
+          path: 'deleted-file.js',
+          language: 'javascript',
+          status: 'deleted',
+        },
       ],
-      gitBranchName: 'feature/new-branch',
-      gitCommitMessage: 'Add and modify files',
-      summary: 'Created a new file and modified an existing one',
+      gitBranchName: 'feature/mixed-changes',
+      gitCommitMessage: 'Add, modify, and delete files',
+      summary:
+        'Created a new file, modified an existing one with multiple changes, and deleted a file',
       potentialIssues: 'None',
     };
+
+    const originalContent =
+      'console.log("Old content");\nfunction oldFunction() {}';
+    const modifiedContent =
+      'console.log("Modified content");\nfunction newFunction() {}';
+
+    // biome-ignore lint/suspicious/noExplicitAny: explicit any is required for the mock
+    vi.mocked(fs.readFile).mockResolvedValue(originalContent as any);
+    vi.mocked(applySearchReplace).mockResolvedValue(modifiedContent);
 
     await applyChanges({
       basePath: mockBasePath,
@@ -57,18 +74,42 @@ describe('applyChanges', () => {
     });
 
     expect(fs.ensureDir).toHaveBeenCalledTimes(1);
-    expect(fs.writeFile).toHaveBeenCalledTimes(2);
+    expect(fs.writeFile).toHaveBeenCalledTimes(3);
+    expect(fs.readFile).toHaveBeenCalledTimes(2);
+    expect(fs.remove).toHaveBeenCalledTimes(1);
+    expect(applySearchReplace).toHaveBeenCalledTimes(1);
+
+    // Check if the deleted file was removed
+    expect(fs.remove).toHaveBeenCalledWith(
+      path.join(mockBasePath, 'deleted-file.js'),
+    );
   });
 
   it('should not apply changes in dry run mode', async () => {
     const mockParsedResponse: AIParsedResponse = {
-      fileList: ['new-file.js'],
+      fileList: ['new-file.js', 'existing-file.js', 'deleted-file.js'],
       files: [
         {
           path: 'new-file.js',
           language: 'javascript',
           content: 'console.log("New file");',
           status: 'new',
+        },
+        {
+          path: 'existing-file.js',
+          language: 'javascript',
+          changes: [
+            {
+              search: 'console.log("Old content");',
+              replace: 'console.log("Modified content");',
+            },
+          ],
+          status: 'modified',
+        },
+        {
+          path: 'deleted-file.js',
+          language: 'javascript',
+          status: 'deleted',
         },
       ],
       gitBranchName: 'feature/dry-run',
@@ -85,6 +126,8 @@ describe('applyChanges', () => {
 
     expect(fs.ensureDir).not.toHaveBeenCalled();
     expect(fs.writeFile).not.toHaveBeenCalled();
+    expect(fs.readFile).not.toHaveBeenCalled();
+    expect(fs.remove).not.toHaveBeenCalled();
   });
 
   it('should handle errors during file operations', async () => {
@@ -117,67 +160,6 @@ describe('applyChanges', () => {
     ).rejects.toThrow('Failed to create directory');
   });
 
-  it('should handle mixed operations (create, modify, delete)', async () => {
-    const mockParsedResponse: AIParsedResponse = {
-      fileList: ['new-file.js', 'modified-file.js', 'deleted-file.js'],
-      files: [
-        {
-          path: 'new-file.js',
-          language: 'javascript',
-          content: 'console.log("New file");',
-          status: 'new',
-        },
-        {
-          path: 'modified-file.js',
-          language: 'javascript',
-          content: 'console.log("Modified file");',
-          status: 'modified',
-        },
-        {
-          path: 'deleted-file.js',
-          language: '',
-          content: '',
-          status: 'deleted',
-        },
-      ],
-      gitBranchName: 'feature/mixed-changes',
-      gitCommitMessage: 'Mixed file operations',
-      summary: 'Created, modified, and deleted files',
-      potentialIssues: 'None',
-    };
-
-    await applyChanges({
-      basePath: mockBasePath,
-      parsedResponse: mockParsedResponse,
-      dryRun: false,
-    });
-
-    expect(fs.ensureDir).toHaveBeenCalledTimes(1);
-    expect(fs.writeFile).toHaveBeenCalledTimes(2);
-    expect(fs.remove).toHaveBeenCalledTimes(1);
-  });
-
-  it('should handle empty file list', async () => {
-    const mockParsedResponse: AIParsedResponse = {
-      fileList: [],
-      files: [],
-      gitBranchName: 'feature/no-changes',
-      gitCommitMessage: 'No changes',
-      summary: 'No files were changed',
-      potentialIssues: 'None',
-    };
-
-    await applyChanges({
-      basePath: mockBasePath,
-      parsedResponse: mockParsedResponse,
-      dryRun: false,
-    });
-
-    expect(fs.ensureDir).not.toHaveBeenCalled();
-    expect(fs.writeFile).not.toHaveBeenCalled();
-    expect(fs.remove).not.toHaveBeenCalled();
-  });
-
   it('should handle file path with subdirectories', async () => {
     const mockParsedResponse: AIParsedResponse = {
       fileList: ['deep/nested/file.js'],
@@ -205,73 +187,29 @@ describe('applyChanges', () => {
       expect.stringContaining(path.join('deep', 'nested')),
     );
     expect(fs.writeFile).toHaveBeenCalledWith(
-      expect.stringContaining(path.join('deep', 'nested', 'file.js')),
+      expect.stringContaining(path.join(os.tmpdir())),
       'console.log("Nested file");',
     );
   });
 
-  it('should apply diffs for modified files when provided', async () => {
-    const mockBasePath = '/mock/base/path';
-    const mockParsedResponse = {
-      fileList: ['modified-file.js'],
-      files: [
-        {
-          path: 'modified-file.js',
-          language: 'javascript',
-          diff: {
-            oldFileName: 'modified-file.js',
-            newFileName: 'modified-file.js',
-            hunks: [
-              {
-                oldStart: 1,
-                oldLines: 1,
-                newStart: 1,
-                newLines: 1,
-                lines: [
-                  '-console.log("Old content");',
-                  '+console.log("New content");',
-                ],
-              },
-            ],
-          },
-          status: 'modified',
-        },
-      ],
-      gitBranchName: 'feature/diff-modification',
-      gitCommitMessage: 'Apply diff to file',
-      summary: 'Modified a file using diff',
+  it('should handle empty file list', async () => {
+    const mockParsedResponse: AIParsedResponse = {
+      fileList: [],
+      files: [],
+      gitBranchName: 'feature/no-changes',
+      gitCommitMessage: 'No changes',
+      summary: 'No files were changed',
       potentialIssues: 'None',
     };
 
-    const oldContent = 'console.log("Old content");';
-    const newContent = 'console.log("New content");';
-
-    // biome-ignore lint/suspicious/noExplicitAny: explicit any is fine here, we're mocking fs.readFile
-    vi.mocked(fs.readFile).mockResolvedValue(oldContent as any);
-    vi.mocked(applyPatch).mockReturnValue(newContent);
-
     await applyChanges({
       basePath: mockBasePath,
-      parsedResponse: mockParsedResponse as AIParsedResponse,
+      parsedResponse: mockParsedResponse,
       dryRun: false,
     });
 
-    expect(fs.readFile).toHaveBeenCalledTimes(1);
-    expect(fs.readFile).toHaveBeenCalledWith(
-      expect.stringContaining('modified-file.js'),
-      'utf-8',
-    );
-
-    expect(applyPatch).toHaveBeenCalledTimes(1);
-    expect(applyPatch).toHaveBeenCalledWith(
-      oldContent,
-      mockParsedResponse.files[0].diff,
-    );
-
-    expect(fs.writeFile).toHaveBeenCalledTimes(1);
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      expect.stringContaining('modified-file.js'),
-      newContent,
-    );
+    expect(fs.ensureDir).not.toHaveBeenCalled();
+    expect(fs.writeFile).not.toHaveBeenCalled();
+    expect(fs.remove).not.toHaveBeenCalled();
   });
 });

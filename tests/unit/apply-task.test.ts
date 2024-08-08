@@ -2,12 +2,12 @@ import path from 'node:path';
 import fs from 'fs-extra';
 import simpleGit from 'simple-git';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import * as applyChanges from '../../src/ai/apply-changes';
 import { applyTask } from '../../src/ai/apply-task';
-import * as applyChanges from '../../src/git/apply-changes';
 import * as gitTools from '../../src/utils/git-tools';
 
 vi.mock('../../src/utils/git-tools');
-vi.mock('../../src/git/apply-changes');
+vi.mock('../../src/ai/apply-changes');
 vi.mock('fs-extra');
 vi.mock('simple-git');
 

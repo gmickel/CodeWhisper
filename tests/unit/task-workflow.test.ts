@@ -1,6 +1,7 @@
 import path from 'node:path';
 import simpleGit, { type SimpleGit } from 'simple-git';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { applyChanges } from '../../src/ai/apply-changes';
 import { generateAIResponse } from '../../src/ai/generate-ai-response';
 import { getInstructions } from '../../src/ai/get-instructions';
 import { getTaskDescription } from '../../src/ai/get-task-description';
@@ -10,7 +11,6 @@ import { reviewPlan } from '../../src/ai/plan-review';
 import { runAIAssistedTask } from '../../src/ai/task-workflow';
 import { processFiles } from '../../src/core/file-processor';
 import { generateMarkdown } from '../../src/core/markdown-generator';
-import { applyChanges } from '../../src/git/apply-changes';
 import { selectFilesPrompt } from '../../src/interactive/select-files-prompt';
 import { selectModelPrompt } from '../../src/interactive/select-model-prompt';
 import type {
@@ -29,7 +29,7 @@ vi.mock('../../src/core/markdown-generator');
 vi.mock('../../src/ai/generate-ai-response');
 vi.mock('../../src/ai/parse-ai-codegen-response');
 vi.mock('../../src/ai/plan-review');
-vi.mock('../../src/git/apply-changes');
+vi.mock('../../src/ai/apply-changes');
 vi.mock('../../src/utils/git-tools');
 vi.mock('../../src/ai/model-config');
 vi.mock('simple-git');
@@ -173,6 +173,7 @@ describe('runAIAssistedTask', () => {
     const mockOptionsWithoutPlan = {
       ...mockOptions,
       plan: false,
+      diff: false,
     };
 
     await runAIAssistedTask(mockOptionsWithoutPlan);
@@ -190,7 +191,7 @@ describe('runAIAssistedTask', () => {
     expect(parseAICodegenResponse).toHaveBeenCalledWith(
       mockGeneratedCode,
       undefined,
-      undefined,
+      false,
     );
 
     expect(ensureBranch).toHaveBeenCalledWith(
@@ -307,7 +308,12 @@ describe('runAIAssistedTask', () => {
     vi.mocked(applyChanges).mockResolvedValue();
     vi.mocked(getModelConfig).mockReturnValue(mockModelConfig);
 
-    await runAIAssistedTask(mockOptions);
+    const mockOptionsWithPlan = {
+      ...mockOptions,
+      diff: false,
+    };
+
+    await runAIAssistedTask(mockOptionsWithPlan);
 
     expect(getTaskDescription).toHaveBeenCalled();
     expect(getInstructions).toHaveBeenCalled();
@@ -322,7 +328,7 @@ describe('runAIAssistedTask', () => {
     expect(parseAICodegenResponse).toHaveBeenCalledWith(
       mockGeneratedCode,
       undefined,
-      undefined,
+      false,
     );
 
     expect(ensureBranch).toHaveBeenCalledWith(
@@ -339,20 +345,20 @@ describe('runAIAssistedTask', () => {
     );
   });
 
-  it('should handle diff-based updates when --diff flag is used', async () => {
+  it('should handle multiple changes when --diff flag is used', async () => {
     const diffOptions = {
       ...mockOptions,
       model: 'claude-3-sonnet-20240229',
       diff: true,
     };
 
-    const mockTaskDescription = 'Test diff-based task';
-    const mockInstructions = 'Test diff-based instructions';
+    const mockTaskDescription = 'Test multiple changes task';
+    const mockInstructions = 'Test multiple changes instructions';
     const mockSelectedFiles = ['file1.ts'];
     const mockProcessedFiles = [
       {
         path: 'file1.ts',
-        content: 'original content',
+        content: 'original content\nmore original content',
         language: 'typescript',
         size: 100,
         created: new Date(),
@@ -360,8 +366,8 @@ describe('runAIAssistedTask', () => {
         extension: 'ts',
       },
     ];
-    const mockGeneratedPlan = 'Generated diff-based plan';
-    const mockReviewedPlan = 'Reviewed diff-based plan';
+    const mockGeneratedPlan = 'Generated multiple changes plan';
+    const mockReviewedPlan = 'Reviewed multiple changes plan';
     const mockGeneratedCode = `
       <file_list>
       file1.ts
@@ -369,45 +375,49 @@ describe('runAIAssistedTask', () => {
       <file>
       <file_path>file1.ts</file_path>
       <file_status>modified</file_status>
-      <file_content language="typescript">
-      --- file1.ts
-      +++ file1.ts
-      @@ -1 +1 @@
-      -original content
-      +updated content
+      <file_content>
+      file1.ts
+      <<<<<<< SEARCH
+      original content
+      =======
+      updated content
+      >>>>>>> REPLACE
+
+      <<<<<<< SEARCH
+      more original content
+      =======
+      additional updated content
+      >>>>>>> REPLACE
       </file_content>
       </file>
-      <git_branch_name>feature/diff-task</git_branch_name>
-      <git_commit_message>Implement diff-based task</git_commit_message>
-      <summary>Updated file using diff</summary>
+      <git_branch_name>feature/multiple-changes-task</git_branch_name>
+      <git_commit_message>Implement multiple changes task</git_commit_message>
+      <summary>Updated file with multiple changes</summary>
       <potential_issues>None</potential_issues>
     `;
 
     const mockParsedResponse = {
-      gitBranchName: 'feature/diff-task',
-      gitCommitMessage: 'Implement diff-based task',
+      gitBranchName: 'feature/multiple-changes-task',
+      gitCommitMessage: 'Implement multiple changes task',
       fileList: ['file1.ts'],
       files: [
         {
           path: 'file1.ts',
           language: 'typescript',
           status: 'modified',
-          diff: {
-            oldFileName: 'file1.ts',
-            newFileName: 'file1.ts',
-            hunks: [
-              {
-                oldStart: 1,
-                oldLines: 1,
-                newStart: 1,
-                newLines: 1,
-                lines: ['-original content', '+updated content'],
-              },
-            ],
-          },
+          changes: [
+            {
+              search: 'original content',
+              replace: 'updated content',
+            },
+            {
+              search: 'more original content',
+              replace: 'additional updated content',
+            },
+          ],
         },
       ],
-      summary: 'Updated file using diff',
+      summary: 'Updated file with multiple changes',
       potentialIssues: 'None',
     };
 
@@ -434,7 +444,7 @@ describe('runAIAssistedTask', () => {
     vi.mocked(parseAICodegenResponse).mockReturnValue(
       mockParsedResponse as unknown as AIParsedResponse,
     );
-    vi.mocked(ensureBranch).mockResolvedValue('feature/diff-task');
+    vi.mocked(ensureBranch).mockResolvedValue('feature/multiple-changes-task');
     vi.mocked(applyChanges).mockResolvedValue();
     vi.mocked(getModelConfig).mockReturnValue(mockModelConfig);
 

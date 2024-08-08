@@ -17,7 +17,7 @@ describe('Cost Calculation', () => {
 
     it('should calculate cost correctly for GPT models', () => {
       const usage = { inputTokens: 1000000, outputTokens: 500000 };
-      expect(calculateCost('gpt-4o', usage)).toBe(12.5);
+      expect(calculateCost('gpt-4o-2024-08-06', usage)).toBe(7.5);
       expect(roundTo(calculateCost('gpt-4o-mini', usage), 2)).toBe(0.45);
     });
 
@@ -43,7 +43,7 @@ describe('Cost Calculation', () => {
     });
 
     it('should estimate cost correctly for GPT models', () => {
-      expect(estimateCost('gpt-4o', 1000000, 500000)).toBe(12.5);
+      expect(estimateCost('gpt-4o-2024-08-06', 1000000, 500000)).toBe(7.5);
       expect(roundTo(estimateCost('gpt-4o-mini', 1000000, 500000), 2)).toBe(
         0.45,
       );
@@ -64,8 +64,9 @@ describe('Cost Calculation', () => {
         'claude-3-opus-20240229',
         'claude-3-sonnet-20240229',
         'claude-3-haiku-20240307',
-        'gpt-4o',
+        'gpt-4o-2024-08-06',
         'gpt-4o-mini',
+        'deepseek-coder',
         'llama-3.1-70b-versatile',
         'ollama',
       ]);

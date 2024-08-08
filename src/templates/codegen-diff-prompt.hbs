@@ -1,5 +1,4 @@
-You are an expert developer tasked with implementing a given task. Your goal is to write all the code changes needed to
-complete the task, ensuring it integrates well with the existing codebase and follows best practices.
+You are an expert developer tasked with implementing a given task. Your goal is to write all the code needed to complete the task, ensuring it integrates well with the existing codebase and follows best practices.
 
 You will be given:
 - A task description
@@ -7,8 +6,7 @@ You will be given:
 - Instructions
 - An implementation plan
 
-Use the plan to guide your implementation, but be prepared to make necessary adjustments or improvements. Double-check
-your work as you go.
+Use the plan to guide your implementation, but be prepared to make necessary adjustments or improvements. Double-check your work as you go.
 
 Note: Focus solely on the technical implementation. Ignore any mentions of human tasks or non-technical aspects.
 
@@ -21,235 +19,131 @@ IMPLEMENTATION_PLAN: A detailed implementation plan for the given issue.
 FORMAT: Instructions for how to format your response.
 
 ---
-
 <task>
-  {{var_taskDescription}}
+{{var_taskDescription}}
 </task>
-
 ---
-
 <instructions>
-  Follow these instructions:
-
-  {{var_instructions}}
+Follow these instructions:
+{{var_instructions}}
 </instructions>
-
 ---
-
 <codebase>
-  ## Code Summary
+## Code Summary
+{{tableOfContents files}}
 
-  {{tableOfContents files}}
-
-  ## Selected Files:
-  {{#each files}}
-  ### {{relativePath this.path}}
-
-  {{#codeblock this.content this.language}}{{/codeblock}}
-
-  {{/each}}
-
+## Selected Files:
+{{#each files}}
+### {{relativePath this.path}}
+{{#codeblock this.content this.language}}{{/codeblock}}
+{{/each}}
 </codebase>
-
 ---
-
 <implementation_plan>
-  {{var_plan}}
+{{var_plan}}
 </implementation_plan>
-
 ---
-
 <format>
+Generate SEARCH/REPLACE blocks for modified files, full content for new files, and only the file path for deleted files.
 
-  Generate diffs for modified files, full content for new files, and only the file path for deleted files.
+If you don't need to modify a file, don't include it - this simplifies Git diffs.
 
-  If you don't need to modify a file, don't include it - this simplifies Git diffs.
+Format your response as follows:
+<file_list>
+FILE_PATH_1
+FILE_PATH_2
+...
+</file_list>
+<git_branch_name>
+__GIT_BRANCH_NAME__
+</git_branch_name>
+<git_commit_message>
+__GIT_COMMIT_MESSAGE__
+</git_commit_message>
+<summary>
+__BRIEF_SUMMARY_OF_CHANGES__
+</summary>
+<potential_issues>
+__LIST_OF_POTENTIAL_ISSUES_OR_TRADE_OFFS__
+</potential_issues>
 
-  Format your response as follows:
-  <file_list>
-    FILE_PATH_1
-    FILE_PATH_2
-    ...
-  </file_list>
-  <git_branch_name>
-    __GIT_BRANCH_NAME__
-  </git_branch_name>
+Then, for each file:
+<file>
+<file_path>__FILE_PATH__</file_path>
+<file_content>
+__CONTENT_OR_SEARCH_REPLACE_BLOCK__
+</file_content>
+<file_status>__STATUS__</file_status>
+<explanation>
+__EXPLANATION__ (if necessary)
+</explanation>
+</file>
 
-  <git_commit_message>
-    __GIT_COMMIT_MESSAGE__
-  </git_commit_message>
+File Handling Instructions:
 
-  <summary>
-    __BRIEF_SUMMARY_OF_CHANGES__
-  </summary>
+1. For modified files:
+   Use SEARCH/REPLACE blocks as described in the SEARCH/REPLACE Block Rules in your system prompt.
+   - Keep each SEARCH/REPLACE block small and focused, ideally modifying no more than 5 lines of code.
+   - Include 1-2 lines of unchanged context before and after the modified code to ensure unique matching.
+   - If a change requires more lines, break it into multiple smaller SEARCH/REPLACE blocks.
 
-  <potential_issues>
-    __LIST_OF_POTENTIAL_ISSUES_OR_TRADE_OFFS__
-  </potential_issues>
+2. For new files:
+   - Provide the complete file content without SEARCH/REPLACE blocks.
+   - Set the file status to 'new'.
+   - Include the full path of the new file.
 
-  Then, for each file:
-  <file>
-    <file_path>__FILE_PATH__</file_path>
-    <file_status>__STATUS__</file_status>
-    <file_content language="__LANGUAGE__">
-      __FILE_CONTENT_OR_DIFF__
-    </file_content>
-    <explanation>
-      __EXPLANATION__ (if necessary)
-    </explanation>
-  </file>
+3. For deleted files:
+   - Only include the <file_path> and <file_status>deleted</file_status>.
 
-  Please adhere to the following guidelines:
+Here's a simple example of a SEARCH/REPLACE block:
 
-  FILE_PATH: Use the full path from the project root.
-  Example: 'src/components/Button.tsx'
+<file>
+<file_path>src/utils/math-helper.ts</file_path>
+<file_content>
+<<<<<<< SEARCH
+export function add(a: number, b: number): number {
+  return a + b;
+}
+=======
+export function add(a: number, b: number): number {
+  return a + b;
+}
 
-  LANGUAGE: Specify the language or file type. For example:
-  'tsx' for .tsx files
-  'javascript' for .js files
-  'css' for .css files
-  'json' for .json files
-  etc
+export function subtract(a: number, b: number): number {
+  return a - b;
+}
+>>>>>>> REPLACE
+</file_content>
+<file_status>modified</file_status>
+<explanation>
+Added a new subtract function to the math-helper utility.
+</explanation>
+</file>
 
-  FILE_CONTENT_OR_DIFF:
-  - For new files: Provide the complete file content, including all necessary imports, function definitions, and
-  exports.
-  - For modified files: Provide a unified diff format. This MUST include:
-    1. File header lines (starting with "---" and "+++")
-    2. Hunk headers (starting with "@@")
-    3. Context lines (starting with a space)
-    4. Removed lines (starting with "-")
-    5. Added lines (starting with "+")
-  - For deleted files: Leave this section empty.
+Ensure that:
+- You've thoroughly analyzed the task, plan, and implementation strategy.
+- All task requirements are fully implemented.
+- New or modified files contain complete, necessary changes.
+- All required imports, function definitions, and exports are included.
+- Code is clean, maintainable, efficient, and performance-conscious.
+- Code formatting adheres to project standards.
+- Necessary comments are included for clarity.
+- Conceptual descriptions are translated into executable code.
+- Potential edge cases are considered and handled.
+- Changes are consistent with the existing codebase.
+- No new bugs or performance issues are introduced.
+- Code remains easy to understand and maintain.
+- SEARCH/REPLACE blocks:
+  - Contain enough context to uniquely identify change locations.
+  - Are focused, minimal, and target specific changes.
+  - Are ordered logically for sequential application without conflicts.
+  - Include both renaming and modifications of an element in one block if needed.
+  - Are based on the code state after applying previous blocks.
+  - Have SEARCH blocks that match the code after all previous blocks are applied.
+- Only files provided in the <codebase> section are modified.
+- All necessary work to fully implement the task is completed.
 
-  Ensure proper indentation and follow the project's coding standards.
-
-  STATUS: Use 'new' for newly created files, 'modified' for existing files that are being updated, and 'deleted' for
-  files that are being deleted.
-
-  EXPLANATION: Provide a brief explanation for any significant design decisions or non-obvious implementations.
-
-  When creating diffs for modified files:
-  - Always include file header lines with the correct file paths.
-  - Always include hunk headers with the correct line numbers.
-  - Use '+' at the beginning of the line to indicate added lines, including new imports.
-  - Use '-' at the beginning of the line to indicate removed lines.
-  - Use ' ' (space) at the beginning of the line for unchanged lines (context).
-  - Include at least 3 lines of unchanged context before and after changes to help with patch application.
-
-  Example of a correct diff format:
-  <file_content language="typescript">
-  --- src/types/index.ts
-  +++ src/types/index.ts
-  @@ -1,4 +1,6 @@
-   import type { ParsedDiff } from 'diff';
-  +import type { LogLevel } from '../utils/logger';
-  +
-   export interface GitHubIssue {
-     number: number;
-     title: string;
-  @@ -40,6 +42,7 @@
-   | 'noCodeblock'
-   > & {
-     dryRun: boolean;
-  +  logLevel?: LogLevel;
-     maxCostThreshold?: number;
-     task?: string;
-     description?: string;
-  </file_content>
-
-  Before modifying a file, carefully review its entire content. Ensure that your changes, especially new imports, are
-  placed in the correct location and don't duplicate existing code.
-
-  When generating diffs:
-  1. Start with the original file content.
-  2. Make your changes, keeping track of line numbers.
-  3. Generate the diff by comparing the original and modified versions.
-  4. Include at least 3 lines of unchanged context before and after each change.
-  5. Verify that the diff accurately represents your intended changes.
-
-  After generating each diff:
-  - Verify that all new lines (including imports and blank lines) start with '+'.
-  - Ensure that the line numbers in the diff headers (@@ -old,oldlines +new,newlines @@) are correct and account for
-  added/removed lines.
-  - Check that there are sufficient unchanged context lines around modifications.
-
-  Example for a new file:
-  <file>
-    <file_path>src/components/IssueList.tsx</file_path>
-    <file_status>new</file_status>
-    <file_content language="tsx">
-  import React from 'react';
-  import { Issue } from '../types';
-
-  interface IssueListProps {
-    issues: Issue[];
-  }
-
-  export const IssueList: React.FC<IssueListProps> = ({ issues }) => {
-    return (
-      <ul>
-        {issues.map((issue) => (
-          <li key={issue.id}>{issue.title}</li>
-        ))}
-      </ul>
-    );
-  };
-    </file_content>
-    <explanation>
-      Created a new IssueList component to display a list of issues. Used React.FC for type-safety and map function for
-      efficient rendering of multiple issues.
-    </explanation>
-  </file>
-
-  Example for a modified file:
-  <file>
-    <file_path>src/components/App.tsx</file_path>
-    <file_status>modified</file_status>
-    <file_content language="tsx">
-  --- src/components/App.tsx
-  +++ src/components/App.tsx
-  @@ -1,5 +1,6 @@
-   import React from 'react';
-   import { Header } from './Header';
-  +import { IssueList } from './IssueList';
-
-   export const App: React.FC = () => {
-     return (
-  @@ -7,6 +8,7 @@
-       <div>
-         <Header />
-         <main>
-  -        {/* TODO: Add issue list */}
-  +        <IssueList issues={[]} />
-         </main>
-       </div>
-     );
-    </file_content>
-    <explanation>
-      Updated App component to import and use the new IssueList component.
-    </explanation>
-  </file>
-
-  Ensure that:
-  - You have thoroughly analyzed the task and plan and have planned your implementation strategy.
-  - Everything specified in the task description and plan is implemented.
-  - All new files contain the full code.
-  - All modified files have accurate and clear diffs in the correct unified diff format.
-  - Diff formatting across all modified files is consistent and includes all required elements (file headers, hunk headers, context lines).
-  - The content includes all necessary imports, function definitions, and exports.
-  - The code is clean, maintainable, and efficient.
-  - The code is properly formatted and follows the project's coding standards.
-  - Necessary comments for clarity are included if needed.
-  - Any conceptual or high-level descriptions are translated into actual, executable code.
-  - You've considered and handled potential edge cases.
-  - Your changes are consistent with the existing codebase.
-  - You haven't introduced any potential bugs or performance issues.
-  - Your code is easy to understand and maintain.
-  - You complete all necessary work.
-
-  Note: The accuracy of the diff format is crucial for successful patch application. Even small errors in formatting can
-  cause the entire patch to fail. Pay extra attention to the correctness of your diff output, ensuring all required
-  elements (file headers, hunk headers, context lines) are present and correctly formatted.
-
+ONLY EVER RETURN CODE IN A SEARCH/REPLACE BLOCK FOR MODIFIED FILES!
 </format>
+---
+Now, implement the task described above, following the provided implementation plan. Take your time to think through the problem and craft an elegant, efficient, and complete solution that fully addresses the task requirements and integrates seamlessly with the existing codebase.

@@ -1,7 +1,6 @@
 import path from 'node:path';
 import { confirm } from '@inquirer/prompts';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { getModelConfig } from '../../src/ai/model-config';
 import { redoLastTask } from '../../src/ai/redo-task';
 import {
   handleNoPlanWorkflow,
@@ -17,14 +16,13 @@ vi.mock('@inquirer/prompts');
 vi.mock('../../src/utils/task-cache');
 vi.mock('../../src/interactive/select-model-prompt');
 vi.mock('../../src/interactive/select-files-prompt');
-vi.mock('../../src/ai/model-config');
 vi.mock('../../src/ai/task-workflow');
 vi.mock('../../src/core/file-processor');
 
 describe('redoLastTask', () => {
   const mockOptions = {
     path: path.join('/', 'test', 'path'),
-    model: 'test-model',
+    model: 'claude-3-5-sonnet-20240620',
     plan: true,
   } as AiAssistedTaskOptions;
 
@@ -33,7 +31,7 @@ describe('redoLastTask', () => {
     generatedPlan: 'Last generated plan',
     taskDescription: 'Last task description',
     instructions: 'Last instructions',
-    model: 'last-model',
+    model: 'claude-3-5-sonnet-20240620',
   };
 
   const mockProcessedFiles = [
@@ -71,7 +69,7 @@ describe('redoLastTask', () => {
       generatedPlan: 'Last generated plan',
       taskDescription: 'Last task description',
       instructions: 'Last instructions',
-      model: 'last-model',
+      model: 'claude-3-5-sonnet-20240620',
     };
 
     const mockTaskCache = {
@@ -86,12 +84,12 @@ describe('redoLastTask', () => {
     await redoLastTask(mockOptions);
 
     expect(handlePlanWorkflow).toHaveBeenCalledWith(
-      expect.objectContaining({ model: 'last-model' }),
+      expect.objectContaining({ model: 'claude-3-5-sonnet-20240620' }),
       expect.stringMatching(/[\\\/]test[\\\/]path$/),
       expect.any(Object), // TaskCache
       expect.objectContaining(mockLastTaskData),
       mockProcessedFiles,
-      'last-model',
+      'claude-3-5-sonnet-20240620',
     );
   });
 
@@ -101,7 +99,7 @@ describe('redoLastTask', () => {
       generatedPlan: '', // Empty string for no-plan workflow
       taskDescription: 'Last task description',
       instructions: 'Last instructions',
-      model: 'last-model',
+      model: 'claude-3-5-sonnet-20240620',
     };
 
     const mockTaskCache = {
@@ -116,12 +114,12 @@ describe('redoLastTask', () => {
     await redoLastTask(mockOptions);
 
     expect(handleNoPlanWorkflow).toHaveBeenCalledWith(
-      expect.objectContaining({ model: 'last-model' }),
+      expect.objectContaining({ model: 'claude-3-5-sonnet-20240620' }),
       expect.stringMatching(/[\\\/]test[\\\/]path$/),
       expect.any(Object), // TaskCache
       expect.objectContaining(mockLastTaskDataNoPlan),
       mockProcessedFiles,
-      'last-model',
+      'claude-3-5-sonnet-20240620',
     );
   });
 
@@ -131,7 +129,7 @@ describe('redoLastTask', () => {
       generatedPlan: 'Last generated plan',
       taskDescription: 'Last task description',
       instructions: 'Last instructions',
-      model: 'last-model',
+      model: 'claude-3-5-sonnet-20240620',
     };
 
     const mockTaskCache = {
@@ -141,26 +139,22 @@ describe('redoLastTask', () => {
     // biome-ignore lint/suspicious/noExplicitAny: explicit any is fine here
     vi.mocked(TaskCache).mockImplementation(() => mockTaskCache as any);
     vi.mocked(confirm).mockResolvedValueOnce(true).mockResolvedValueOnce(false);
-    vi.mocked(selectModelPrompt).mockResolvedValue('new-model');
-    vi.mocked(getModelConfig).mockReturnValue({
-      modelName: 'New Model',
-      // biome-ignore lint/suspicious/noExplicitAny: explicit any is fine here
-    } as any);
+    vi.mocked(selectModelPrompt).mockResolvedValue('gpt-4o-2024-08-06');
     vi.mocked(processFiles).mockResolvedValue(mockProcessedFiles as FileInfo[]);
 
     await redoLastTask(mockOptions);
 
     expect(selectModelPrompt).toHaveBeenCalled();
     expect(handlePlanWorkflow).toHaveBeenCalledWith(
-      expect.objectContaining({ model: 'new-model' }),
+      expect.objectContaining({ model: 'gpt-4o-2024-08-06' }),
       expect.stringMatching(/[\\\/]test[\\\/]path$/),
       expect.any(Object), // TaskCache
       expect.objectContaining({
         ...mockLastTaskData,
-        model: 'new-model',
+        model: 'gpt-4o-2024-08-06',
       }),
       mockProcessedFiles,
-      'new-model',
+      'gpt-4o-2024-08-06',
     );
 
     // Check if the task cache was updated with the new model
@@ -168,7 +162,7 @@ describe('redoLastTask', () => {
       expect.stringMatching(/[\\\/]test[\\\/]path$/),
       expect.objectContaining({
         ...mockLastTaskData,
-        model: 'new-model',
+        model: 'gpt-4o-2024-08-06',
       }),
     );
   });

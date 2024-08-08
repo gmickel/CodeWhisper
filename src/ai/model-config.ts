@@ -9,8 +9,10 @@ export const MODEL_CONFIGS: ModelSpecs = {
     modelFamily: 'claude',
     temperature: {
       planningTemperature: 0.5,
-      codegenTemperature: 0.3,
+      codegenTemperature: 0.2,
     },
+    mode: 'diff',
+    apiKeyEnv: 'ANTHROPIC_API_KEY',
   },
   'claude-3-opus-20240229': {
     contextWindow: 200000,
@@ -20,8 +22,10 @@ export const MODEL_CONFIGS: ModelSpecs = {
     modelFamily: 'claude',
     temperature: {
       planningTemperature: 0.5,
-      codegenTemperature: 0.3,
+      codegenTemperature: 0.2,
     },
+    mode: 'diff',
+    apiKeyEnv: 'ANTHROPIC_API_KEY',
   },
   'claude-3-sonnet-20240229': {
     contextWindow: 200000,
@@ -31,8 +35,10 @@ export const MODEL_CONFIGS: ModelSpecs = {
     modelFamily: 'claude',
     temperature: {
       planningTemperature: 0.5,
-      codegenTemperature: 0.3,
+      codegenTemperature: 0.2,
     },
+    mode: 'whole',
+    apiKeyEnv: 'ANTHROPIC_API_KEY',
   },
   'claude-3-haiku-20240307': {
     contextWindow: 200000,
@@ -42,19 +48,23 @@ export const MODEL_CONFIGS: ModelSpecs = {
     modelFamily: 'claude',
     temperature: {
       planningTemperature: 0.5,
-      codegenTemperature: 0.3,
+      codegenTemperature: 0.2,
     },
+    mode: 'whole',
+    apiKeyEnv: 'ANTHROPIC_API_KEY',
   },
-  'gpt-4o': {
+  'gpt-4o-2024-08-06': {
     contextWindow: 128000,
-    maxOutput: 4096,
+    maxOutput: 16384,
     modelName: 'GPT 4 Omni',
-    pricing: { inputCost: 5, outputCost: 15 },
+    pricing: { inputCost: 2.5, outputCost: 10 },
     modelFamily: 'openai',
     temperature: {
       planningTemperature: 0.5,
-      codegenTemperature: 0.2,
+      codegenTemperature: 0.1,
     },
+    mode: 'diff',
+    apiKeyEnv: 'OPENAI_API_KEY',
   },
   'gpt-4o-mini': {
     contextWindow: 128000,
@@ -64,15 +74,38 @@ export const MODEL_CONFIGS: ModelSpecs = {
     modelFamily: 'openai',
     temperature: {
       planningTemperature: 0.5,
-      codegenTemperature: 0.2,
+      codegenTemperature: 0.1,
     },
+    mode: 'whole',
+    apiKeyEnv: 'OPENAI_API_KEY',
+  },
+  'deepseek-coder': {
+    contextWindow: 128000,
+    maxOutput: 8000,
+    modelName: 'DeepSeek-Coder',
+    pricing: { inputCost: 0.14, outputCost: 0.28 },
+    modelFamily: 'openai-compatible',
+    temperature: {
+      planningTemperature: 0.5,
+      codegenTemperature: 0.1,
+    },
+    mode: 'diff',
+    baseURL: 'https://api.deepseek.com/beta',
+    apiKeyEnv: 'DEEPSEEK_API_KEY',
   },
   'llama-3.1-70b-versatile': {
     contextWindow: 131072,
     maxOutput: 8000,
     modelName: 'Llama 3.1 70B Groq',
     pricing: { inputCost: 0.15, outputCost: 0.6 },
-    modelFamily: 'groq',
+    modelFamily: 'openai-compatible',
+    temperature: {
+      planningTemperature: 0.5,
+      codegenTemperature: 0.1,
+    },
+    mode: 'whole',
+    baseURL: 'https://api.groq.com/openai/v1',
+    apiKeyEnv: 'GROQ_API_KEY',
   },
   ollama: {
     contextWindow: 4096,
@@ -80,6 +113,7 @@ export const MODEL_CONFIGS: ModelSpecs = {
     modelName: 'Ollama Model',
     pricing: { inputCost: 0, outputCost: 0 },
     modelFamily: 'ollama',
+    mode: 'whole',
   },
 };
 

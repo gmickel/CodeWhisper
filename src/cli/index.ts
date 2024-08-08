@@ -9,9 +9,9 @@ import { applyTask } from '../ai/apply-task';
 import { getModelConfig, getModelNames } from '../ai/model-config';
 import { redoLastTask } from '../ai/redo-task';
 import { runAIAssistedTask } from '../ai/task-workflow';
+import { undoTaskChanges } from '../ai/undo-task-changes';
 import { processFiles } from '../core/file-processor';
 import { generateMarkdown } from '../core/markdown-generator';
-import { undoTaskChanges } from '../git/undo-task-changes';
 import { runInteractiveMode } from '../interactive/interactive-workflow';
 import { DEFAULT_CACHE_PATH, clearCache } from '../utils/cache-utils';
 import { handleEditorAndOutput } from '../utils/editor-utils';
@@ -93,10 +93,12 @@ export function cli(_args: string[]) {
     )
     .option(
       '-df, --diff',
-      'Use the new diff mode for AI-generated code modifications',
-      false,
+      "Use the new diff mode for AI-generated code modifications (overwrites the model's editing mode settings)",
     )
-    .option('--no-diff', 'Use full file content for updates')
+    .option(
+      '--no-diff',
+      "Use the whole file edit mode for AI-generated code modifications (overwrites the model's editing mode settings)",
+    )
     .option(
       '--plan',
       'Use the plan mode for AI-generated code modifications',

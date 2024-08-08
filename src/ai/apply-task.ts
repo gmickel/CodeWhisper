@@ -2,8 +2,8 @@ import path from 'node:path';
 import chalk from 'chalk';
 import fs from 'fs-extra';
 import simpleGit from 'simple-git';
-import { applyChanges } from '../git/apply-changes';
 import { ensureBranch } from '../utils/git-tools';
+import { applyChanges } from './apply-changes';
 
 export async function applyTask(
   filePath: string,
