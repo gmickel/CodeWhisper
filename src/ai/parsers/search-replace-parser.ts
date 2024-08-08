@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { detectLanguage } from '../../core/file-worker';
 import type { AIFileChange, AIFileInfo } from '../../types';
 import getLogger from '../../utils/logger';
@@ -42,8 +43,8 @@ export function parseSearchReplaceFiles(response: string): AIFileInfo[] {
       ? explanationMatch[1].trim()
       : undefined;
 
-    console.log(`Parsing file: ${path}`);
-    console.log(`Status: ${status}`);
+    console.log(chalk.cyan(`Parsing file: ${path}`));
+    console.log(chalk.cyan(`Status: ${status}`));
 
     const fileInfo: AIFileInfo = {
       path,
@@ -78,7 +79,7 @@ export function parseSearchReplaceFiles(response: string): AIFileInfo[] {
  * @returns An array of AIFileChange objects representing the parsed search/replace blocks.
  */
 function parseSearchReplaceBlocks(content: string): AIFileChange[] {
-  console.log('Parsing search/replace blocks. Content:', content);
+  console.log(chalk.cyan('Parsing search/replace blocks.'));
 
   const blockRegex =
     /<<<<<<< SEARCH([\s\S]*?)=======([\s\S]*?)>>>>>>> REPLACE/g;
@@ -93,11 +94,11 @@ function parseSearchReplaceBlocks(content: string): AIFileChange[] {
     if (search && replace) {
       changes.push({ search, replace });
     } else {
-      console.log('Invalid block structure');
+      console.log(chalk.red('Invalid block structure'));
     }
   }
 
-  console.log(`Found ${changes.length} valid changes`);
+  console.log(chalk.cyan(`Found ${changes.length} valid changes`));
   return changes;
 }
 
@@ -118,10 +119,6 @@ export function applySearchReplace(
     const matchResult = flexibleMatch(result, block.search, block.replace);
     if (matchResult) {
       result = matchResult;
-    } else {
-      console.warn(
-        `Failed to apply change:\n${block.search}\n=====\n${block.replace}`,
-      );
     }
   }
 
@@ -154,7 +151,7 @@ function flexibleMatch(
   }
 
   // If nothing else, log the failure so the user can manually fix it
-  console.warn(generateMatchFailureReport(content, searchBlock));
+  console.warn(chalk.yellow(generateMatchFailureReport(content, searchBlock)));
   logger.info(
     generateMatchFailureReport(
       'Match Failure:',
@@ -242,6 +239,8 @@ function generateMatchFailureReport(
 
   const similarLines = findSimilarLines(searchLines, contentLines);
   errorMessage += similarLines;
+
+  errorMessage += '\n\nThis diff will have to be applied manually.\n\n';
 
   return errorMessage;
 }

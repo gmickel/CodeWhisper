@@ -34,8 +34,8 @@ async function applyFileChange(
   const fullPath = path.join(basePath, file.path);
   const tempPath = path.join(tmpdir(), `codewhisper-${uuidv4()}`);
 
-  console.log(`Processing file: ${file.path}`);
-  console.log(`File status: ${file.status}`);
+  console.log(chalk.cyan(`Processing file: ${file.path}`));
+  console.log(chalk.cyan(`File status: ${file.status}`));
 
   try {
     switch (file.status) {
@@ -78,7 +78,6 @@ async function applyFileChange(
           let currentContent: string;
           try {
             currentContent = await fs.readFile(fullPath, 'utf-8');
-            console.log(`Current content length: ${currentContent.length}`);
           } catch (error) {
             console.error(chalk.red(`Error reading file ${file.path}:`, error));
             throw error;
@@ -86,27 +85,29 @@ async function applyFileChange(
 
           // Write current content to temp file first
           await fs.writeFile(tempPath, currentContent);
-          console.log(`Wrote original content to temp file: ${tempPath}`);
+          console.log(
+            chalk.cyan(`Wrote original content to temp file: ${tempPath}`),
+          );
 
           let updatedContent: string;
 
           if (file.changes && file.changes.length > 0) {
-            console.log(`Applying ${file.changes.length} changes in diff mode`);
+            console.log(
+              chalk.cyan(
+                `Applying ${file.changes.length} changes in diff mode`,
+              ),
+            );
             updatedContent = applySearchReplace(currentContent, file.changes);
             if (updatedContent === currentContent) {
               console.log(chalk.yellow(`No changes applied to: ${file.path}`));
               await fs.remove(tempPath);
               return;
             }
-            console.log(
-              `Updated content length after changes: ${updatedContent.length}`,
-            );
             // Write updated content to temp file
             await fs.writeFile(tempPath, updatedContent);
           } else if (file.content) {
             console.log('Applying whole file edit');
             updatedContent = file.content;
-            console.log(`New content length: ${updatedContent.length}`);
             // Write new content to temp file
             await fs.writeFile(tempPath, updatedContent);
           } else {
@@ -118,10 +119,6 @@ async function applyFileChange(
           // Move temp file to overwrite original file
           await fs.move(tempPath, fullPath, { overwrite: true });
           console.log(chalk.green(`Modified file: ${file.path}`));
-
-          // Verify final content
-          const finalContent = await fs.readFile(fullPath, 'utf-8');
-          console.log(`Final content length: ${finalContent.length}`);
         }
         break;
       case 'deleted':

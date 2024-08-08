@@ -75,7 +75,7 @@ describe('applyChanges', () => {
 
     expect(fs.ensureDir).toHaveBeenCalledTimes(1);
     expect(fs.writeFile).toHaveBeenCalledTimes(3);
-    expect(fs.readFile).toHaveBeenCalledTimes(2);
+    expect(fs.readFile).toHaveBeenCalledTimes(1);
     expect(fs.remove).toHaveBeenCalledTimes(1);
     expect(applySearchReplace).toHaveBeenCalledTimes(1);
 
