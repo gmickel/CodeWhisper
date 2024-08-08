@@ -1,3 +1,4 @@
+import os from 'node:os';
 import path from 'node:path';
 import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -186,7 +187,7 @@ describe('applyChanges', () => {
       expect.stringContaining(path.join('deep', 'nested')),
     );
     expect(fs.writeFile).toHaveBeenCalledWith(
-      expect.stringContaining(path.join('var', 'folders')),
+      expect.stringContaining(path.join(os.tmpdir())),
       'console.log("Nested file");',
     );
   });
