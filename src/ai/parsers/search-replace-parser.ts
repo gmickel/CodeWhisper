@@ -1,4 +1,3 @@
-import * as Diff3 from 'node-diff3';
 import { detectLanguage } from '../../core/file-worker';
 import type { AIFileChange, AIFileInfo } from '../../types';
 import { handleDeletedFiles, preprocessBlock } from './common-parser';
@@ -92,26 +91,18 @@ export function applySearchReplace(
   searchReplaceBlocks: AIFileChange[],
 ): string {
   let result = source;
-  console.log('Original content length:', source.length);
 
   for (const block of searchReplaceBlocks) {
-    console.log('Applying search/replace block:', block);
     const matchResult = flexibleMatch(result, block.search, block.replace);
     if (matchResult) {
       result = matchResult;
-      console.log(
-        'Block applied successfully. New content length:',
-        result.length,
-      );
     } else {
       console.warn(
-        'Failed to apply block:',
-        handleMatchFailure(result, block.search),
+        `Failed to apply change:\n${block.search}\n=====\n${block.replace}`,
       );
     }
   }
 
-  console.log('Final content length after all changes:', result.length);
   return result;
 }
 
@@ -125,106 +116,153 @@ function flexibleMatch(
   console.log('Search block length:', searchBlock.length);
   console.log('Replace block length:', replaceBlock.length);
 
-  // Try exact matching
-  const patch = Diff3.diffPatch(content.split('\n'), searchBlock.split('\n'));
-  let result = Diff3.patch(content.split('\n'), patch);
-
+  // Try for a perfect match
+  let result = perfectReplace(content, searchBlock, replaceBlock);
   if (result) {
-    console.log('Exact match successful');
-    const finalResult = result.join('\n').replace(searchBlock, replaceBlock);
-    console.log('Result after exact match. Length:', finalResult.length);
-    return finalResult;
+    console.log('Perfect match successful');
+    return result;
   }
 
-  console.log('Exact match failed, trying flexible whitespace match');
+  console.log('Perfect match failed, attempting flexible whitespace match');
 
-  // Try matching with flexible whitespace
-  const normalizedContent = content.replace(/\s+/g, ' ');
-  const normalizedSearch = searchBlock.replace(/\s+/g, ' ');
-  const flexPatch = Diff3.diffPatch(
-    normalizedContent.split('\n'),
-    normalizedSearch.split('\n'),
+  // Try being flexible about leading whitespace
+  result = replaceWithMissingLeadingWhitespace(
+    content,
+    searchBlock,
+    replaceBlock,
   );
-  result = Diff3.patch(normalizedContent.split('\n'), flexPatch);
-
   if (result) {
     console.log('Flexible whitespace match successful');
-    const flexResult = result
-      .join('\n')
-      .replace(normalizedSearch, replaceBlock);
-    const mappedResult = mapChangesToOriginal(content, flexResult);
-    console.log(
-      'Result after flexible match and mapping. Length:',
-      mappedResult.length,
-    );
-    return mappedResult;
+    return result;
   }
 
   console.log('All matching attempts failed');
   return null;
 }
 
-function mapChangesToOriginal(
-  originalContent: string,
-  changedContent: string,
-): string {
-  console.log('Mapping changes to original content');
-  console.log('Original content length:', originalContent.length);
-  console.log('Changed content length:', changedContent.length);
+function perfectReplace(
+  whole: string,
+  part: string,
+  replace: string,
+): string | null {
+  const wholeLines = whole.split('\n');
+  const partLines = part.split('\n');
+  const replaceLines = replace.split('\n');
+  const partLen = partLines.length;
 
-  const originalLines = originalContent.split('\n');
-  const changedLines = changedContent.split('\n');
-
-  let result = '';
-  let originalIndex = 0;
-  let changedIndex = 0;
-
-  while (
-    originalIndex < originalLines.length &&
-    changedIndex < changedLines.length
-  ) {
-    if (
-      originalLines[originalIndex].trim() === changedLines[changedIndex].trim()
-    ) {
-      result += `${originalLines[originalIndex]}\n`;
-      originalIndex++;
-      changedIndex++;
-    } else {
-      result += `${changedLines[changedIndex]}\n`;
-      changedIndex++;
+  for (let i = 0; i <= wholeLines.length - partLen; i++) {
+    const chunk = wholeLines.slice(i, i + partLen);
+    if (chunk.join('\n') === part) {
+      return [
+        ...wholeLines.slice(0, i),
+        ...replaceLines,
+        ...wholeLines.slice(i + partLen),
+      ].join('\n');
     }
   }
 
-  // Add any remaining lines from either original or changed content
-  while (originalIndex < originalLines.length) {
-    result += `${originalLines[originalIndex]}\n`;
-    originalIndex++;
-  }
-  while (changedIndex < changedLines.length) {
-    result += `${changedLines[changedIndex]}\n`;
-    changedIndex++;
+  return null;
+}
+
+function replaceWithMissingLeadingWhitespace(
+  whole: string,
+  part: string,
+  replace: string,
+): string | null {
+  const wholeLines = whole.split('\n');
+  const partLines = part.split('\n');
+  const replaceLines = replace.split('\n');
+
+  // Outdent everything in partLines and replaceLines by the max fixed amount possible
+  const minLeading = Math.min(
+    ...partLines
+      .filter((l) => l.trim())
+      .map((l) => l.length - l.trimStart().length),
+    ...replaceLines
+      .filter((l) => l.trim())
+      .map((l) => l.length - l.trimStart().length),
+  );
+
+  const outdentedPartLines = partLines.map((l) => l.slice(minLeading));
+  const outdentedReplaceLines = replaceLines.map((l) => l.slice(minLeading));
+
+  for (let i = 0; i <= wholeLines.length - outdentedPartLines.length; i++) {
+    const chunk = wholeLines.slice(i, i + outdentedPartLines.length);
+    const leadingSpace = chunk[0].slice(
+      0,
+      chunk[0].length - chunk[0].trimStart().length,
+    );
+
+    if (
+      chunk.map((l) => l.slice(leadingSpace.length)).join('\n') ===
+      outdentedPartLines.join('\n')
+    ) {
+      const newChunk = outdentedReplaceLines.map((l) => leadingSpace + l);
+      return [
+        ...wholeLines.slice(0, i),
+        ...newChunk,
+        ...wholeLines.slice(i + outdentedPartLines.length),
+      ].join('\n');
+    }
   }
 
-  console.log('Mapping complete. Result length:', result.length);
-  return result.trim();
+  return null;
 }
 
 function handleMatchFailure(content: string, searchBlock: string): string {
   const contentLines = content.split('\n');
   const searchLines = searchBlock.split('\n');
-  const indices = Diff3.diffIndices(contentLines, searchLines);
 
   let errorMessage = 'Failed to match the following block:\n\n';
   errorMessage += `${searchBlock}\n\n`;
   errorMessage += 'Possible similar sections in the file:\n\n';
 
-  for (const index of indices) {
-    if (Array.isArray(index) && index.length >= 2) {
-      const start = Math.max(0, index[0] - 2);
-      const end = Math.min(contentLines.length, index[1] + 3);
-      errorMessage += `${contentLines.slice(start, end).join('\n')}\n---\n`;
+  const similarLines = findSimilarLines(searchLines, contentLines);
+  errorMessage += similarLines;
+
+  return errorMessage;
+}
+
+function findSimilarLines(
+  searchLines: string[],
+  contentLines: string[],
+  threshold = 0.6,
+): string {
+  let bestRatio = 0;
+  let bestMatch: string[] = [];
+  let bestMatchIndex = -1;
+
+  for (let i = 0; i <= contentLines.length - searchLines.length; i++) {
+    const chunk = contentLines.slice(i, i + searchLines.length);
+    const ratio = calculateSimilarity(searchLines, chunk);
+    if (ratio > bestRatio) {
+      bestRatio = ratio;
+      bestMatch = chunk;
+      bestMatchIndex = i;
     }
   }
 
-  return errorMessage;
+  if (bestRatio < threshold) {
+    return '';
+  }
+
+  if (
+    bestMatch[0] === searchLines[0] &&
+    bestMatch[bestMatch.length - 1] === searchLines[searchLines.length - 1]
+  ) {
+    return bestMatch.join('\n');
+  }
+
+  const N = 5;
+  const start = Math.max(0, bestMatchIndex - N);
+  const end = Math.min(
+    contentLines.length,
+    bestMatchIndex + searchLines.length + N,
+  );
+  return contentLines.slice(start, end).join('\n');
+}
+
+function calculateSimilarity(a: string[], b: string[]): number {
+  const matches = a.filter((line, index) => line === b[index]).length;
+  return matches / Math.max(a.length, b.length);
 }
