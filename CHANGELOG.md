@@ -1,3 +1,11 @@
+## [1.14.1](https://github.com/gmickel/CodeWhisper/compare/v1.14.0...v1.14.1) (2024-08-08)
+
+
+### Bug Fixes
+
+* cleanup stdout output ([9a1f351](https://github.com/gmickel/CodeWhisper/commit/9a1f351490b2d46bd64270d709497e1628964a5b))
+* trigger release ([e5c8186](https://github.com/gmickel/CodeWhisper/commit/e5c81867ab19eeba41c557fe998e322451fafd8a))
+
 # [1.14.0](https://github.com/gmickel/CodeWhisper/compare/v1.13.6...v1.14.0) (2024-08-08)
 
 
