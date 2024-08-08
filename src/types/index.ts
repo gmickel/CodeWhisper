@@ -1,5 +1,3 @@
-import type { ParsedDiff } from 'diff';
-
 export interface GitHubIssue {
   number: number;
   title: string;
@@ -97,7 +95,6 @@ export interface AIFileInfo {
   path: string;
   language: string;
   content?: string;
-  diff?: ParsedDiff;
   status: 'new' | 'modified' | 'deleted';
   explanation?: string;
 }
@@ -179,7 +176,6 @@ export interface AIFileInfo {
   path: string;
   language: string;
   content?: string;
-  diff?: ParsedDiff;
   changes?: AIFileChange[];
   status: 'new' | 'modified' | 'deleted';
   explanation?: string;
