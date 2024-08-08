@@ -1,0 +1,81 @@
+{
+  "fileList": [
+    "src/edge-cases/whitespace.ts",
+    "src/edge-cases/multiple-changes.ts",
+    "src/edge-cases/partial-match.ts",
+    "src/edge-cases/no-match.ts",
+    "src/edge-cases/new-file.ts",
+    "src/edge-cases/delete-me.ts"
+  ],
+  "files": [
+    {
+      "path": "src/edge-cases/whitespace.ts",
+      "language": "typescript",
+      "status": "modified",
+      "explanation": "Test flexible whitespace matching",
+      "changes": [
+        {
+          "search": "function hello() {\n    console.log('Hello, world!');\n}",
+          "replace": "function hello() {\n  console.log('Hello, flexible whitespace!');\n}"
+        }
+      ]
+    },
+    {
+      "path": "src/edge-cases/multiple-changes.ts",
+      "language": "typescript",
+      "status": "modified",
+      "explanation": "Test multiple changes in one file",
+      "changes": [
+        {
+          "search": "const PI = 3.14;",
+          "replace": "const PI = Math.PI;"
+        },
+        {
+          "search": "function square(x) {\n  return x * x;\n}",
+          "replace": "function square(x: number): number {\n  return x ** 2;\n}"
+        }
+      ]
+    },
+    {
+      "path": "src/edge-cases/partial-match.ts",
+      "language": "typescript",
+      "status": "modified",
+      "explanation": "Test partial matching with surrounding context",
+      "changes": [
+        {
+          "search": "function processData(data) {\n  // TODO: Implement data processing\n  return data;\n}",
+          "replace": "function processData(data: any): any {\n  // Data processing implemented\n  return data.map(item => item * 2);\n}"
+        }
+      ]
+    },
+    {
+      "path": "src/edge-cases/no-match.ts",
+      "language": "typescript",
+      "status": "modified",
+      "explanation": "Test behavior when no match is found",
+      "changes": [
+        {
+          "search": "function nonExistentFunction() {\n  console.log('This function does not exist');\n}",
+          "replace": "function newFunction() {\n  console.log('This is a new function');\n}"
+        }
+      ]
+    },
+    {
+      "path": "src/edge-cases/new-file.ts",
+      "language": "typescript",
+      "status": "new",
+      "explanation": "Test creating a new file",
+      "content": "// This is a new file\nexport const NEW_CONSTANT = 42;\n\nexport function newFunction() {\n  return NEW_CONSTANT;\n}"
+    },
+    {
+      "path": "src/edge-cases/delete-me.ts",
+      "language": "typescript",
+      "status": "deleted",
+      "explanation": "Test file deletion"
+    }
+  ],
+  "gitBranchName": "feature/edge-cases",
+  "gitCommitMessage": "Add edge cases for search/replace functionality",
+  "summary": "Added various edge cases to test the robustness of the search/replace functionality, including whitespace handling, multiple changes, partial matches, and error cases.",
+  "potentialIssues": "Some changes may not be applied if the matching algorithm fails to find the correct location in the file."
+}

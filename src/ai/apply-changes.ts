@@ -137,7 +137,14 @@ async function applyFileChange(
     }
   } catch (error) {
     console.error(chalk.red(`Error applying change to ${file.path}:`), error);
-    await fs.remove(tempPath).catch(() => {});
+    try {
+      await fs.remove(tempPath);
+    } catch (removeError) {
+      console.error(
+        chalk.yellow(`Failed to remove temp file: ${tempPath}`),
+        removeError,
+      );
+    }
     throw error;
   }
 }

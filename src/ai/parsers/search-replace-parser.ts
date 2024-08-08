@@ -1,7 +1,16 @@
 import { detectLanguage } from '../../core/file-worker';
 import type { AIFileChange, AIFileInfo } from '../../types';
+import getLogger from '../../utils/logger';
 import { handleDeletedFiles, preprocessBlock } from './common-parser';
 
+const logger = getLogger(true);
+
+/**
+ * Parses the AI response to extract file information and changes.
+ *
+ * @param response - The string response from the AI containing file information.
+ * @returns An array of AIFileInfo objects representing the parsed files.
+ */
 export function parseSearchReplaceFiles(response: string): AIFileInfo[] {
   let files: AIFileInfo[] = [];
 
@@ -62,6 +71,12 @@ export function parseSearchReplaceFiles(response: string): AIFileInfo[] {
   return files;
 }
 
+/**
+ * Parses the AI response to extract search/replace blocks.
+ *
+ * @param content - The string content from the AI containing search/replace blocks.
+ * @returns An array of AIFileChange objects representing the parsed search/replace blocks.
+ */
 function parseSearchReplaceBlocks(content: string): AIFileChange[] {
   console.log('Parsing search/replace blocks. Content:', content);
 
@@ -86,6 +101,13 @@ function parseSearchReplaceBlocks(content: string): AIFileChange[] {
   return changes;
 }
 
+/**
+ * Applies the search/replace blocks to the source code.
+ *
+ * @param source - The string source code to apply the search/replace blocks to.
+ * @param searchReplaceBlocks - The array of AIFileChange objects representing the search/replace blocks.
+ * @returns The string result of applying the search/replace blocks to the source code.
+ */
 export function applySearchReplace(
   source: string,
   searchReplaceBlocks: AIFileChange[],
@@ -106,65 +128,71 @@ export function applySearchReplace(
   return result;
 }
 
+/**
+ * Attempts to match the search block to the content and replace it with the replace block.
+ *
+ * @param content - The string content to match the search block to.
+ * @param searchBlock - The string search block to match to the content.
+ * @param replaceBlock - The string replace block to replace the search block with.
+ * @returns The string result of applying the search/replace blocks to the source code.
+ */
 function flexibleMatch(
   content: string,
   searchBlock: string,
   replaceBlock: string,
 ): string | null {
-  console.log('Attempting flexible match');
-  console.log('Content length:', content.length);
-  console.log('Search block length:', searchBlock.length);
-  console.log('Replace block length:', replaceBlock.length);
-
   // Try for a perfect match
   let result = perfectReplace(content, searchBlock, replaceBlock);
   if (result) {
-    console.log('Perfect match successful');
     return result;
   }
 
-  console.log('Perfect match failed, attempting flexible whitespace match');
-
-  // Try being flexible about leading whitespace
-  result = replaceWithMissingLeadingWhitespace(
-    content,
-    searchBlock,
-    replaceBlock,
-  );
+  // Try being flexible about whitespace
+  result = replaceWithFlexibleWhitespace(content, searchBlock, replaceBlock);
   if (result) {
-    console.log('Flexible whitespace match successful');
     return result;
   }
 
-  console.log('All matching attempts failed');
+  // If nothing else, log the failure so the user can manually fix it
+  console.warn(generateMatchFailureReport(content, searchBlock));
+  logger.info(
+    generateMatchFailureReport(
+      'Match Failure:',
+      `${searchBlock}\n${replaceBlock}`,
+    ),
+  );
   return null;
 }
 
+/**
+ * Attempts to replace the search block with the replace block in the content.
+ *
+ * @param whole - The string content to replace the search block in.
+ * @param part - The string search block to replace in the content.
+ * @param replace - The string replace block to replace the search block with.
+ * @returns The string result of replacing the search block with the replace block in the content.
+ */
 function perfectReplace(
   whole: string,
   part: string,
   replace: string,
 ): string | null {
-  const wholeLines = whole.split('\n');
-  const partLines = part.split('\n');
-  const replaceLines = replace.split('\n');
-  const partLen = partLines.length;
-
-  for (let i = 0; i <= wholeLines.length - partLen; i++) {
-    const chunk = wholeLines.slice(i, i + partLen);
-    if (chunk.join('\n') === part) {
-      return [
-        ...wholeLines.slice(0, i),
-        ...replaceLines,
-        ...wholeLines.slice(i + partLen),
-      ].join('\n');
-    }
+  const index = whole.indexOf(part);
+  if (index !== -1) {
+    return whole.slice(0, index) + replace + whole.slice(index + part.length);
   }
-
   return null;
 }
 
-function replaceWithMissingLeadingWhitespace(
+/**
+ * Attempts to replace the search block with the replace block in the content.
+ *
+ * @param whole - The string content to replace the search block in.
+ * @param part - The string search block to replace in the content.
+ * @param replace - The string replace block to replace the search block with.
+ * @returns The string result of replacing the search block with the replace block in the content.
+ */
+function replaceWithFlexibleWhitespace(
   whole: string,
   part: string,
   replace: string,
@@ -173,35 +201,20 @@ function replaceWithMissingLeadingWhitespace(
   const partLines = part.split('\n');
   const replaceLines = replace.split('\n');
 
-  // Outdent everything in partLines and replaceLines by the max fixed amount possible
-  const minLeading = Math.min(
-    ...partLines
-      .filter((l) => l.trim())
-      .map((l) => l.length - l.trimStart().length),
-    ...replaceLines
-      .filter((l) => l.trim())
-      .map((l) => l.length - l.trimStart().length),
-  );
-
-  const outdentedPartLines = partLines.map((l) => l.slice(minLeading));
-  const outdentedReplaceLines = replaceLines.map((l) => l.slice(minLeading));
-
-  for (let i = 0; i <= wholeLines.length - outdentedPartLines.length; i++) {
-    const chunk = wholeLines.slice(i, i + outdentedPartLines.length);
-    const leadingSpace = chunk[0].slice(
-      0,
-      chunk[0].length - chunk[0].trimStart().length,
-    );
-
+  for (let i = 0; i <= wholeLines.length - partLines.length; i++) {
+    const chunk = wholeLines.slice(i, i + partLines.length);
     if (
-      chunk.map((l) => l.slice(leadingSpace.length)).join('\n') ===
-      outdentedPartLines.join('\n')
+      chunk.map((l) => l.trim()).join('\n') ===
+      partLines.map((l) => l.trim()).join('\n')
     ) {
-      const newChunk = outdentedReplaceLines.map((l) => leadingSpace + l);
+      const newChunk = chunk.map((line, index) => {
+        const leadingSpace = line.match(/^\s*/)?.[0] || '';
+        return leadingSpace + replaceLines[index].trim();
+      });
       return [
         ...wholeLines.slice(0, i),
         ...newChunk,
-        ...wholeLines.slice(i + outdentedPartLines.length),
+        ...wholeLines.slice(i + partLines.length),
       ].join('\n');
     }
   }
@@ -209,7 +222,17 @@ function replaceWithMissingLeadingWhitespace(
   return null;
 }
 
-function handleMatchFailure(content: string, searchBlock: string): string {
+/**
+ * Generates a report of the failure to match the search block to the content.
+ *
+ * @param content - The string content to match the search block to.
+ * @param searchBlock - The string search block to match to the content.
+ * @returns The string result of the failure to match the search block to the content.
+ */
+function generateMatchFailureReport(
+  content: string,
+  searchBlock: string,
+): string {
   const contentLines = content.split('\n');
   const searchLines = searchBlock.split('\n');
 
@@ -223,6 +246,13 @@ function handleMatchFailure(content: string, searchBlock: string): string {
   return errorMessage;
 }
 
+/**
+ * Finds similar lines in the content to the search block.
+ *
+ * @param searchLines - The string search block to match to the content.
+ * @param contentLines - The string content to match the search block to.
+ * @returns The string result of the failure to match the search block to the content.
+ */
 function findSimilarLines(
   searchLines: string[],
   contentLines: string[],
@@ -262,6 +292,13 @@ function findSimilarLines(
   return contentLines.slice(start, end).join('\n');
 }
 
+/**
+ * Calculates the similarity between two arrays of strings.
+ *
+ * @param a - The first array of strings to compare.
+ * @param b - The second array of strings to compare.
+ * @returns The similarity between the two arrays of strings.
+ */
 function calculateSimilarity(a: string[], b: string[]): number {
   const matches = a.filter((line, index) => line === b[index]).length;
   return matches / Math.max(a.length, b.length);
