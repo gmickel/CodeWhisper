@@ -203,12 +203,15 @@ While CodeWhisper supports a variety of providers and models, our current recomm
 
 This section is still under development. We are actively testing and evaluating models.
 
-| Model             | Provider  | Recommendation | Editing Mode | Notes                                                                               |
-| ----------------- | --------- | -------------- | ------------ | ----------------------------------------------------------------------------------- |
-| Claude-3.5-Sonnet | Anthropic | Highest        | Diff         | Generates exceptional quality plans and results                                     |
-| GPT-4o            | OpenAI    | Excellent      | Diff         | Produces high-quality plans and good results, long max output length (16384 tokens) |
-| GPT-4o-mini       | OpenAI    | Strong         | Whole        | Good quality plans and results, long max output length (16384 tokens)               |
-| DeepSeek Coder    | DeepSeek  | Good           | Diff         | Good quality plans and results, long max output length (16384 tokens)               |
+| Model             | Provider  | Recommendation | Editing Mode | Plan Quality | Code Quality | Edit Precision | Notes                                                                               |
+| ----------------- | --------- | -------------- | ------------ | ------------ | ------------ | -------------- | ----------------------------------------------------------------------------------- |
+| Claude-3.5-Sonnet | Anthropic | Highest        | Diff         | Excellent    | Excellent    | High           | Generates exceptional quality plans and results                                     |
+| GPT-4o            | OpenAI    | Excellent      | Diff         | Very Good    | Good         | Medium         | Produces high-quality plans and good results, long max output length (16384 tokens) |
+| GPT-4o-mini       | OpenAI    | Strong         | Diff         | Good         | Good         | Medium         | Good quality plans and results, long max output length (16384 tokens)               |
+| GPT-4o-mini       | OpenAI    | Strong         | Whole\*      | Good         | Very Good    | High           | Improved code quality and precision in whole-file edit mode                         |
+| DeepSeek Coder    | DeepSeek  | Good           | Diff         | Good         | Good         | Medium         | Good quality plans and results, long max output length (16384 tokens)               |
+
+\* Whole-file edit mode is generally more precise but may lead to issues with maximum output token length, potentially limiting the ability to process larger files or multiple files simultaneously. It can also result in incomplete outputs for very large files, with the model resorting to placeholders like "// other functions here" instead of providing full implementations.
 
 #### Experimental Support
 
