@@ -1,3 +1,10 @@
+## [1.14.2](https://github.com/gmickel/CodeWhisper/compare/v1.14.1...v1.14.2) (2024-08-09)
+
+
+### Bug Fixes
+
+* update docs and order of commands ([934ab3d](https://github.com/gmickel/CodeWhisper/commit/934ab3dad6c6174c2214e7401409078d06402943))
+
 ## [1.14.1](https://github.com/gmickel/CodeWhisper/compare/v1.14.0...v1.14.1) (2024-08-08)
 
 
