@@ -230,6 +230,59 @@ This command clears the cache file which is used to store information about proc
 
 ## Usage Examples
 
+### A. AI End-to-End Task Implementation
+
+1. Start an AI-assisted coding task with a dry run:
+
+   ```bash
+   codewhisper task --dry-run -t "Implement user authentication" -d "Add user login and registration functionality using JWT"
+   ```
+
+2. Apply an AI-generated task with automatic commit:
+
+   ```bash
+   codewhisper apply-task ./codewhisper-task-output.json --auto-commit
+   ```
+
+3. Run an AI-assisted task with detailed logging:
+
+   ```bash
+   codewhisper task -m claude-3-5-sonnet-20240620 --log-ai-interactions -t "Implement error handling" -d "Add comprehensive error handling to all API endpoints" -i "some instructions"
+   ```
+
+4. Run an AI-assisted task using whole-file code modifications:
+
+   ```bash
+   codewhisper task --no-diff -m claude-3-5-sonnet-20240620 -t "Refactor authentication logic" -d "Update the user authentication system to use JWT tokens" -i "some instructions"
+   ```
+
+5. Undo AI-assisted task changes:
+
+   ```bash
+   codewhisper task --undo
+   ```
+
+6. Redo the last task with the option to change the generated plan as well as the model and file selection:
+
+   ```bash
+   codewhisper task --redo
+   ```
+
+7. Use CodeWhisper with a different LLM provider:
+
+   ```bash
+   # Assuming you've set up the necessary environment variables for the new LLM provider
+   codewhisper task --model llm
+   ```
+
+8. Use a local Ollama model:
+
+   ```bash
+   codewhisper task --model ollama:llama3.1:70b --context-window 131072 --max-tokens 8192
+   ```
+
+### B. Prompt Generation from Codebase and Templates
+
 1. Include only JavaScript and TypeScript files:
 
    ```bash
@@ -285,11 +338,10 @@ This command clears the cache file which is used to store information about proc
    ```
 
 10. Review changes in a specific branch compared to main:
+
     ```bash
     codewhisper generate --filter $(git diff --name-only main...feature-branch) --template deep-code-review
     ```
-
-## Advanced Usage Scenarios
 
 11. Generate documentation for a new release:
 
@@ -315,110 +367,25 @@ This command clears the cache file which is used to store information about proc
     codewhisper generate --template optimize-llm-prompt --editor --custom-data '{"prompt": "your prompt goes here"}'
     ```
 
-15. Start an AI-assisted coding task with a dry run:
-
-    ```bash
-    codewhisper task --dry-run -t "Implement user authentication" -d "Add user login and registration functionality using JWT"
-    ```
-
-16. Apply an AI-generated task with automatic commit:
-
-    ```bash
-    codewhisper apply-task ./codewhisper-task-output.json --auto-commit
-    ```
-
-17. Analyze code changes between two specific commits:
+15. Analyze code changes between two specific commits:
 
     ```bash
     codewhisper generate --filter $(git diff --name-only commit1..commit2) --template deep-code-review
     ```
 
-18. Generate a code summary for a specific pull request:
+16. Generate a code summary for a specific pull request:
 
     ```bash
     codewhisper generate --filter $(git diff --name-only main...pull-request-branch) --template codebase-summary
     ```
 
-19. Create a custom template for generating API documentation:
+17. Create a custom template for generating API documentation:
 
     ```bash
     codewhisper export-templates
     # Edit the exported template to focus on API documentation
     codewhisper generate --custom-template ./my-templates/api-docs.hbs -f "src/api/**/*"
     ```
-
-20. Use CodeWhisper with a different LLM provider:
-
-    ```bash
-    # Assuming you've set up the necessary environment variables for the new LLM provider
-    codewhisper generate --model llm
-    ```
-
-21. Use a local Ollama model:
-
-    ```bash
-    codewhisper generate --model ollama:llama3.1:70b --context-window 131072 --max-tokens 8192
-    ```
-
-22. Run an AI-assisted task with detailed logging:
-
-    ```bash
-    # This will generate a log file (codewhisper-<date>.log) in the current directory, containing all AI prompts, responses, and parsing results.
-    codewhisper task -m claude-3-5-sonnet-20240620 --log-ai-interactions -t "Implement error handling" -d "Add comprehensive error handling to all API endpoints" -i "some instructions"
-    ```
-
-23. Run an AI-assisted task using whole-file code modifications:
-
-    ```bash
-    # This command will use whole-file code modifications for modified files, useful if diff-based updates are not reliable with the model you are using.
-    codewhisper task --no-diff -m claude-3-5-sonnet-20240620 -t "Refactor authentication logic" -d "Update the user authentication system to use JWT tokens" -i "some instructions"
-    ```
-
-24. Undo AI-assisted task changes:
-
-    ```bash
-    codewhisper task --undo
-    ```
-
-    This command will:
-
-    - Discard uncommitted changes if any
-    - Delete the AI-generated branch if not on the main branch
-    - Offer to revert the last commit if on the main branch
-
-    The command will always ask for confirmation before making any changes.
-
-25. Redo the last task with the option to change the generated plan as well as the model and file selection:
-
-    ```bash
-    codewhisper task --redo
-    ```
-
-    This command will:
-
-    - Retrieve the last task data for the current project directory
-    - Display the details of the last task, including the task description, instructions, model used, and files included
-    - Give you the option to change the AI model for code generation
-    - Allow you to modify the file selection for the task
-    - Continue from the review plan stage, where you can then modify the plan to your liking
-
-    This feature is particularly useful when:
-
-    - You want to try a different AI model for the same task
-    - You need to adjust the file selection for the same task
-    - You want to quickly tweak the plan without starting from scratch
-
-    Note: The redo functionality uses a cache stored in your home directory, so it persists across different sessions and is not affected by git operations like branch switching or resetting.
-
-    Example workflow:
-
-    1. Run an initial task: `codewhisper task`
-    2. Review the code modifications and decide you want to tweak the plan or try a different model
-    3. Undo the task: `codewhisper task --undo`
-    4. Redo the task: `codewhisper task --redo`
-    5. Optionally change the model when prompted
-    6. Optionally adjust the file selection
-    7. Adjust the plan as needed
 
 ## CI/CD Integration
 
