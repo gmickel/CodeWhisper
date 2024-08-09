@@ -2,7 +2,7 @@
   "name": "codewhisper",
   "type": "module",
   "version": "1.14.1",
-  "description": "A powerful tool for converting repository code to AI-friendly prompts",
+  "description": "AI-Powered End-to-End Task Implementation & blazingly fast Codebase-to-LLM Context Bridge",
   "author": "Gordon Mickel <gordon@mickel.tech>",
   "license": "MIT",
   "funding": "https://github.com/sponsors/gmickel",

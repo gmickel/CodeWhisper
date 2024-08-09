@@ -155,12 +155,6 @@ npm install -g codewhisper
 # Navigate to your project directory
 cd /path/to/your/project
 
-# Generate an AI-friendly prompt using interactive mode
-codewhisper interactive
-
-# List available models
-codewhisper list-models
-
 # Start an AI-assisted coding task
 # CodeWhisper will prompt you to select a model from the list of available models
 codewhisper task
@@ -189,6 +183,13 @@ codewhisper task --undo
 # To redo the last task with the option to change the model, file selection or plan, use the --redo option.
 # Note: CodeWhisper saves the plan, instructions, model and selected files from the last task. Other options (such as --dry-run) need to be specified again.
 codewhisper task --redo
+
+# Generate an AI-friendly prompt using interactive mode
+codewhisper interactive
+
+# List available models
+codewhisper list-models
+
 ```
 
 > Note: If you are using CodeWhisper's LLM integration with `codewhisper task`, you will need to set the respective environment variable for the model you want to use (e.g., `export ANTHROPIC_API_KEY=your_api_key` or `export OPENAI_API_KEY=your_api_key` or `export GROQ_API_KEY=your_api_key` or `export DEEPSEEK_API_KEY=your_api_key` ).

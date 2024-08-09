@@ -40,41 +40,10 @@ export function cli(_args: string[]) {
   );
   program
     .name('codewhisper')
-    .description('A powerful tool for converting code to AI-friendly prompts')
+    .description(
+      'AI-Powered End-to-End Task Implementation & blazingly fast Codebase-to-LLM Context Bridge',
+    )
     .version(packageJson.version);
-
-  program
-    .command('list-models')
-    .description('List available AI models')
-    .action(() => {
-      const models = getModelNames();
-      console.log('Available AI models:');
-      for (const modelId of models) {
-        const config = getModelConfig(modelId);
-        if (config) {
-          console.log(`- ${config.modelName} (${chalk.cyan(modelId)})`);
-          console.log(
-            `  Context window: ${config.contextWindow}, Max output: ${config.maxOutput}`,
-          );
-          console.log(
-            `  Pricing: $${config.pricing.inputCost}/1M tokens (input), $${config.pricing.outputCost}/1M tokens (output)`,
-          );
-        }
-      }
-    });
-
-  program
-    .command('apply-task <file>')
-    .description('Apply an AI-generated task from a file')
-    .option('--auto-commit', 'Automatically commit changes', false)
-    .action(async (file) => {
-      try {
-        await applyTask(file);
-      } catch (error) {
-        console.error(chalk.red('Error applying task:'), error);
-        process.exit(1);
-      }
-    });
 
   program
     .command('task')
@@ -202,6 +171,98 @@ Note: see "query parameters" at https://docs.github.com/en/rest/issues/issues?ap
     });
 
   program
+    .command('list-models')
+    .description('List available AI models')
+    .action(() => {
+      const models = getModelNames();
+      console.log('Available AI models:');
+      for (const modelId of models) {
+        const config = getModelConfig(modelId);
+        if (config) {
+          console.log(`- ${config.modelName} (${chalk.cyan(modelId)})`);
+          console.log(
+            `  Context window: ${config.contextWindow}, Max output: ${config.maxOutput}`,
+          );
+          console.log(
+            `  Pricing: $${config.pricing.inputCost}/1M tokens (input), $${config.pricing.outputCost}/1M tokens (output)`,
+          );
+        }
+      }
+    });
+
+  program
+    .command('apply-task <file>')
+    .description('Apply an AI-generated task from a file')
+    .option('--auto-commit', 'Automatically commit changes', false)
+    .action(async (file) => {
+      try {
+        await applyTask(file);
+      } catch (error) {
+        console.error(chalk.red('Error applying task:'), error);
+        process.exit(1);
+      }
+    });
+
+  program
+    .command('interactive')
+    .description('Start interactive mode')
+    .option('-p, --path <path>', 'Path to the codebase', '.')
+    .option(
+      '-pr, --prompt <prompt>',
+      'Custom prompt to append to the output',
+      (value) => value,
+    )
+    .option('-t, --template <template>', 'Template to use')
+    .option('-g, --gitignore <path>', 'Path to .gitignore file', '.gitignore')
+    .option(
+      '-f, --filter <patterns...>',
+      'File patterns to include (use glob patterns, e.g., "src/**/*.js")',
+    )
+    .option(
+      '-e, --exclude <patterns...>',
+      'File patterns to exclude (use glob patterns, e.g., "**/*.test.js")',
+    )
+    .option(
+      '-E, --open-editor',
+      'Open the result in your default editor',
+      false,
+    )
+    .option('-s, --suppress-comments', 'Strip comments from the code', false)
+    .option('-l, --line-numbers', 'Add line numbers to code blocks', false)
+    .option('--case-sensitive', 'Use case-sensitive pattern matching', false)
+    .option(
+      '--no-codeblock',
+      'Disable wrapping code inside markdown code blocks',
+      false,
+    )
+    .option(
+      '--custom-data <json>',
+      'Custom data to pass to the template (JSON string)',
+    )
+    .option('--custom-template <path>', 'Path to a custom Handlebars template')
+    .option('--custom-ignores <patterns...>', 'Additional patterns to ignore')
+    .option(
+      '--cache-path <path>',
+      'Custom path for the cache file',
+      DEFAULT_CACHE_PATH,
+    )
+    .option('--respect-gitignore', 'Respect entries in .gitignore', true)
+    .option(
+      '--no-respect-gitignore',
+      'Do not respect entries in .gitignore',
+      false,
+    )
+    .option('--invert', 'Selected files will be excluded', false)
+    .action(async (options) => {
+      try {
+        await runInteractiveMode(options);
+      } catch (error) {
+        console.error(chalk.red('Error in interactive mode:'), error);
+        process.exit(1);
+      }
+    });
+
+  program
     .command('generate')
     .description('Generate a markdown file from your codebase')
     .option('-p, --path <path>', 'Path to the codebase', '.')
@@ -303,65 +364,6 @@ Note: see "query parameters" at https://docs.github.com/en/rest/issues/issues?ap
       } catch (error) {
         spinner.fail('Error generating output');
         console.error(chalk.red((error as Error).message));
-        process.exit(1);
-      }
-    });
-
-  program
-    .command('interactive')
-    .description('Start interactive mode')
-    .option('-p, --path <path>', 'Path to the codebase', '.')
-    .option(
-      '-pr, --prompt <prompt>',
-      'Custom prompt to append to the output',
-      (value) => value,
-    )
-    .option('-t, --template <template>', 'Template to use')
-    .option('-g, --gitignore <path>', 'Path to .gitignore file', '.gitignore')
-    .option(
-      '-f, --filter <patterns...>',
-      'File patterns to include (use glob patterns, e.g., "src/**/*.js")',
-    )
-    .option(
-      '-e, --exclude <patterns...>',
-      'File patterns to exclude (use glob patterns, e.g., "**/*.test.js")',
-    )
-    .option(
-      '-E, --open-editor',
-      'Open the result in your default editor',
-      false,
-    )
-    .option('-s, --suppress-comments', 'Strip comments from the code', false)
-    .option('-l, --line-numbers', 'Add line numbers to code blocks', false)
-    .option('--case-sensitive', 'Use case-sensitive pattern matching', false)
-    .option(
-      '--no-codeblock',
-      'Disable wrapping code inside markdown code blocks',
-      false,
-    )
-    .option(
-      '--custom-data <json>',
-      'Custom data to pass to the template (JSON string)',
-    )
-    .option('--custom-template <path>', 'Path to a custom Handlebars template')
-    .option('--custom-ignores <patterns...>', 'Additional patterns to ignore')
-    .option(
-      '--cache-path <path>',
-      'Custom path for the cache file',
-      DEFAULT_CACHE_PATH,
-    )
-    .option('--respect-gitignore', 'Respect entries in .gitignore', true)
-    .option(
-      '--no-respect-gitignore',
-      'Do not respect entries in .gitignore',
-      false,
-    )
-    .option('--invert', 'Selected files will be excluded', false)
-    .action(async (options) => {
-      try {
-        await runInteractiveMode(options);
-      } catch (error) {
-        console.error(chalk.red('Error in interactive mode:'), error);
         process.exit(1);
       }
     });
