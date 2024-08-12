@@ -126,7 +126,7 @@
     "@types/fs-extra": "11.0.4",
     "@types/inquirer": "9.0.7",
     "@types/micromatch": "4.0.9",
-    "@types/node": "20.14.14",
+    "@types/node": "20.14.15",
     "@types/strip-comments": "2.0.4",
     "@vitest/coverage-v8": "2.0.5",
     "@vitest/ui": "2.0.5",
