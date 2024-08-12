@@ -1,3 +1,10 @@
+## [1.14.3](https://github.com/gmickel/CodeWhisper/compare/v1.14.2...v1.14.3) (2024-08-12)
+
+
+### Bug Fixes
+
+* update whole code editing prompt to avoid lazy coding ([b760acf](https://github.com/gmickel/CodeWhisper/commit/b760acf75af405cb5b21e9e4e833f17f2a4584bf))
+
 ## [1.14.2](https://github.com/gmickel/CodeWhisper/compare/v1.14.1...v1.14.2) (2024-08-09)
 
 
