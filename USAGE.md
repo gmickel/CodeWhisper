@@ -57,6 +57,7 @@ codewhisper task [options]
 | `--no-diff`                           | Override the default diff mode for the model.                                                                                                                                                                                                                                                                                                                                 |
 | `--plan`                              | Use the planning mode, this generates an intermediate plan, which can be modified. Useful for complex tasks. (default: true)                                                                                                                                                                                                                                                  |
 | `--no-plan`                           | Disable the planning mode. Useful for simple tasks (default: false)                                                                                                                                                                                                                                                                                                           |
+| `--accept-plan`                       | Automatically accept the AI-generated plan and directly proceed to the code generation step                                                                                                                                                                                                                                                                                   |
 | `-g, --gitignore <path>`              | Path to .gitignore file (default: .gitignore)                                                                                                                                                                                                                                                                                                                                 |
 | `-f, --filter <patterns...>`          | File patterns to include (use glob patterns, e.g., "src/\*_/_.js")                                                                                                                                                                                                                                                                                                            |
 | `-e, --exclude <patterns...>`         | File patterns to exclude (use glob patterns, e.g., "\*_/_.test.js")                                                                                                                                                                                                                                                                                                           |
@@ -256,26 +257,32 @@ This command clears the cache file which is used to store information about proc
    codewhisper task --no-diff -m claude-3-5-sonnet-20240620 -t "Refactor authentication logic" -d "Update the user authentication system to use JWT tokens" -i "some instructions"
    ```
 
-5. Undo AI-assisted task changes:
+5. Run an AI-assisted task with automatic plan acceptance:
+
+   ```bash
+   codewhisper task --accept-plan -m claude-3-5-sonnet-20240620 -t "Add input validation" -d "Implement input validation for all user input fields" -i "Use a validation library for consistency"
+   ```
+
+6. Undo AI-assisted task changes:
 
    ```bash
    codewhisper task --undo
    ```
 
-6. Redo the last task with the option to change the generated plan as well as the model and file selection:
+7. Redo the last task with the option to change the generated plan as well as the model and file selection:
 
    ```bash
    codewhisper task --redo
    ```
 
-7. Use CodeWhisper with a different LLM provider:
+8. Use CodeWhisper with a different LLM provider:
 
    ```bash
    # Assuming you've set up the necessary environment variables for the new LLM provider
    codewhisper task --model llm
    ```
 
-8. Use a local Ollama model:
+9. Use a local Ollama model:
 
    ```bash
    codewhisper task --model ollama:llama3.1:70b --context-window 131072 --max-tokens 8192
@@ -473,3 +480,6 @@ Here are some common issues and their solutions:
    **Solution**: Ensure you're using a model that can handle diff-based code modifications. If you're using a model that doesn't support diff-based code modifications, you can try using the `--no-diff` flag to disable them.
 
 For more complex issues or if these solutions don't help, please open an issue on the [CodeWhisper GitHub repository](https://github.com/gmickel/CodeWhisper/issues).
+
+7. **Issue**: Unexpected behavior when using `--accept-plan` flag.
+   **Solution**: Ensure you understand the implications of using `--accept-plan`. This flag skips the manual review of the generated plan, which might lead to unintended code changes. If you're unsure about the generated plan, avoid using this flag and manually review the plan instead.
