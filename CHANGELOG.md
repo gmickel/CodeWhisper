@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/gmickel/CodeWhisper/compare/v1.14.3...v1.15.0) (2024-08-13)
+
+
+### Features
+
+* add auto accept plan ([#93](https://github.com/gmickel/CodeWhisper/issues/93)) ([ce82fe8](https://github.com/gmickel/CodeWhisper/commit/ce82fe8fa8a34534014fcd8c2755eb664dceacf8))
+
 ## [1.14.3](https://github.com/gmickel/CodeWhisper/compare/v1.14.2...v1.14.3) (2024-08-12)
 
 
