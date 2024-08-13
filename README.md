@@ -184,6 +184,12 @@ codewhisper task --undo
 # Note: CodeWhisper saves the plan, instructions, model and selected files from the last task. Other options (such as --dry-run) need to be specified again.
 codewhisper task --redo
 
+# Run the task without the AI-generated planning step
+codewhisper task --no-plan
+
+# Automatically accept the AI-generated plan and directly proceed to the code generation step
+codewhisper task --accept-plan
+
 # Generate an AI-friendly prompt using interactive mode
 codewhisper interactive
 

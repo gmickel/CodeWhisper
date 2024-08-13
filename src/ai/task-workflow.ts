@@ -284,7 +284,17 @@ export async function handlePlanWorkflow(
     basePath,
   );
   const generatedPlan = await generatePlan(planPrompt, modelKey, options);
-  const reviewedPlan = await reviewPlan(generatedPlan);
+
+  let reviewedPlan = generatedPlan;
+  if (!options.acceptPlan) {
+    reviewedPlan = await reviewPlan(generatedPlan);
+  } else {
+    console.log(
+      chalk.yellow(
+        'Automatically accepting the generated plan. Skipping manual review.',
+      ),
+    );
+  }
 
   taskCache.setTaskData(basePath, { ...taskData, generatedPlan: reviewedPlan });
 

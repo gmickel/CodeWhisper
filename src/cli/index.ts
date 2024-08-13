@@ -78,6 +78,11 @@ export function cli(_args: string[]) {
       'Directly provide the code modifications without the intermediate planning step',
     )
     .option(
+      '--accept-plan',
+      'Automatically accept the AI-generated plan and directly proceed to the code generation step',
+      false,
+    )
+    .option(
       '-cw, --context-window <number>',
       'Specify the context window for the AI model. Only applicable for Ollama models.',
       parseOptionStringToInt,
@@ -146,6 +151,13 @@ Note: see "query parameters" at https://docs.github.com/en/rest/issues/issues?ap
       false,
     )
     .action(async (options) => {
+      if (options.acceptPlan && !options.plan) {
+        console.error(
+          chalk.red('Error: --accept-plan cannot be used with --no-plan'),
+        );
+        process.exit(1);
+      }
+
       if (options.redo) {
         try {
           await redoLastTask(options);
