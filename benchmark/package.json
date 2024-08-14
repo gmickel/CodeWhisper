@@ -1,0 +1,35 @@
+{
+  "name": "codewhisper-benchmark",
+  "version": "1.0.0",
+  "description": "Benchmark tool for CodeWhisper",
+  "main": "dist/benchmark.js",
+  "type": "module",
+  "private": true,
+  "module": "./dist/benchmark.js",
+  "types": "./dist/benchmark.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": ["./dist/*", "./dist/benchmark.d.ts"]
+    }
+  },
+  "scripts": {
+    "prebuild": "pnpm run typecheck",
+    "build": "tsup",
+    "lint": "biome check .",
+    "lint:fix": "biome check . --write",
+    "start": "esno src/benchmark.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "p-limit": "^6.1.0",
+    "typescript": "5.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.15"
+  },
+  "packageManager": "pnpm@9.6.0",
+  "trustedDependencies": ["@biomejs/biome", "lefthook"],
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
