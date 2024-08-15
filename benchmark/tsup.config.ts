@@ -9,7 +9,6 @@ export default defineConfig({
   clean: true,
   shims: true,
   name: 'codewhisper-benchmark',
-  tsconfig: 'tsconfig.build.json',
   dts: true,
   esbuildOptions: (options) => {
     options.platform = 'node';

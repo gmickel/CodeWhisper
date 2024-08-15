@@ -12,6 +12,10 @@ export interface BenchmarkResult {
   mode_used: 'diff' | 'whole';
   model_used: string;
   test_passed: boolean;
+  test_output: string;
+  total_tests: number;
+  passed_tests: number;
+  failed_tests: string[];
   errors: string[];
 }
 

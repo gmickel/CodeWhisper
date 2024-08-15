@@ -27,26 +27,31 @@ This benchmark tool is designed to evaluate the performance of CodeWhisper on Ex
 
    - `--model`: The AI model to use (default: claude-3-5-sonnet-20240620)
    - `--workers`: Number of concurrent workers (default: 4)
-   - `--tests`: Number of tests to run (default: 10)
+   - `--tests`: Number of tests to run (default: all tests)
    - `--no-plan`: Disable the planning mode (default: false)
    - `--diff`: Use the diff mode for AI-generated code modifications (overrides the model's default setting)
    - `--no-diff`: Use the whole file edit mode for AI-generated code modifications (overrides the model's default setting)
 
 ## Output
 
-The benchmark will output a JSON array of metrics for each exercise, including:
+The benchmark will generate a detailed Markdown report for each run, including:
 
-- Time taken
-- Total cost (LLM API costs)
-- Mode used (diff/whole)
-- Model used
-- Whether the test passed
-- Any errors encountered
+- Summary statistics (total time, total cost, percentage of passed tests)
+- Detailed results for each exercise:
+  - Time taken
+  - Total cost (LLM API costs)
+  - Mode used (diff/whole)
+  - Model used
+  - Number of tests passed
+  - Any failed tests or errors encountered
 
-A summary of the results will also be displayed, showing the total time, total cost, and percentage of passed tests.
+The report will be saved in the `benchmark/reports/` directory with a timestamp in the filename.
+
+A brief summary will also be displayed in the console after the benchmark completes.
 
 ## Notes
 
 - Ensure that you've set the appropriate API key as an environment variable for the model you intend to use before running the benchmark.
 - The benchmark runs in a Docker container to sandbox the execution and prevent changes to the host filesystem.
 - Each model has a default setting for diff/whole file edit mode. The `--diff` and `--no-diff` options allow you to override this default behavior for the benchmark.
+- You can run multiple benchmarks without overwriting previous results. Each run generates a new report file with a unique timestamp.

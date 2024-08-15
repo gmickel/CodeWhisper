@@ -17,14 +17,16 @@
     "build": "tsup",
     "lint": "biome check .",
     "lint:fix": "biome check . --write",
-    "start": "esno src/benchmark.ts",
+    "start": "node dist/benchmark.js",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "ora": "8.0.1",
     "p-limit": "^6.1.0",
     "typescript": "5.5.4"
   },
   "devDependencies": {
+    "tsup": "8.2.4",
     "@types/node": "20.14.15"
   },
   "packageManager": "pnpm@9.6.0",

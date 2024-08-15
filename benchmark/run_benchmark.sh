@@ -1,9 +1,12 @@
 #!/bin/bash
 
+# Get the directory where the script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
 # Default values
 MODEL="claude-3-5-sonnet-20240620"
 CONCURRENT_WORKERS=4
-NUM_TESTS=10
+NUM_TESTS="all"  # Changed default to "all"
 NO_PLAN=false
 DIFF_MODE=""
 
@@ -65,12 +68,23 @@ if [ -z "$API_KEY" ]; then
     exit 1
 fi
 
+# Get the directory where the script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+
+# Create a directory for reports if it doesn't exist
+mkdir -p "$SCRIPT_DIR/reports"
+
 # Run the Docker container
 docker run -it --rm \
-    -e API_KEY=$API_KEY \
+    -e ANTHROPIC_API_KEY=$API_KEY \
+    -e OPENAI_API_KEY=$API_KEY \
+    -e GROQ_API_KEY=$API_KEY \
+    -e DEEPSEEK_API_KEY=$API_KEY \
     -e MODEL=$MODEL \
     -e CONCURRENT_WORKERS=$CONCURRENT_WORKERS \
     -e NUM_TESTS=$NUM_TESTS \
     -e NO_PLAN=$NO_PLAN \
     -e DIFF_MODE=$DIFF_MODE \
+    -v "$SCRIPT_DIR/reports":/app/benchmark/reports \
     codewhisper-benchmark

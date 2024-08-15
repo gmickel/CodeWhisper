@@ -141,6 +141,9 @@ importers:
 
   benchmark:
     dependencies:
+      ora:
+        specifier: 8.0.1
+        version: 8.0.1
       p-limit:
         specifier: ^6.1.0
         version: 6.1.0
@@ -151,6 +154,9 @@ importers:
       '@types/node':
         specifier: 20.14.15
         version: 20.14.15
+      tsup:
+        specifier: 8.2.4
+        version: 8.2.4(jiti@1.21.6)(postcss@8.4.41)(tsx@4.16.2)(typescript@5.5.4)
 
 packages:
 

@@ -103,6 +103,11 @@ export function cli(_args: string[]) {
       '-e, --exclude <patterns...>',
       'File patterns to exclude (use glob patterns, e.g., "**/*.test.js")',
     )
+    .option(
+      '--skip-files',
+      'Optionally skip the file selection step and use the files provided by the --filter and --exclude options',
+      false,
+    )
     .option('-s, --suppress-comments', 'Strip comments from the code', false)
     .option('-l, --line-numbers', 'Add line numbers to code blocks', false)
     .option('--case-sensitive', 'Use case-sensitive pattern matching', false)
