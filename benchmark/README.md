@@ -2,6 +2,11 @@
 
 This benchmark tool is designed to evaluate the performance of CodeWhisper on Exercism Python exercises.
 
+## Please note
+
+- Running the full benchmark will use a significant amount of tokens.
+- Too many concurrent workers is likely to cause rate limiting issues.
+
 ## Usage
 
 1. Build the Docker image:

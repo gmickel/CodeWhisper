@@ -19,6 +19,7 @@ AI-Powered End-to-End Task Implementation & blazingly fast Codebase-to-LLM Conte
 [Templates](#-templates) •
 [Configuration](#-configuration) •
 [API](#-api) •
+[Benchmarking](#-benchmarking) •
 [Contributing](#-contributing) •
 [Roadmap](#-roadmap) •
 [FAQ](#-faq)
@@ -385,6 +386,43 @@ For more detailed instructions on using the GitHub integration and other CodeWhi
 ## 📚 API
 
 CodeWhisper can be used programmatically in your Node.js projects. For detailed API documentation and examples, please refer to [USAGE.md](USAGE.md).
+
+## 🏋️ Benchmarking
+
+CodeWhisper includes a benchmarking tool to evaluate its performance on Exercism Python exercises. This tool allows you to assess the capabilities of different AI models and configurations.
+
+### Key Features
+
+- Docker-based execution for consistent environments
+- Concurrent worker support for faster benchmarking
+- Detailed Markdown reports with performance metrics
+- Options to customize test runs (number of tests, planning mode, diff mode)
+
+### Usage
+
+1. Build the Docker image:
+
+   ```
+   ./benchmark/docker_build.sh
+   ```
+
+2. Set up the appropriate API key as an environment variable.
+
+3. Run the benchmark:
+   ```
+   ./benchmark/run_benchmark.sh --model <model_name> --workers <num_workers> --tests <num_tests> [options]
+   ```
+
+### Output
+
+The benchmark generates a detailed Markdown report including:
+
+- Summary statistics (total time, cost, pass percentage)
+- Per-exercise results (time, cost, mode, model, tests passed)
+
+Reports are saved in `benchmark/reports/` with timestamped filenames.
+
+For full details on running benchmarks, interpreting results, and available options, please refer to the [Benchmark README](./benchmark/README.md).
 
 ## 🤝 Contributing
 
