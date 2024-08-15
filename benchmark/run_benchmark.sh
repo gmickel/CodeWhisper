@@ -41,6 +41,10 @@ while [[ $# -gt 0 ]]; do
         DIFF_MODE="--no-diff"
         shift
         ;;
+        --debug)
+        DEBUG_MODE=true
+        shift
+        ;;
         *)
         echo "Unknown option: $1"
         exit 1
@@ -86,5 +90,6 @@ docker run -it --rm \
     -e NUM_TESTS=$NUM_TESTS \
     -e NO_PLAN=$NO_PLAN \
     -e DIFF_MODE=$DIFF_MODE \
+    -e DEBUG_MODE=$DEBUG_MODE \
     -v "$SCRIPT_DIR/reports":/app/benchmark/reports \
     codewhisper-benchmark

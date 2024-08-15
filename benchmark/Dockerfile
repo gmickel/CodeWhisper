@@ -45,4 +45,4 @@ ENV NODE_ENV=production
 ENV PATH="/app/dist/cli:${PATH}"
 
 # Run benchmark
-CMD ["pnpm", "start"]
+CMD ["node", "--unhandled-rejections=strict", "/app/benchmark/dist/benchmark.js"]

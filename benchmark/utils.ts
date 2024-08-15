@@ -10,7 +10,21 @@ export async function cloneRepo(
   repoUrl: string,
   targetDir: string,
 ): Promise<void> {
-  await execAsync(`git clone --depth 1 ${repoUrl} ${targetDir}`);
+  console.log(`Cloning repository into ${targetDir}`);
+  try {
+    // Remove the directory if it exists
+    if (fs.existsSync(targetDir)) {
+      fs.rmSync(targetDir, { recursive: true, force: true });
+      console.log(`Removed existing directory: ${targetDir}`);
+    }
+
+    // Clone the repository
+    await execAsync(`git clone --depth 1 ${repoUrl} ${targetDir}`);
+    console.log('Repository cloned successfully.');
+  } catch (error) {
+    console.error('Error cloning repository:', error);
+    throw error;
+  }
 }
 
 export async function runCodeWhisper(
@@ -130,6 +144,9 @@ export async function runExercise(
   noPlan: boolean,
   diffMode: string,
 ): Promise<BenchmarkResult> {
+  const exerciseName = path.basename(exerciseDir);
+  console.log(`Starting exercise: ${exerciseName}`);
+
   const configFile = path.join(exerciseDir, '.meta', 'config.json');
   const config = JSON.parse(fs.readFileSync(configFile, 'utf-8'));
 
@@ -137,21 +154,35 @@ export async function runExercise(
 
   let codewhisperResult: CodeWhisperResult | undefined;
   let codewhisperError: string | null = null;
+
   try {
-    codewhisperResult = await runCodeWhisper(
+    const codewhisperPromise = runCodeWhisper(
       exerciseDir,
       model,
       noPlan,
       diffMode,
     );
+    const timeoutPromise = new Promise<never>(
+      (_, reject) =>
+        setTimeout(
+          () => reject(new Error('CodeWhisper execution timed out')),
+          600000,
+        ), // 10 minutes timeout
+    );
+    codewhisperResult = await Promise.race([
+      codewhisperPromise,
+      timeoutPromise,
+    ]);
   } catch (error) {
     codewhisperError =
       error instanceof Error ? error.message : 'Unknown error occurred';
+    console.error(`Error in runCodeWhisper for ${exerciseName}:`, error);
   }
 
   if (codewhisperError || !codewhisperResult) {
+    console.log(`Exercise ${exerciseName} failed during CodeWhisper execution`);
     return {
-      exercise: path.basename(exerciseDir),
+      exercise: exerciseName,
       time_taken: 0,
       total_cost: 0,
       mode_used: diffMode ? 'diff' : 'whole',
@@ -168,11 +199,14 @@ export async function runExercise(
   }
 
   // Run tests
+  console.log(`Running tests for ${exerciseName}`);
   const testResult = await runTests(testFile);
+
+  console.log(`Completed exercise: ${exerciseName}`);
 
   // Calculate metrics
   return {
-    exercise: path.basename(exerciseDir),
+    exercise: exerciseName,
     time_taken: codewhisperResult.time / 1000, // Convert to seconds
     total_cost: codewhisperResult.totalCost,
     mode_used: codewhisperResult.modeUsed,
@@ -182,6 +216,6 @@ export async function runExercise(
     total_tests: testResult.total_tests,
     passed_tests: testResult.passed_tests,
     failed_tests: testResult.failed_tests,
-    errors: [], // This will be populated with any errors encountered during CodeWhisper execution
+    errors: [],
   };
 }
