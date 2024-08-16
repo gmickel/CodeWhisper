@@ -29,18 +29,9 @@ INSTRUCTIONS: Specific instructions and guidelines on how to complete the task, 
 preferences.
 FORMAT: Instructions on how to format your response.
 
----
-
-# Task
-
 <task>
   {{var_taskDescription}}
 </task>
-
----
-
-# Codebase
-
 <codebase>
   ## Code Summary
 
@@ -57,27 +48,13 @@ FORMAT: Instructions on how to format your response.
   {{#codeblock this.content this.language}}{{/codeblock}}
 
   {{/each}}
-
 </codebase>
-
----
-
-# Instructions
-
 <instructions>
-
   Follow these instructions:
 
   {{var_instructions}}
-
 </instructions>
-
----
-
-# Format
-
 <format>
-
   Format your response as follows:
 
   1. Begin with a brief summary of the task and its main objectives.
@@ -93,5 +70,4 @@ FORMAT: Instructions on how to format your response.
   - Performance considerations
   - Scalability aspects
   6. Use markdown formatting throughout.
-
 </format>
