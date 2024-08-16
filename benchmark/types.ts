@@ -19,8 +19,10 @@ export interface BenchmarkResult {
   errors: string[];
 }
 
-export interface SummaryStats {
+export type SummaryStats = {
   totalTime: number;
   totalCost: number;
   passedTests: number;
-}
+  totalTests: number;
+  totalPassedTests: number;
+};

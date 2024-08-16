@@ -170,3 +170,4 @@ demotask.md
 
 # benchmark reports
 benchmark/reports/
+!benchmark/reports/*_reference.md

@@ -19,7 +19,7 @@ AI-Powered End-to-End Task Implementation & blazingly fast Codebase-to-LLM Conte
 [Templates](#-templates) •
 [Configuration](#-configuration) •
 [API](#-api) •
-[Benchmarking](#-benchmarking) •
+[Benchmarking](#benchmarking) •
 [Contributing](#-contributing) •
 [Roadmap](#-roadmap) •
 [FAQ](#-faq)
@@ -28,7 +28,7 @@ AI-Powered End-to-End Task Implementation & blazingly fast Codebase-to-LLM Conte
 
 CodeWhisper is a powerful tool that bridges the gap between your codebase and Large Language Models (LLMs). It serves two primary functions:
 
-1. **AI-Powered End-to-End Task Implementation**: Tackle complex, codebase-spanning tasks with ease. CodeWhisper doesn't just suggest snippets; it plans, generates, and applies comprehensive code changes across your entire project, from backend logic to frontend integration.
+1. **AI-Powered End-to-End Task Implementation**: Tackle complex, codebase-spanning tasks with ease. CodeWhisper doesn't just suggest snippets; it plans, generates, and applies comprehensive code changes across your entire project, from backend logic to frontend integration. CodeWhisper's generations are SOTA and outperform other AI-code generation tools in benchmarks. See [Benchmarking](#benchmarking) for more details.
 
 2. **Precision-Guided Context Curation for LLMs**: Harness the power of human insight to feed AI exactly what it needs. Quickly transform carefully selected parts of your codebase into rich, relevant context for LLMs, ensuring more accurate and project-aligned results.
 
@@ -112,26 +112,27 @@ While CodeWhisper excels at performing individual coding tasks and even large fe
 
 ## ✨ Key Features
 
-| Feature                                         | Description                                                       |
-| ----------------------------------------------- | ----------------------------------------------------------------- |
-| 🧠 AI-powered task planning and code generation | Leverage AI to plan and implement complex coding tasks            |
-| 🔄 Full git integration                         | Version control of AI-generated changes                           |
-| 🔄 Diff-based code modifications                | Handle larger edits within output token limits                    |
-| 🌍 Support for various LLM providers            | Compatible with Anthropic, OpenAI, Ollama and Groq                |
-| 🔐 Support for local models                     | Use local models via Ollama                                       |
-| 🚀 Blazingly fast code processing               | Concurrent workers for improved performance                       |
-| 🎯 Customizable file filtering and exclusion    | Fine-tune which files to include in the context                   |
-| 📊 Intelligent caching                          | Improved performance through smart caching                        |
-| 🔧 Extensible template system                   | Interactive variable prompts for flexible output                  |
-| 🖊️ Custom variables in templates                | Support for single-line and multi-line custom variables           |
-| 💾 Value caching                                | Quick template reuse with cached values                           |
-| 🖥️ CLI and programmatic API                     | Use CodeWhisper in scripts or as a library                        |
-| 🔒 Respect for .gitignore                       | Option to use custom include and exclude globs                    |
-| 🌈 Full language support                        | Compatible with all text-based file types                         |
-| 🤖 Interactive mode                             | Granular file selection and template customization                |
-| ⚡ Optimized for large repositories             | Efficient processing of extensive codebases                       |
-| 📝 Detailed logging                             | Log AI prompts, responses, and parsing results                    |
-| 🔗 GitHub integration                           | Fetch and work with issues (see [Configuration](#-configuration)) |
+| Feature                                         | Description                                                                                                                                         |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🧠 AI-powered task planning and code generation | Leverage AI to plan and implement complex coding tasks                                                                                              |
+| 🚀 SOTA generations                             | CodeWhisper's generations are SOTA and outperform other AI-code generation tools in benchmarks. See [Benchmarking](#benchmarking) for more details. |
+| 🔄 Full git integration                         | Version control of AI-generated changes                                                                                                             |
+| 🔄 Diff-based code modifications                | Handle larger edits within output token limits                                                                                                      |
+| 🌍 Support for various LLM providers            | Compatible with Anthropic, OpenAI, Ollama and Groq                                                                                                  |
+| 🔐 Support for local models                     | Use local models via Ollama                                                                                                                         |
+| 🚀 Blazingly fast code processing               | Concurrent workers for improved performance                                                                                                         |
+| 🎯 Customizable file filtering and exclusion    | Fine-tune which files to include in the context                                                                                                     |
+| 📊 Intelligent caching                          | Improved performance through smart caching                                                                                                          |
+| 🔧 Extensible template system                   | Interactive variable prompts for flexible output                                                                                                    |
+| 🖊️ Custom variables in templates                | Support for single-line and multi-line custom variables                                                                                             |
+| 💾 Value caching                                | Quick template reuse with cached values                                                                                                             |
+| 🖥️ CLI and programmatic API                     | Use CodeWhisper in scripts or as a library                                                                                                          |
+| 🔒 Respect for .gitignore                       | Option to use custom include and exclude globs                                                                                                      |
+| 🌈 Full language support                        | Compatible with all text-based file types                                                                                                           |
+| 🤖 Interactive mode                             | Granular file selection and template customization                                                                                                  |
+| ⚡ Optimized for large repositories             | Efficient processing of extensive codebases                                                                                                         |
+| 📝 Detailed logging                             | Log AI prompts, responses, and parsing results                                                                                                      |
+| 🔗 GitHub integration                           | Fetch and work with issues (see [Configuration](#-configuration))                                                                                   |
 
 ## 📺 Video
 
@@ -387,7 +388,7 @@ For more detailed instructions on using the GitHub integration and other CodeWhi
 
 CodeWhisper can be used programmatically in your Node.js projects. For detailed API documentation and examples, please refer to [USAGE.md](USAGE.md).
 
-## 🏋️ Benchmarking
+## Benchmarking
 
 CodeWhisper includes a benchmarking tool to evaluate its performance on Exercism Python exercises. This tool allows you to assess the capabilities of different AI models and configurations.
 
@@ -423,6 +424,18 @@ The benchmark generates a detailed Markdown report including:
 Reports are saved in `benchmark/reports/` with timestamped filenames.
 
 For full details on running benchmarks, interpreting results, and available options, please refer to the [Benchmark README](./benchmark/README.md).
+
+### Results
+
+CodeWhisper's performance has been evaluated across different models using the Exercism Python exercises. Below is a summary of the benchmark results:
+
+| Model                      | Tests Passed | Time (s) | Cost ($) | Command                                              |
+| -------------------------- | ------------ | -------- | -------- | ---------------------------------------------------- |
+| claude-3-5-sonnet-20240620 | 80.27%       | 1619.49  | 3.4000   | `./benchmark/run_benchmark.sh --workers 5 --no-plan` |
+
+These results provide insights into the efficiency and accuracy of different models when used with CodeWhisper. The "Tests Passed" percentage indicates the proportion of Exercism tests successfully completed, while the time and cost metrics offer a view of the resource requirements for each model.
+
+As we continue to run benchmarks with various models and configurations, this table will be updated to provide a comprehensive comparison, helping users make informed decisions about which model might best suit their needs.
 
 ## 🤝 Contributing
 

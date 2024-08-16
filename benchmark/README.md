@@ -7,6 +7,21 @@ This benchmark tool is designed to evaluate the performance of CodeWhisper on Ex
 - Running the full benchmark will use a significant amount of tokens.
 - Too many concurrent workers is likely to cause rate limiting issues.
 
+## Results
+
+CodeWhisper's performance has been evaluated across different models using the Exercism Python exercises. Below is a summary of the benchmark results:
+
+| Model                      | Tests Passed | Time (s) | Cost ($) | Command                                                                        |
+| -------------------------- | ------------ | -------- | -------- | ------------------------------------------------------------------------------ |
+| claude-3-5-sonnet-20240620 | 80.27%       | 1619.49  | 3.4000   | `./benchmark/run_benchmark.sh --workers 5 --no-plan`                           |
+| gpt-4o-2024-08-06          | 81.51%       | 986.68   | 1.6800   | `./benchmark/run_benchmark.sh --workers 5 --no-plan --model gpt-4o-2024-08-06` |
+
+The full reports used to generate these results are available in the `benchmark/reports/` directory.
+
+These results provide insights into the efficiency and accuracy of different models when used with CodeWhisper. The "Tests Passed" percentage indicates the proportion of Exercism tests successfully completed, while the time and cost metrics offer a view of the resource requirements for each model.
+
+As we continue to run benchmarks with various models and configurations, this table will be updated to provide a comprehensive comparison, helping users make informed decisions about which model might best suit their needs.
+
 ## Usage
 
 1. Build the Docker image:
