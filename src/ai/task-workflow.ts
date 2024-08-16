@@ -57,7 +57,15 @@ export async function runAIAssistedTask(options: AiAssistedTaskOptions) {
       basePath,
       filters,
     );
-    const selectedFiles = await selectFiles(options, basePath);
+
+    let selectedFiles: string[] = [];
+
+    if (!options.skipFiles) {
+      selectedFiles = await selectFiles(options, basePath);
+      selectedFiles.push(...(options.filter ?? []));
+    } else {
+      selectedFiles = options.filter ?? [];
+    }
 
     spinner.start('Processing files...');
     const processedFiles = await processFiles(
