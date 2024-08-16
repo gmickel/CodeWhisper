@@ -66,6 +66,7 @@ export type AiAssistedTaskOptions = Pick<
   context?: string[];
   acceptPlan?: boolean;
   skipFiles?: boolean;
+  promptCache?: boolean;
 };
 
 export type ProcessOptions = Pick<

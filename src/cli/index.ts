@@ -69,6 +69,11 @@ export function cli(_args: string[]) {
       "Use the whole file edit mode for AI-generated code modifications (overwrites the model's editing mode settings)",
     )
     .option(
+      '--prompt-cache',
+      "Use Anthropic's new experimental prompt caching",
+      false,
+    )
+    .option(
       '--plan',
       'Use the plan mode for AI-generated code modifications',
       true,
