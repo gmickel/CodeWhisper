@@ -112,27 +112,27 @@ While CodeWhisper excels at performing individual coding tasks and even large fe
 
 ## ✨ Key Features
 
-| Feature                                         | Description                                                                                                                                         |
-| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🧠 AI-powered task planning and code generation | Leverage AI to plan and implement complex coding tasks                                                                                              |
-| 🚀 SOTA generations                             | CodeWhisper's generations are SOTA and outperform other AI-code generation tools in benchmarks. See [Benchmarking](#benchmarking) for more details. |
-| 🔄 Full git integration                         | Version control of AI-generated changes                                                                                                             |
-| 🔄 Diff-based code modifications                | Handle larger edits within output token limits                                                                                                      |
-| 🌍 Support for various LLM providers            | Compatible with Anthropic, OpenAI, Ollama and Groq                                                                                                  |
-| 🔐 Support for local models                     | Use local models via Ollama                                                                                                                         |
-| 🚀 Blazingly fast code processing               | Concurrent workers for improved performance                                                                                                         |
-| 🎯 Customizable file filtering and exclusion    | Fine-tune which files to include in the context                                                                                                     |
-| 📊 Intelligent caching                          | Improved performance through smart caching                                                                                                          |
-| 🔧 Extensible template system                   | Interactive variable prompts for flexible output                                                                                                    |
-| 🖊️ Custom variables in templates                | Support for single-line and multi-line custom variables                                                                                             |
-| 💾 Value caching                                | Quick template reuse with cached values                                                                                                             |
-| 🖥️ CLI and programmatic API                     | Use CodeWhisper in scripts or as a library                                                                                                          |
-| 🔒 Respect for .gitignore                       | Option to use custom include and exclude globs                                                                                                      |
-| 🌈 Full language support                        | Compatible with all text-based file types                                                                                                           |
-| 🤖 Interactive mode                             | Granular file selection and template customization                                                                                                  |
-| ⚡ Optimized for large repositories             | Efficient processing of extensive codebases                                                                                                         |
-| 📝 Detailed logging                             | Log AI prompts, responses, and parsing results                                                                                                      |
-| 🔗 GitHub integration                           | Fetch and work with issues (see [Configuration](#-configuration))                                                                                   |
+| Feature                                         | Description                                                                                                                                                                                  |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🧠 AI-powered task planning and code generation | Leverage AI to plan and implement complex coding tasks                                                                                                                                       |
+| 🚀 SOTA generations                             | CodeWhisper's generations are SOTA and outperform other AI-code generation tools in benchmarks, even though it uses one-shot generation. See [Benchmarking](#benchmarking) for more details. |
+| 🔄 Full git integration                         | Version control of AI-generated changes                                                                                                                                                      |
+| 🔄 Diff-based code modifications                | Handle larger edits within output token limits                                                                                                                                               |
+| 🌍 Support for various LLM providers            | Compatible with Anthropic, OpenAI, Ollama and Groq                                                                                                                                           |
+| 🔐 Support for local models                     | Use local models via Ollama                                                                                                                                                                  |
+| 🚀 Blazingly fast code processing               | Concurrent workers for improved performance                                                                                                                                                  |
+| 🎯 Customizable file filtering and exclusion    | Fine-tune which files to include in the context                                                                                                                                              |
+| 📊 Intelligent caching                          | Improved performance through smart caching                                                                                                                                                   |
+| 🔧 Extensible template system                   | Interactive variable prompts for flexible output                                                                                                                                             |
+| 🖊️ Custom variables in templates                | Support for single-line and multi-line custom variables                                                                                                                                      |
+| 💾 Value caching                                | Quick template reuse with cached values                                                                                                                                                      |
+| 🖥️ CLI and programmatic API                     | Use CodeWhisper in scripts or as a library                                                                                                                                                   |
+| 🔒 Respect for .gitignore                       | Option to use custom include and exclude globs                                                                                                                                               |
+| 🌈 Full language support                        | Compatible with all text-based file types                                                                                                                                                    |
+| 🤖 Interactive mode                             | Granular file selection and template customization                                                                                                                                           |
+| ⚡ Optimized for large repositories             | Efficient processing of extensive codebases                                                                                                                                                  |
+| 📝 Detailed logging                             | Log AI prompts, responses, and parsing results                                                                                                                                               |
+| 🔗 GitHub integration                           | Fetch and work with issues (see [Configuration](#-configuration))                                                                                                                            |
 
 ## 📺 Video
 
