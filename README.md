@@ -222,6 +222,8 @@ This section is still under development. We are actively testing and evaluating 
 
 \* Whole-file edit mode is generally more precise but may lead to issues with maximum output token length, potentially limiting the ability to process larger files or multiple files simultaneously. It can also result in incomplete outputs for very large files, with the model resorting to placeholders like "// other functions here" instead of providing full implementations.
 
+For more details, see the [Benchmarking](#-benchmarking) section.
+
 #### Experimental Support
 
 - **Groq as a provider**
