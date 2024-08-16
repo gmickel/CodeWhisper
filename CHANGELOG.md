@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/gmickel/CodeWhisper/compare/v1.15.0...v1.16.0) (2024-08-16)
+
+
+### Features
+
+* add benchmark tool ([#95](https://github.com/gmickel/CodeWhisper/issues/95)) ([a82619e](https://github.com/gmickel/CodeWhisper/commit/a82619ed48a200ed56b27b71df10c857aa17c486))
+
 # [1.15.0](https://github.com/gmickel/CodeWhisper/compare/v1.14.3...v1.15.0) (2024-08-13)
 
 
