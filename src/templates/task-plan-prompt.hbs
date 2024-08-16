@@ -24,14 +24,17 @@ The plan can add new files to the codebase, but it should only modify files that
 Encoded in XML tags, here is what you will be given:
 
 TASK: Detailed information about the task, including context and requirements.
-CODEBASE: Relevant files from the codebase, including their structure and content.
-INSTRUCTIONS: Specific instructions and guidelines on how to complete the task, including any constraints or
+INSTRUCTIONS: Specific additional instructions and guidelines on how to complete the task, including any constraints or
 preferences.
+CODEBASE: Relevant files from the codebase, including their structure and content.
 FORMAT: Instructions on how to format your response.
 
 <task>
   {{var_taskDescription}}
 </task>
+<instructions>
+  {{var_instructions}}
+</instructions>
 <codebase>
   ## Code Summary
 
@@ -49,11 +52,6 @@ FORMAT: Instructions on how to format your response.
 
   {{/each}}
 </codebase>
-<instructions>
-  Follow these instructions:
-
-  {{var_instructions}}
-</instructions>
 <format>
   Format your response as follows:
 
