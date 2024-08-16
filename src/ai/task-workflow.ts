@@ -275,7 +275,7 @@ export async function handlePlanWorkflow(
   processedFiles: FileInfo[],
   modelKey: string,
 ) {
-  const planTemplatePath = getTemplatePath('task-plan-prompt');
+  const planTemplatePath = getTemplatePath('task-plan-prompt-full');
   const planTemplateContent = await fs.readFile(planTemplatePath, 'utf-8');
   const planCustomData = await prepareCustomData(
     planTemplateContent,
