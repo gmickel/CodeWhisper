@@ -431,6 +431,11 @@ CodeWhisper's performance has been evaluated across different models using the E
 | -------------------------- | ------------ | -------- | -------- | ------------------------------------------------------------------------------ |
 | claude-3-5-sonnet-20240620 | 80.27%       | 1619.49  | 3.4000   | `./benchmark/run_benchmark.sh --workers 5 --no-plan`                           |
 | gpt-4o-2024-08-06          | 81.51%       | 986.68   | 1.6800   | `./benchmark/run_benchmark.sh --workers 5 --no-plan --model gpt-4o-2024-08-06` |
+| deepseek-coder             | 76.89%       | 5850.58  | 0.0000\* | `./benchmark/run_benchmark.sh --workers 5 --no-plan --model deepseek-coder`    |
+
+\*The cost calculation was not working properly for this benchmark run.
+
+> **Note:** All benchmarks are one-shot only, unlike other benchmarks which use multiple generations that depend on the results of the test run.
 
 The full reports used to generate these results are available in the `benchmark/reports/` directory.
 
