@@ -49,7 +49,11 @@ export function cli(_args: string[]) {
     .command('task')
     .description('Start an AI-assisted coding task')
     .option('-p, --path <path>', 'Path to the codebase', '.')
-    .option('-m, --model <modelId>', 'Specify the AI model to use')
+    .option(
+      '-m, --model <modelId>',
+      'Specify the AI model to use',
+      'claude-3-5-sonnet-20240620',
+    )
     .option(
       '-c, --context <paths...>',
       'Specify files or directories to include in the task context. Can be file paths, directory paths, or glob patterns. Multiple entries should be space-separated.',
@@ -164,6 +168,19 @@ Note: see "query parameters" at https://docs.github.com/en/rest/issues/issues?ap
       if (options.acceptPlan && !options.plan) {
         console.error(
           chalk.red('Error: --accept-plan cannot be used with --no-plan'),
+        );
+        process.exit(1);
+      }
+      if (
+        options.promptCache &&
+        (!options.model ||
+          (!options.model.includes('claude-3-5-sonnet') &&
+            !options.model.includes('claude-3-haiku')))
+      ) {
+        console.error(
+          chalk.red(
+            'Error: --prompt-cache is only available for Claude-3.5 Sonnet and Claude-3 Haiku models',
+          ),
         );
         process.exit(1);
       }
