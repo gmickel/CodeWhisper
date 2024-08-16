@@ -55,6 +55,7 @@ codewhisper task [options]
 | `--github-issue-filters <filters>`    | Use these filters when fetching issues. Format: comma-separated key:value pairs. Example: labels:p1,assignee:abc Note: see "query parameters" at https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues--parameters for all options.                                                                                                      |
 | `-df, --diff`                         | Override the default diff mode for the model.                                                                                                                                                                                                                                                                                                                                 |
 | `--no-diff`                           | Override the default diff mode for the model.                                                                                                                                                                                                                                                                                                                                 |
+| `--prompt-cache`                      | Use Anthropic's new experimental prompt caching for faster generation and to save costs. Currently only available for Claude-3.5 Sonnet and Claude-3 Haiku                                                                                                                                                                                                                    |
 | `--plan`                              | Use the planning mode, this generates an intermediate plan, which can be modified. Useful for complex tasks. (default: true)                                                                                                                                                                                                                                                  |
 | `--no-plan`                           | Disable the planning mode. Useful for simple tasks (default: false)                                                                                                                                                                                                                                                                                                           |
 | `--accept-plan`                       | Automatically accept the AI-generated plan and directly proceed to the code generation step                                                                                                                                                                                                                                                                                   |
@@ -288,6 +289,12 @@ This command clears the cache file which is used to store information about proc
    ```bash
    codewhisper task --model ollama:llama3.1:70b --context-window 131072 --max-tokens 8192
    ```
+
+10. Use Anthropic's new experimental prompt caching:
+
+    ```bash
+    codewhisper task --prompt-cache
+    ```
 
 ### B. Prompt Generation from Codebase and Templates
 

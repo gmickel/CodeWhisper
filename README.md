@@ -116,6 +116,7 @@ While CodeWhisper excels at performing individual coding tasks and even large fe
 | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🧠 AI-powered task planning and code generation | Leverage AI to plan and implement complex coding tasks                                                                                                                                       |
 | 🚀 SOTA generations                             | CodeWhisper's generations are SOTA and outperform other AI-code generation tools in benchmarks, even though it uses one-shot generation. See [Benchmarking](#benchmarking) for more details. |
+| 🏎️ Support for Anthropic's new prompt caching   | Use Anthropic's new experimental prompt caching for faster generation and to save costs.                                                                                                     |
 | 🔄 Full git integration                         | Version control of AI-generated changes                                                                                                                                                      |
 | 🔄 Diff-based code modifications                | Handle larger edits within output token limits                                                                                                                                               |
 | 🌍 Support for various LLM providers            | Compatible with Anthropic, OpenAI, Ollama and Groq                                                                                                                                           |
@@ -169,6 +170,12 @@ codewhisper task --no-diff
 # You can also specify a model directly
 # Claude-3.5 Sonnet
 codewhisper task -m claude-3-5-sonnet-20240620
+
+# Use Anthropic's new experimental prompt caching
+# Limitations:
+# - Token counting and cost calculation are not yet supported
+# - Only available for Claude-3.5 Sonnet and Claude-3 Haiku
+codewhisper task --prompt-cache
 
 # GPT-4o
 codewhisper task -m gpt-4o-2024-08-06
