@@ -442,13 +442,8 @@ async function generateAndApplyCode(
 }
 
 function getCodegenTemplatePath(options: AiAssistedTaskOptions): string {
-  if (options.plan) {
-    return getTemplatePath(
-      options.diff ? 'codegen-diff-prompt' : 'codegen-prompt',
-    );
-  }
   return getTemplatePath(
-    options.diff ? 'codegen-diff-no-plan-prompt' : 'codegen-no-plan-prompt',
+    options.diff ? 'codegen-diff-prompt' : 'codegen-prompt',
   );
 }
 

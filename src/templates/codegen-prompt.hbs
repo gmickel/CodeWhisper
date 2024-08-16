@@ -5,10 +5,15 @@ You will be given:
 - A task description
 - A codebase
 - Instructions
+{{#if var_plan}}
 - An implementation plan
+{{/if}}
 
-Use the plan to guide your implementation, but be prepared to make necessary adjustments or improvements. Double-check
-your work as you go.
+{{#if var_plan}}
+Use the implementation plan to guide your implementation, but be prepared to make necessary adjustments or improvements by carefully analyzing the task description, instructions, and codebase. Approach this task as a senior developer working on a critical feature for a high-profile client. Double-check your work as you go.
+{{else}}
+Before implementing the task, carefully analyze the task description, instructions, and codebase. Plan your implementation strategy, considering best practices, coding standards, potential edge cases, and performance implications. Approach this task as a senior developer working on a critical feature for a high-profile client.
+{{/if}}
 
 Note: Focus solely on the technical implementation. Ignore any mentions of human tasks or non-technical aspects.
 
@@ -17,25 +22,19 @@ Encoded in XML tags, here is what you will be given:
 TASK: Context about the task to complete.
 INSTRUCTIONS: Instructions on how to complete the task.
 CODEBASE: Files from the codebase you have access to.
+{{#if var_plan}}
 IMPLEMENTATION_PLAN: A detailed implementation plan for the given issue.
+{{/if}}
 FORMAT: Instructions for how to format your response.
-
----
 
 <task>
   {{var_taskDescription}}
 </task>
-
----
-
 <instructions>
   Follow these instructions:
 
   {{var_instructions}}
 </instructions>
-
----
-
 <codebase>
   ## Code Summary
 
@@ -50,15 +49,11 @@ FORMAT: Instructions for how to format your response.
   {{/each}}
 
 </codebase>
-
----
-
+{{#if var_plan}}
 <implementation_plan>
   {{var_plan}}
 </implementation_plan>
-
----
-
+{{/if}}
 <format>
 
   Always generate the full content for each new or modified file.
@@ -150,7 +145,11 @@ FORMAT: Instructions for how to format your response.
   </file>
 
   Ensure that:
+  {{#if var_plan}}
   - You have thoroughly analyzed the task and plan and have planned your implementation strategy.
+  {{else}}
+  - You have thoroughly analyzed the task and planned your implementation strategy.
+  {{/if}}
   - Everything specified in the task description and plan is implemented.
   - All new or modified files contain the full code.
   - When editing files, always provide the complete file content in your response, regardless of the extent of changes. DO NOT use placeholder comments like '//rest of code unchanged' or '//code remains the same'. You MUST include all parts of the file, even if they haven't been modified.
@@ -168,3 +167,8 @@ FORMAT: Instructions for how to format your response.
   - You complete all necessary work to fully implement the task.
 
 </format>
+{{#if var_plan}}
+Now, implement the task described above, following the provided implementation plan. Take your time to think through the problem and craft an elegant, efficient, and complete solution that fully addresses the task requirements and integrates seamlessly with the existing codebase.
+{{else}}
+Now, implement the task described above. Take your time to think through the problem and craft an elegant, efficient, and complete solution that fully addresses the task requirements and integrates seamlessly with the existing codebase.
+{{/if}}
