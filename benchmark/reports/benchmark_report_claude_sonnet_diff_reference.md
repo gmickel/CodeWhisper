@@ -5,7 +5,9 @@
 - **Total time:** 1619.49 seconds
 - **Total cost:** $3.4000
 - **Passed exercises:** 104/133 (78.20%)
-- **Total tests passed:** 22601/28155 (80.27%)
+- **Total tests passed:** 3595/4479 (80.26%)
+
+## Detailed Results
 
 ### 2. acronym
 
@@ -16,10 +18,6 @@
 - **Tests passed:** 13/17 (76.47%)
 - **Failed tests:**
   - test_underscore_emphasis
-
-# CodeWhisper Benchmark Report
-
-## Detailed Results
 
 ### 1. accumulate
 
@@ -701,7 +699,7 @@
 - **Cost:** $0.0400
 - **Mode used:** diff
 - **Model used:** claude-3-5-sonnet-20240620
-- **Tests passed:** 19544/24447 (79.94%)
+- **Tests passed:** 58/73 (79.45%)
 - **Failed tests:**
   - test_can_find_path_from_nodes_other_than_x
   - test_can_find_path_not_involving_root
@@ -1176,4 +1174,3 @@
 - **Failed tests:**
   - test_resident_who_drinks_water
   - test_resident_who_owns_zebra
-
