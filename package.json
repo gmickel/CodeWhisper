@@ -93,7 +93,7 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "0.0.39",
-    "@ai-sdk/openai": "0.0.44",
+    "@ai-sdk/openai": "0.0.48",
     "@anthropic-ai/sdk": "0.25.2",
     "@inquirer/prompts": "5.3.8",
     "@octokit/rest": "21.0.2",
