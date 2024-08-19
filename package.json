@@ -92,7 +92,7 @@
     "prepare": "lefthook install"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "0.0.39",
+    "@ai-sdk/anthropic": "0.0.43",
     "@ai-sdk/openai": "0.0.44",
     "@anthropic-ai/sdk": "0.25.2",
     "@inquirer/prompts": "5.3.8",
