@@ -12,8 +12,8 @@ importers:
         specifier: 0.0.43
         version: 0.0.43(zod@3.23.8)
       '@ai-sdk/openai':
-        specifier: 0.0.44
-        version: 0.0.44(zod@3.23.8)
+        specifier: 0.0.48
+        version: 0.0.48(zod@3.23.8)
       '@anthropic-ai/sdk':
         specifier: 0.25.2
         version: 0.25.2
@@ -166,8 +166,8 @@ packages:
     peerDependencies:
       zod: ^3.0.0
 
-  '@ai-sdk/openai@0.0.44':
-    resolution: {integrity: sha512-fIUypicSnuWIOdoRG+dgzAnZDWQrhzqyUvQaLC8hQB6UDAUXkn8sIPdsqKEV35vs3mNXDz/KZ4EEeLxSVGrzMg==}
+  '@ai-sdk/openai@0.0.48':
+    resolution: {integrity: sha512-buw9cT/55VGjvtcNvQGDljHQMan8C3/D1UvkcpY8XPfnimffrjAQa66fXldahhFQM20didNJawh0vlTM1MvRDw==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.0.0
@@ -3176,10 +3176,19 @@ snapshots:
       '@ai-sdk/provider-utils': 1.0.13(zod@3.23.8)
       zod: 3.23.8
 
-  '@ai-sdk/openai@0.0.44(zod@3.23.8)':
+  '@ai-sdk/openai@0.0.48(zod@3.23.8)':
     dependencies:
-      '@ai-sdk/provider': 0.0.17
-      '@ai-sdk/provider-utils': 1.0.9(zod@3.23.8)
+      '@ai-sdk/provider': 0.0.20
+      '@ai-sdk/provider-utils': 1.0.13(zod@3.23.8)
+      zod: 3.23.8
+
+  '@ai-sdk/provider-utils@1.0.13(zod@3.23.8)':
+    dependencies:
+      '@ai-sdk/provider': 0.0.20
+      eventsource-parser: 1.1.2
+      nanoid: 3.3.6
+      secure-json-parse: 2.7.0
+    optionalDependencies:
       zod: 3.23.8
 
   '@ai-sdk/provider-utils@1.0.13(zod@3.23.8)':
