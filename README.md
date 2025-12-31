@@ -10,6 +10,12 @@ AI-Powered End-to-End Task Implementation & blazingly fast Codebase-to-LLM Conte
 [![NPM Version](https://img.shields.io/npm/v/codewhisper)](https://www.npmjs.com/package/codewhisper)
 [![NPM Downloads](https://img.shields.io/npm/dw/codewhisper)](https://www.npmjs.com/package/codewhisper)
 
+---
+
+> **Looking for local document search?** Check out [**GNO**](https://gno.sh) ([gmickel/gno](https://github.com/gmickel/gno)) - a local knowledge engine with hybrid search (BM25 + vector + LLM reranking), MCP server for AI agents, and privacy-first design. Index Markdown, PDF, Office docs and get AI-powered answers from your own files.
+
+---
+
 [About](#-about) •
 [Why CodeWhisper?](#-why-codewhisper) •
 [Key Features](#-key-features) •
