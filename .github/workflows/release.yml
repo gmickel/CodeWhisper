@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: 'lts/*'
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: 9.6.0
       - name: Install dependencies
